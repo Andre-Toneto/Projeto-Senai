@@ -95,8 +95,11 @@ export default {
     ]
 
     onMounted(() => {
-      if (process.client && !sessionStorage.getItem('carometro_authenticated')) {
-        router.push('/carometro/login')
+      if (process.client) {
+        const isAuthenticated = sessionStorage.getItem('carometro_authenticated')
+        if (!isAuthenticated) {
+          router.push('/carometro/login')
+        }
       }
     })
 
