@@ -98,19 +98,19 @@ const recentTurmas = ref(['T2025-001', 'ADM-2024', 'TEC-2025'])
 
 const loadTurma = async () => {
   loading.value = true
-  
+
   // Simular carregamento
   setTimeout(() => {
-    if (turmaCode.value.trim()) {
+    if (turmaCode.value.trim() && process.client) {
       // Salvar turma selecionada
       sessionStorage.setItem('turma_selecionada', turmaCode.value)
-      
+
       // Adicionar à lista de recentes se não existir
       if (!recentTurmas.value.includes(turmaCode.value)) {
         recentTurmas.value.unshift(turmaCode.value)
         recentTurmas.value = recentTurmas.value.slice(0, 5) // Manter apenas 5
       }
-      
+
       router.push('/carometro')
     }
     loading.value = false
