@@ -88,18 +88,18 @@ export default {
     }
 
     onMounted(() => {
-      const updateWidth = () => {
-        if (process.client) {
+      if (process.client) {
+        const updateWidth = () => {
           navigationWidth.value = window.innerWidth < 960 ? 260 : 280
         }
+
+        updateWidth()
+        window.addEventListener('resize', updateWidth)
+
+        onUnmounted(() => {
+          window.removeEventListener('resize', updateWidth)
+        })
       }
-
-      updateWidth()
-      window.addEventListener('resize', updateWidth)
-
-      onUnmounted(() => {
-        window.removeEventListener('resize', updateWidth)
-      })
     })
 
     return {
