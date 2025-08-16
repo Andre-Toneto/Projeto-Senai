@@ -89,7 +89,7 @@ const turmaCode = ref('')
 
 // Verificar autenticação
 onMounted(() => {
-  if (!sessionStorage.getItem('carometro_authenticated')) {
+  if (process.client && !sessionStorage.getItem('carometro_authenticated')) {
     router.push('/carometro/login')
   }
 })
