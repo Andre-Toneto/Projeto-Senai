@@ -123,7 +123,9 @@ const selectRecentTurma = (turma) => {
 }
 
 const goBack = () => {
-  sessionStorage.removeItem('carometro_authenticated')
+  if (process.client) {
+    sessionStorage.removeItem('carometro_authenticated')
+  }
   router.push('/carometro/login')
 }
 </script>
