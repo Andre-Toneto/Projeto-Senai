@@ -81,10 +81,47 @@ function abrirModal(pessoa) {
 
 <style scoped>
 .hover-scale {
-  transition: transform 0.2s;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
 }
+
 .hover-scale:hover {
-  transform: scale(1.03);
+  transform: translateY(-4px);
   cursor: pointer;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.v-card-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: rgb(var(--v-theme-senai-navy));
+}
+
+.v-card-subtitle {
+  color: rgb(var(--v-theme-on-surface));
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+.v-img {
+  border-radius: 8px 8px 0 0;
+}
+
+/* Responsividade melhorada */
+@media (max-width: 600px) {
+  .v-container {
+    padding: 0.5rem;
+  }
+
+  .v-card-title {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+
+  .v-card-subtitle {
+    padding: 0 0.75rem 0.75rem;
+    font-size: 0.85rem;
+  }
 }
 </style>
