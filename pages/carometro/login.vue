@@ -74,7 +74,9 @@ const authenticate = async () => {
   setTimeout(() => {
     if (credentials.value.usuario === 'professor' && credentials.value.senha === '123456') {
       // Salvar estado de autenticação
-      sessionStorage.setItem('carometro_authenticated', 'true')
+      if (process.client) {
+        sessionStorage.setItem('carometro_authenticated', 'true')
+      }
       router.push('/carometro/turma')
     } else {
       alert('Credenciais inválidas. Use: professor/123456')
