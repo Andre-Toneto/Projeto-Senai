@@ -74,16 +74,18 @@ import { ref, onMounted } from 'vue'
 export default {
   name: 'AppToolbar',
   setup() {
-    const currentDate = ref('')
+    const currentDate = ref('Portal SENAI')
 
     onMounted(() => {
-      const date = new Date()
-      currentDate.value = date.toLocaleDateString('pt-BR', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
+      if (process.client) {
+        const date = new Date()
+        currentDate.value = date.toLocaleDateString('pt-BR', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      }
     })
 
     const menuItems = [
