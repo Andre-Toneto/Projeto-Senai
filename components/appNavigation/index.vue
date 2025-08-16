@@ -77,7 +77,7 @@ export default {
     ]
 
     const getIconColor = (routeName) => {
-      if (process.client && route.path) {
+      if (process.client && route && route.path) {
         return route.path.includes(routeName) ? 'senai-red' : 'senai-navy'
       }
       return 'senai-navy'
