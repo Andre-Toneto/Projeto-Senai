@@ -3,13 +3,13 @@
     <AppToolbar />
     <AppNavigation />
     <v-main>
-      <v-container fluid>
-        <slot />
-      </v-container>
+      <slot />
     </v-main>
   </v-app>
 </template>
 
-<script setup>
-
+<script>
+export default {
+  name: 'DefaultLayout'
+}
 </script>
