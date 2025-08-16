@@ -15,10 +15,10 @@
 
     <!-- Date Section -->
     <v-icon size="small" class="mr-2">mdi-calendar</v-icon>
-    <ClientOnly>
+    <ClientOnly fallback-tag="span" class="text-body-2">
       <span class="text-body-2 font-weight-medium text-capitalize">{{ currentDate }}</span>
       <template #fallback>
-        <span class="text-body-2">Carregando...</span>
+        <span class="text-body-2">Portal SENAI</span>
       </template>
     </ClientOnly>
 
