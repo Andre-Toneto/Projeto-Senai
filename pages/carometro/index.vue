@@ -57,21 +57,22 @@ export default {
     const totalAlunos = ref(0)
 
     onMounted(() => {
-      if (!process.client) return
+      if (process.client) {
+        const isAuthenticated = sessionStorage.getItem('carometro_authenticated')
+        if (!isAuthenticated) {
+          router.push('/carometro/login')
+          return
+        }
 
-      if (!sessionStorage.getItem('carometro_authenticated')) {
-        router.push('/carometro/login')
-        return
+        const turma = sessionStorage.getItem('turma_selecionada')
+        if (!turma) {
+          router.push('/carometro/turma')
+          return
+        }
+
+        turmaSelecionada.value = turma
+        totalAlunos.value = 2
       }
-
-      const turma = sessionStorage.getItem('turma_selecionada')
-      if (!turma) {
-        router.push('/carometro/turma')
-        return
-      }
-
-      turmaSelecionada.value = turma
-      totalAlunos.value = 2
     })
 
     const selecionarPessoa = (pessoa) => {
