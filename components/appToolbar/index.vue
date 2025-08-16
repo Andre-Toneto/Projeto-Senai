@@ -64,13 +64,77 @@
 </template>
 
 <script setup>
+const currentDate = computed(() => {
+  const date = new Date()
+  return date.toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+})
+
 const menuItems = [
-  { text: 'INTRANET SENAI/SP' },
-  { text: 'PORTAL EDUCACIONAL' },
-  { text: 'ART RH SAP' },
-  { text: 'GED SENAI-SP' },
-  { text: 'OUTLOOK' },
-  { text: 'SGSET-SP' },
-  { text: 'EMPREGRA+' }
+  { text: 'INTRANET', icon: 'mdi-web', link: '#' },
+  { text: 'PORTAL EDU', icon: 'mdi-school', link: '#' },
+  { text: 'RH SAP', icon: 'mdi-account-group', link: '#' },
+  { text: 'GED', icon: 'mdi-file-document', link: '#' },
+  { text: 'OUTLOOK', icon: 'mdi-email', link: '#' },
+  { text: 'SGSET', icon: 'mdi-cog', link: '#' },
+  { text: 'EMPREGRA+', icon: 'mdi-briefcase', link: '#' }
 ]
 </script>
+
+<style scoped>
+.toolbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.senai-toolbar-logo {
+  filter: brightness(1.1);
+}
+
+.toolbar-date {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.date-text {
+  font-size: 0.875rem;
+  text-transform: capitalize;
+}
+
+.toolbar-menu {
+  gap: 0.5rem;
+}
+
+.menu-item {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.menu-item:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 960px) {
+  .date-text {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .toolbar-logo {
+    flex-shrink: 0;
+  }
+
+  .senai-toolbar-logo {
+    max-width: 80px;
+  }
+}
+</style>
