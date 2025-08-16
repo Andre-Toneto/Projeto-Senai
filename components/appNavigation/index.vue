@@ -71,8 +71,11 @@ const navItems = [
   { text: 'Educacional Plano', route: 'educacional', icon: 'mdi-school' }
 ]
 
-const getIconColor = (route: string) => {
-  return $route.path.includes(route) ? 'senai-red' : 'senai-navy'
+const getIconColor = (routeName: string) => {
+  if (process.client && route.path) {
+    return route.path.includes(routeName) ? 'senai-red' : 'senai-navy'
+  }
+  return 'senai-navy'
 }
 
 const openHelp = () => {
