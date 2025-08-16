@@ -50,6 +50,8 @@ const totalAlunos = ref(0)
 
 // Verificar autenticação e turma selecionada
 onMounted(() => {
+  if (!process.client) return
+
   if (!sessionStorage.getItem('carometro_authenticated')) {
     router.push('/carometro/login')
     return
