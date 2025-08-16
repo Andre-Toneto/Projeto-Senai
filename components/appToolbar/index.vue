@@ -16,7 +16,12 @@
     <!-- Date Section -->
     <div class="toolbar-date">
       <v-icon size="small" class="mr-2">mdi-calendar</v-icon>
-      <span class="date-text">{{ currentDate }}</span>
+      <ClientOnly>
+        <span class="date-text">{{ currentDate }}</span>
+        <template #fallback>
+          <span class="date-text">Carregando...</span>
+        </template>
+      </ClientOnly>
     </div>
 
     <v-spacer />
