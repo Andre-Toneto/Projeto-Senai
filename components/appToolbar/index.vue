@@ -69,9 +69,11 @@
 </template>
 
 <script setup>
-const currentDate = computed(() => {
+const currentDate = ref('')
+
+onMounted(() => {
   const date = new Date()
-  return date.toLocaleDateString('pt-BR', {
+  currentDate.value = date.toLocaleDateString('pt-BR', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
