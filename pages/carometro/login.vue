@@ -1,28 +1,28 @@
 <template>
-  <v-container class="fill-height">
+  <v-container fluid class="fill-height">
     <v-row justify="center" align="center" class="fill-height">
       <v-col cols="12" sm="8" md="6" lg="4">
-        <v-card class="pa-6" elevation="12" rounded="lg">
+        <v-card elevation="12" rounded="lg" class="pa-6">
           <v-card-title class="text-center pb-4">
-            <div class="auth-header">
+            <div class="text-center">
               <v-icon size="48" color="senai-red" class="mb-2">mdi-account-group</v-icon>
-              <h2 class="auth-title">Acesso ao Carômetro</h2>
-              <p class="auth-subtitle">Autenticação necessária</p>
+              <h2 class="text-h4 text-senai-navy font-weight-medium mb-2">Acesso ao Carômetro</h2>
+              <p class="text-body-1 text-medium-emphasis">Autenticação necessária</p>
             </div>
           </v-card-title>
 
           <v-card-text>
-            <v-form v-model="valid" @submit.prevent="authenticate">
+            <v-form ref="form" v-model="valid" @submit.prevent="authenticate">
               <v-text-field
                 v-model="credentials.usuario"
                 label="Usuário"
                 variant="outlined"
                 density="comfortable"
                 prepend-inner-icon="mdi-account"
-                :rules="[v => !!v || 'Usuário é obrigatório']"
+                :rules="usuarioRules"
                 class="mb-3"
               />
-              
+
               <v-text-field
                 v-model="credentials.senha"
                 label="Senha"
@@ -30,7 +30,7 @@
                 variant="outlined"
                 density="comfortable"
                 prepend-inner-icon="mdi-lock"
-                :rules="[v => !!v || 'Senha é obrigatória']"
+                :rules="senhaRules"
                 class="mb-4"
               />
 
@@ -53,57 +53,54 @@
   </v-container>
 </template>
 
-<script setup>
-definePageMeta({
-  layout: 'default'
-})
+<script>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const router = useRouter()
-const valid = ref(false)
-const loading = ref(false)
+export default {
+  name: 'CarometroLogin',
+  setup() {
+    const router = useRouter()
+    const valid = ref(false)
+    const loading = ref(false)
 
-const credentials = ref({
-  usuario: '',
-  senha: ''
-})
+    const credentials = ref({
+      usuario: '',
+      senha: ''
+    })
 
-const authenticate = async () => {
-  loading.value = true
-  
-  // Simular autenticação
-  setTimeout(() => {
-    if (credentials.value.usuario === 'professor' && credentials.value.senha === '123456') {
-      // Salvar estado de autenticação
-      if (process.client) {
-        sessionStorage.setItem('carometro_authenticated', 'true')
-      }
-      router.push('/carometro/turma')
-    } else {
-      alert('Credenciais inválidas. Use: professor/123456')
+    const usuarioRules = [
+      v => !!v || 'Usuário é obrigatório'
+    ]
+
+    const senhaRules = [
+      v => !!v || 'Senha é obrigatória'
+    ]
+
+    const authenticate = () => {
+      loading.value = true
+
+      setTimeout(() => {
+        if (credentials.value.usuario === 'professor' && credentials.value.senha === '123456') {
+          if (process.client) {
+            sessionStorage.setItem('carometro_authenticated', 'true')
+          }
+          router.push('/carometro/turma')
+        } else {
+          alert('Credenciais inválidas. Use: professor/123456')
+        }
+        loading.value = false
+      }, 1000)
     }
-    loading.value = false
-  }, 1000)
+
+    return {
+      valid,
+      loading,
+      credentials,
+      usuarioRules,
+      senhaRules,
+      authenticate
+    }
+  }
 }
 </script>
-
-<style scoped>
-.auth-header {
-  text-align: center;
-}
-
-.auth-title {
-  color: rgb(var(--v-theme-senai-navy));
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.auth-subtitle {
-  color: rgb(var(--v-theme-on-surface));
-  opacity: 0.7;
-  margin: 0;
-}
-
-.v-card {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-</style>
