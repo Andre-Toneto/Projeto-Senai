@@ -78,6 +78,7 @@ import { useRouter } from 'vue-router'
 
 export default {
   name: 'LoginPage',
+  layout: false,
   setup() {
     const router = useRouter()
 
