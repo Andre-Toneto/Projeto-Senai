@@ -80,14 +80,16 @@ const openHelp = () => {
   console.log('Abrindo ajuda...')
 }
 
-// Responsividade
+// Responsividade - fix hydration
 onMounted(() => {
   const updateWidth = () => {
-    navigationWidth.value = window.innerWidth < 960 ? 260 : 280
+    if (process.client) {
+      navigationWidth.value = window.innerWidth < 960 ? 260 : 280
+    }
   }
 
-  window.addEventListener('resize', updateWidth)
   updateWidth()
+  window.addEventListener('resize', updateWidth)
 
   onUnmounted(() => {
     window.removeEventListener('resize', updateWidth)
