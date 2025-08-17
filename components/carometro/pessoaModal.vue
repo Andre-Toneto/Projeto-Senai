@@ -324,52 +324,313 @@ const adicionarOcorrencia = () => {
 </script>
 
 <style scoped>
-.info-grid {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 16px;
-  background-color: #fafafa;
+/* Modal Moderno */
+.modern-dialog :deep(.v-overlay__content) {
+  margin: 24px;
 }
 
-.info-item {
+.modern-modal {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Header com Gradiente */
+.modal-header {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 24px 24px 0 0;
+}
+
+.header-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #6366f1 100%);
+}
+
+.header-content {
+  position: relative;
+  z-index: 2;
+  padding: 24px;
+  color: white;
   display: flex;
   align-items: center;
-  padding: 4px 0;
-  border-bottom: 1px solid #eeeeee;
+  justify-content: space-between;
 }
 
-.info-item:last-child {
-  border-bottom: none;
+.header-avatar {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
 }
 
-.info-label {
+.header-info {
+  flex-grow: 1;
+}
+
+.person-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.person-role {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin-bottom: 8px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.close-btn {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Seção da Foto */
+.photo-section {
+  text-align: center;
+}
+
+.main-photo {
+  border-radius: 16px;
+  border: 4px solid rgba(var(--v-theme-senai-navy), 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  margin: 0 auto;
+}
+
+/* Cards de Informação */
+.info-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.info-card {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+}
+
+.card-title {
+  font-size: 1.1rem;
   font-weight: 600;
+  margin-left: 8px;
   color: rgb(var(--v-theme-senai-navy));
-  min-width: 100px;
-  margin-right: 8px;
 }
 
-.info-value {
-  color: #333;
-  flex: 1;
-}
-
-.ocorrencias-section {
-  margin-top: 16px;
-}
-
-.d-flex.gap-2 {
+.info-rows {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
-@media (max-width: 600px) {
-  .info-label {
-    min-width: 80px;
-    font-size: 0.875rem;
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-weight: 600;
+  color: rgb(var(--v-theme-senai-navy));
+  font-size: 0.875rem;
+  min-width: 80px;
+}
+
+.value {
+  color: #374151;
+  font-size: 0.875rem;
+  text-align: right;
+  flex-grow: 1;
+  margin-left: 8px;
+}
+
+/* Seção de Ocorrências */
+.occurrences-section {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgb(var(--v-theme-senai-navy));
+  display: flex;
+  align-items: center;
+}
+
+/* Container com Scroll Fixo */
+.occurrences-container {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+/* Scrollbar customizada */
+.occurrences-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.occurrences-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.occurrences-container::-webkit-scrollbar-thumb {
+  background: rgb(var(--v-theme-senai-red));
+  border-radius: 3px;
+}
+
+.occurrences-container::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--v-theme-senai-navy));
+}
+
+.occurrences-list {
+  padding: 8px;
+}
+
+.occurrence-item {
+  margin-bottom: 8px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.occurrence-item:last-child {
+  margin-bottom: 0;
+}
+
+.occurrence-text {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin-bottom: 4px;
+  color: #374151;
+}
+
+.occurrence-date {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Estado Vazio */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+}
+
+.empty-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: rgb(var(--v-theme-senai-navy));
+}
+
+.empty-subtitle {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Formulário */
+.add-form-card {
+  background: linear-gradient(145deg, #ffffff 0%, #f0f9ff 100%);
+  border: 2px solid rgba(var(--v-theme-senai-red), 0.1);
+}
+
+.form-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgb(var(--v-theme-senai-navy));
+  display: flex;
+  align-items: center;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* Footer */
+.footer-actions {
+  background: linear-gradient(145deg, #f8fafc 0%, #ffffff 100%);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .info-cards-grid {
+    grid-template-columns: 1fr;
   }
 
-  .info-value {
-    font-size: 0.875rem;
+  .header-content {
+    padding: 16px;
+  }
+
+  .person-name {
+    font-size: 1.25rem;
+  }
+
+  .main-photo {
+    width: 140px;
+    height: 180px;
+  }
+
+  .occurrences-container {
+    max-height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .value {
+    text-align: left;
+    margin-left: 0;
+    margin-top: 2px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-actions .v-btn {
+    width: 100%;
   }
 }
 </style>
