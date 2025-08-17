@@ -68,40 +68,28 @@
   </v-app-bar>
 </template>
 
-<script>
-import { ref, onMounted } from 'vue'
+<script setup>
+const currentDate = ref('Portal SENAI')
 
-export default {
-  name: 'AppToolbar',
-  setup() {
-    const currentDate = ref('Portal SENAI')
-
-    onMounted(() => {
-      if (process.client) {
-        const date = new Date()
-        currentDate.value = date.toLocaleDateString('pt-BR', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        })
-      }
+onMounted(() => {
+  if (process.client) {
+    const date = new Date()
+    currentDate.value = date.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     })
-
-    const menuItems = [
-      { text: 'INTRANET', icon: 'mdi-web', link: '#' },
-      { text: 'PORTAL EDU', icon: 'mdi-school', link: '#' },
-      { text: 'RH SAP', icon: 'mdi-account-group', link: '#' },
-      { text: 'GED', icon: 'mdi-file-document', link: '#' },
-      { text: 'OUTLOOK', icon: 'mdi-email', link: '#' },
-      { text: 'SGSET', icon: 'mdi-cog', link: '#' },
-      { text: 'EMPREGRA+', icon: 'mdi-briefcase', link: '#' }
-    ]
-
-    return {
-      currentDate,
-      menuItems
-    }
   }
-}
+})
+
+const menuItems = [
+  { text: 'INTRANET', icon: 'mdi-web', link: '#' },
+  { text: 'PORTAL EDU', icon: 'mdi-school', link: '#' },
+  { text: 'RH SAP', icon: 'mdi-account-group', link: '#' },
+  { text: 'GED', icon: 'mdi-file-document', link: '#' },
+  { text: 'OUTLOOK', icon: 'mdi-email', link: '#' },
+  { text: 'SGSET', icon: 'mdi-cog', link: '#' },
+  { text: 'EMPREGRA+', icon: 'mdi-briefcase', link: '#' }
+]
 </script>
