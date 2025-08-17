@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-defineEmits(['selectPessoa'])
+const emit = defineEmits(['selectPessoa'])
 
 const pessoas = ref([
   {
