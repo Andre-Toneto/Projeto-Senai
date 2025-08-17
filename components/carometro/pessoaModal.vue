@@ -1,171 +1,273 @@
 <template>
-  <v-dialog v-model="isOpen" max-width="800" persistent>
-    <v-card rounded="lg" elevation="8">
-      <!-- Header -->
-      <v-card-title class="pa-4 pb-2 d-flex align-center justify-space-between">
-        <h2 class="text-h6 text-senai-navy font-weight-bold">
-          {{ pessoa.nome?.toUpperCase() }}
-        </h2>
-        <v-btn
-          icon="mdi-close"
-          variant="text"
-          color="senai-navy"
-          @click="isOpen = false"
-        />
-      </v-card-title>
+  <v-dialog v-model="isOpen" max-width="1000" persistent class="modern-dialog">
+    <v-card class="modern-modal" elevation="24" rounded="xl">
+      <!-- Header Moderno com Gradiente -->
+      <div class="modal-header">
+        <div class="header-gradient"></div>
+        <div class="header-content">
+          <div class="d-flex align-center">
+            <v-avatar size="64" class="header-avatar elevation-8">
+              <v-img :src="pessoa.foto" />
+            </v-avatar>
+            <div class="header-info ml-4">
+              <h2 class="person-name">{{ pessoa.nome?.toUpperCase() }}</h2>
+              <p class="person-role">{{ pessoa.cargo }}</p>
+              <v-chip size="small" color="success" variant="elevated" class="mt-1">
+                <v-icon start size="small">mdi-check-circle</v-icon>
+                Ativo
+              </v-chip>
+            </div>
+          </div>
+          <v-btn
+            icon="mdi-close"
+            variant="text"
+            color="white"
+            size="large"
+            @click="isOpen = false"
+            class="close-btn"
+          />
+        </div>
+      </div>
 
-      <v-card-text class="pa-4 pt-2">
-        <v-row dense>
-          <!-- Foto -->
-          <v-col cols="12" md="3" class="d-flex justify-center">
-            <v-img
-              :src="pessoa.foto"
-              height="200"
-              width="150"
-              class="rounded-lg elevation-4"
-              cover
-            />
+      <!-- Conteúdo Principal -->
+      <v-card-text class="pa-6">
+        <v-row>
+          <!-- Foto Principal -->
+          <v-col cols="12" md="3">
+            <div class="photo-section">
+              <v-img
+                :src="pessoa.foto"
+                height="240"
+                width="180"
+                class="main-photo"
+                cover
+              />
+            </div>
           </v-col>
 
-          <!-- Informações -->
+          <!-- Informações em Cards Modernos -->
           <v-col cols="12" md="9">
-            <v-container fluid class="pa-0">
-              <!-- Matrícula / Turma -->
-              <v-row dense>
-                <v-col cols="12" sm="6" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">Matrícula:</span>
-                  <span class="ml-2">{{ pessoa.matricula }}</span>
-                </v-col>
-                <v-col cols="12" sm="6" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">Turma:</span>
-                  <span class="ml-2">{{ pessoa.turma }}</span>
-                </v-col>
-              </v-row>
+            <div class="info-cards-grid">
+              <!-- Card Acadêmico -->
+              <v-card class="info-card academic-card" elevation="4" rounded="xl">
+                <v-card-text class="pa-4">
+                  <div class="card-header">
+                    <v-icon color="primary" size="24">mdi-school</v-icon>
+                    <h4 class="card-title">Acadêmico</h4>
+                  </div>
+                  <div class="info-rows">
+                    <div class="info-row">
+                      <span class="label">Matrícula</span>
+                      <span class="value">{{ pessoa.matricula }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">Turma</span>
+                      <span class="value">{{ pessoa.turma }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">Curso</span>
+                      <span class="value">{{ pessoa.curso }}</span>
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
 
-              <!-- Curso -->
-              <v-row dense>
-                <v-col cols="12" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">Curso:</span>
-                  <span class="ml-2">{{ pessoa.curso }}</span>
-                </v-col>
-              </v-row>
+              <!-- Card Pessoal -->
+              <v-card class="info-card personal-card" elevation="4" rounded="xl">
+                <v-card-text class="pa-4">
+                  <div class="card-header">
+                    <v-icon color="warning" size="24">mdi-account-circle</v-icon>
+                    <h4 class="card-title">Pessoal</h4>
+                  </div>
+                  <div class="info-rows">
+                    <div class="info-row">
+                      <span class="label">RG</span>
+                      <span class="value">{{ pessoa.rg }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">CPF</span>
+                      <span class="value">{{ pessoa.cpf }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">Nascimento</span>
+                      <span class="value">17/01/2007</span>
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
 
-              <!-- Endereço -->
-              <v-row dense>
-                <v-col cols="12" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">Endereço:</span>
-                  <span class="ml-2">{{ pessoa.endereco }}, {{ pessoa.bairro }}</span>
-                </v-col>
-              </v-row>
+              <!-- Card Contato -->
+              <v-card class="info-card contact-card" elevation="4" rounded="xl">
+                <v-card-text class="pa-4">
+                  <div class="card-header">
+                    <v-icon color="info" size="24">mdi-phone</v-icon>
+                    <h4 class="card-title">Contato</h4>
+                  </div>
+                  <div class="info-rows">
+                    <div class="info-row">
+                      <span class="label">Telefone</span>
+                      <span class="value">{{ pessoa.telefone }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">Celular</span>
+                      <span class="value">{{ pessoa.celular }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">Endereço</span>
+                      <span class="value">{{ pessoa.endereco }}, {{ pessoa.bairro }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">Cidade</span>
+                      <span class="value">{{ pessoa.cidade }} - {{ pessoa.estado }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">CEP</span>
+                      <span class="value">{{ pessoa.cep }}</span>
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
 
-              <!-- Cidade / CEP -->
-              <v-row dense>
-                <v-col cols="12" sm="8" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">Cidade:</span>
-                  <span class="ml-2">{{ pessoa.cidade }} - {{ pessoa.estado }}</span>
-                </v-col>
-                <v-col cols="12" sm="4" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">CEP:</span>
-                  <span class="ml-2">{{ pessoa.cep }}</span>
-                </v-col>
-              </v-row>
-
-              <!-- Telefones -->
-              <v-row dense>
-                <v-col cols="12" sm="6" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">Telefone:</span>
-                  <span class="ml-2">{{ pessoa.telefone }}</span>
-                </v-col>
-                <v-col cols="12" sm="6" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">Celular:</span>
-                  <span class="ml-2">{{ pessoa.celular }}</span>
-                </v-col>
-              </v-row>
-
-              <!-- RG / CPF -->
-              <v-row dense>
-                <v-col cols="12" sm="6" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">RG:</span>
-                  <span class="ml-2">{{ pessoa.rg }}</span>
-                </v-col>
-                <v-col cols="12" sm="6" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">CPF:</span>
-                  <span class="ml-2">{{ pessoa.cpf }}</span>
-                </v-col>
-              </v-row>
-
-              <!-- Pais -->
-              <v-row dense>
-                <v-col cols="12" sm="6" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">Mãe:</span>
-                  <span class="ml-2">{{ pessoa.mae }}</span>
-                </v-col>
-                <v-col cols="12" sm="6" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">Pai:</span>
-                  <span class="ml-2">{{ pessoa.pai }}</span>
-                </v-col>
-              </v-row>
-
-              <!-- Empresa -->
-              <v-row dense>
-                <v-col cols="12" class="py-1">
-                  <span class="font-weight-bold text-senai-navy">Empresa:</span>
-                  <span class="ml-2">
-                    {{ pessoa.empresa }} - Nascimento: 17/01/2007
-                  </span>
-                </v-col>
-              </v-row>
-            </v-container>
+              <!-- Card Filiação -->
+              <v-card class="info-card family-card" elevation="4" rounded="xl">
+                <v-card-text class="pa-4">
+                  <div class="card-header">
+                    <v-icon color="success" size="24">mdi-account-group</v-icon>
+                    <h4 class="card-title">Filiação</h4>
+                  </div>
+                  <div class="info-rows">
+                    <div class="info-row">
+                      <span class="label">Mãe</span>
+                      <span class="value">{{ pessoa.mae }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">Pai</span>
+                      <span class="value">{{ pessoa.pai }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">Empresa</span>
+                      <span class="value">{{ pessoa.empresa }}</span>
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </div>
           </v-col>
         </v-row>
 
-        <v-divider class="my-3" />
+        <!-- Seção de Ocorrências -->
+        <v-card class="occurrences-section mt-6" elevation="4" rounded="xl">
+          <v-card-text class="pa-4">
+            <div class="section-header">
+              <h3 class="section-title">
+                <v-icon color="senai-red" class="mr-2">mdi-history</v-icon>
+                Histórico de Ocorrências
+              </h3>
+              <v-chip v-if="pessoa.ocorrencias?.length" size="small" color="senai-red" variant="outlined">
+                {{ pessoa.ocorrencias.length }} registros
+              </v-chip>
+            </div>
 
-        <!-- Ocorrências -->
-        <div>
-          <h3 class="text-subtitle-1 text-senai-navy font-weight-bold mb-2">
-            Histórico de Ocorrências
-          </h3>
-
-          <div v-if="pessoa.ocorrencias && pessoa.ocorrencias.length > 0">
-            <v-card
-              v-for="(ocorrencia, index) in pessoa.ocorrencias"
-              :key="index"
-              variant="outlined"
-              class="mb-2 pa-2"
-            >
-              <div class="d-flex align-start">
-                <v-icon color="senai-red" size="small" class="mr-2 mt-1">mdi-circle</v-icon>
-                <div>
-                  <p class="text-body-2 mb-1">{{ ocorrencia }}</p>
-                  <p class="text-caption text-medium-emphasis">
-                    Registrado em: {{ new Date().toLocaleDateString('pt-BR') }}
-                  </p>
-                </div>
+            <!-- Container com Scroll Fixo (200px) -->
+            <div class="occurrences-container">
+              <div v-if="pessoa.ocorrencias && pessoa.ocorrencias.length > 0" class="occurrences-list">
+                <v-card
+                  v-for="(ocorrencia, index) in pessoa.ocorrencias"
+                  :key="index"
+                  class="occurrence-item"
+                  variant="outlined"
+                  rounded="lg"
+                >
+                  <v-card-text class="pa-3">
+                    <div class="d-flex align-start">
+                      <v-icon color="senai-red" size="12" class="mt-1 mr-2">mdi-circle</v-icon>
+                      <div class="flex-grow-1">
+                        <p class="occurrence-text">{{ ocorrencia }}</p>
+                        <p class="occurrence-date">
+                          <v-icon size="12" class="mr-1">mdi-calendar</v-icon>
+                          {{ new Date().toLocaleDateString('pt-BR') }}
+                        </p>
+                      </div>
+                    </div>
+                  </v-card-text>
+                </v-card>
               </div>
-            </v-card>
-          </div>
 
-          <div v-else class="text-center pa-4">
-            <v-icon size="48" color="success" class="mb-2">mdi-check-circle</v-icon>
-            <p class="text-body-2 text-medium-emphasis">
-              Nenhuma ocorrência registrada para {{ pessoa.nome }}.
-            </p>
-          </div>
-        </div>
+              <div v-else class="empty-state">
+                <v-icon size="64" color="success" class="mb-3">mdi-check-circle-outline</v-icon>
+                <h4 class="empty-title">Nenhuma ocorrência registrada</h4>
+                <p class="empty-subtitle">{{ pessoa.nome }} não possui registros de ocorrências.</p>
+              </div>
+            </div>
+
+            <!-- Formulário para Nova Ocorrência -->
+            <v-expand-transition>
+              <v-card v-if="showAddForm" class="add-form-card mt-4" elevation="2" rounded="lg">
+                <v-card-text class="pa-4">
+                  <h4 class="form-title mb-3">
+                    <v-icon color="senai-red" class="mr-2">mdi-plus-circle</v-icon>
+                    Nova Ocorrência
+                  </h4>
+                  <v-form ref="formRef" v-model="formValid" @submit.prevent="adicionarOcorrencia">
+                    <v-textarea
+                      v-model="novaOcorrencia"
+                      label="Descrição da Ocorrência"
+                      variant="outlined"
+                      rows="3"
+                      :rules="[v => !!v || 'Descrição é obrigatória']"
+                      class="mb-4"
+                      bg-color="surface"
+                    />
+                    <div class="form-actions">
+                      <v-btn
+                        color="senai-red"
+                        :disabled="!formValid"
+                        type="submit"
+                        rounded="lg"
+                        elevation="2"
+                      >
+                        <v-icon start>mdi-content-save</v-icon>
+                        Registrar
+                      </v-btn>
+                      <v-btn
+                        variant="outlined"
+                        @click="cancelarRegistro"
+                        rounded="lg"
+                        class="ml-2"
+                      >
+                        Cancelar
+                      </v-btn>
+                    </div>
+                  </v-form>
+                </v-card-text>
+              </v-card>
+            </v-expand-transition>
+          </v-card-text>
+        </v-card>
       </v-card-text>
 
-      <!-- Footer -->
-      <v-card-actions class="pa-3 pt-0">
-        <v-btn variant="outlined" color="senai-navy" @click="isOpen = false">
-          Voltar p/ Carômetro
+      <!-- Footer Moderno -->
+      <v-card-actions class="footer-actions pa-6 pt-0">
+        <v-btn
+          variant="outlined"
+          color="senai-navy"
+          @click="isOpen = false"
+          rounded="lg"
+          size="large"
+        >
+          <v-icon start>mdi-arrow-left</v-icon>
+          Voltar
         </v-btn>
         <v-spacer />
         <v-btn
-          color="senai-red"
+          :color="showAddForm ? 'grey' : 'senai-red'"
           @click="toggleAddForm"
-          :prepend-icon="showAddForm ? 'mdi-close' : 'mdi-plus'"
+          :variant="showAddForm ? 'outlined' : 'elevated'"
+          rounded="lg"
+          size="large"
+          elevation="2"
         >
+          <v-icon start>{{ showAddForm ? 'mdi-close' : 'mdi-plus' }}</v-icon>
           {{ showAddForm ? 'Cancelar' : 'Registrar Ocorrência' }}
         </v-btn>
       </v-card-actions>
