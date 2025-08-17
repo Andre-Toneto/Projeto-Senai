@@ -127,13 +127,6 @@
 </template>
 
 <script setup>
-defineProps({
-  modelValue: { type: Boolean, required: true },
-  pessoa: { type: Object, default: () => ({}) }
-})
-
-defineEmits(['update:modelValue'])
-
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
   pessoa: { type: Object, default: () => ({}) }
