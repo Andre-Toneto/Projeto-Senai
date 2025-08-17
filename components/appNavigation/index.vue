@@ -53,61 +53,46 @@
   </v-navigation-drawer>
 </template>
 
-<script>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+<script setup>
+const route = useRoute()
+const navigationWidth = ref(280)
 
-export default {
-  name: 'AppNavigation',
-  setup() {
-    const route = useRoute()
-    const navigationWidth = ref(280)
+const navItems = [
+  { text: 'Carômetro', route: 'carometro/login', icon: 'mdi-account-group', badge: 'Novo' },
+  { text: 'Planilha de Registros', route: 'registros', icon: 'mdi-table-large' },
+  { text: 'Formulários', route: 'formularios', icon: 'mdi-form-select' },
+  { text: 'Horário Escolar', route: 'horarios', icon: 'mdi-calendar-clock' },
+  { text: 'Calendário Escolar', route: 'calendario', icon: 'mdi-calendar' },
+  { text: 'Proposta Pedagógica', route: 'proposta', icon: 'mdi-book-open-variant' },
+  { text: 'Plano Escolar', route: 'plano', icon: 'mdi-file-document-outline' },
+  { text: 'Coordenação', route: 'coordenacao', icon: 'mdi-account-supervisor' },
+  { text: 'Regimento SENAI', route: 'regimento', icon: 'mdi-gavel' },
+  { text: 'Educacional Plano', route: 'educacional', icon: 'mdi-school' }
+]
 
-    const navItems = [
-      { text: 'Carômetro', route: 'carometro/login', icon: 'mdi-account-group', badge: 'Novo' },
-      { text: 'Planilha de Registros', route: 'registros', icon: 'mdi-table-large' },
-      { text: 'Formulários', route: 'formularios', icon: 'mdi-form-select' },
-      { text: 'Horário Escolar', route: 'horarios', icon: 'mdi-calendar-clock' },
-      { text: 'Calendário Escolar', route: 'calendario', icon: 'mdi-calendar' },
-      { text: 'Proposta Pedagógica', route: 'proposta', icon: 'mdi-book-open-variant' },
-      { text: 'Plano Escolar', route: 'plano', icon: 'mdi-file-document-outline' },
-      { text: 'Coordenação', route: 'coordenacao', icon: 'mdi-account-supervisor' },
-      { text: 'Regimento SENAI', route: 'regimento', icon: 'mdi-gavel' },
-      { text: 'Educacional Plano', route: 'educacional', icon: 'mdi-school' }
-    ]
-
-    const getIconColor = (routeName) => {
-      if (process.client && route && route.path) {
-        return route.path.includes(routeName) ? 'senai-red' : 'senai-navy'
-      }
-      return 'senai-navy'
-    }
-
-    const openHelp = () => {
-      console.log('Abrindo ajuda...')
-    }
-
-    onMounted(() => {
-      if (process.client) {
-        const updateWidth = () => {
-          navigationWidth.value = window.innerWidth < 960 ? 260 : 280
-        }
-
-        updateWidth()
-        window.addEventListener('resize', updateWidth)
-
-        onUnmounted(() => {
-          window.removeEventListener('resize', updateWidth)
-        })
-      }
-    })
-
-    return {
-      navigationWidth,
-      navItems,
-      getIconColor,
-      openHelp
-    }
+const getIconColor = (routeName) => {
+  if (process.client && route && route.path) {
+    return route.path.includes(routeName) ? 'senai-red' : 'senai-navy'
   }
+  return 'senai-navy'
 }
+
+const openHelp = () => {
+  console.log('Abrindo ajuda...')
+}
+
+onMounted(() => {
+  if (process.client) {
+    const updateWidth = () => {
+      navigationWidth.value = window.innerWidth < 960 ? 260 : 280
+    }
+
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+
+    onUnmounted(() => {
+      window.removeEventListener('resize', updateWidth)
+    })
+  }
+})
 </script>
