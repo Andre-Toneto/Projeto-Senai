@@ -1,27 +1,98 @@
 <template>
-  <v-navigation-drawer app permanent color="blue lighten-4">
-    <v-list>
-      <v-list-item v-for="item in navItems" :key="item.text" @click="router.push(`/${item.route}`)"  >
-          {{ item.text }}
+  <v-navigation-drawer
+    app
+    permanent
+    :width="navigationWidth"
+    color="surface"
+    elevation="4"
+    border="0"
+  >
+    <!-- Header -->
+    <v-list-item class="pa-4">
+      <template v-slot:prepend>
+        <v-icon color="senai-navy" size="large">mdi-view-dashboard</v-icon>
+      </template>
+      <v-list-item-title class="text-h6 font-weight-medium">Menu Principal</v-list-item-title>
+    </v-list-item>
+
+    <v-divider />
+
+    <!-- Navigation Items -->
+    <v-list density="comfortable" nav class="pa-2">
+      <v-list-item
+        v-for="item in navItems"
+        :key="item.text"
+        :to="`/${item.route}`"
+        rounded="xl"
+        class="mb-1"
+      >
+        <template v-slot:prepend>
+          <v-icon :color="getIconColor(item.route)">{{ item.icon }}</v-icon>
+        </template>
+        <v-list-item-title class="font-weight-medium">{{ item.text }}</v-list-item-title>
+        <template v-slot:append v-if="item.badge">
+          <v-chip size="x-small" color="senai-red" text-color="white">
+            {{ item.badge }}
+          </v-chip>
+        </template>
       </v-list-item>
     </v-list>
+
+    <!-- Footer -->
+    <template v-slot:append>
+      <v-divider />
+      <v-list-item
+        prepend-icon="mdi-help-circle"
+        title="Ajuda"
+        subtitle="Suporte técnico"
+        density="compact"
+        @click="openHelp"
+        class="pa-4"
+      />
+    </template>
   </v-navigation-drawer>
 </template>
 
 <script setup>
-
-const router = useRouter()
+const route = useRoute()
+const navigationWidth = ref(280)
 
 const navItems = [
-  { text: 'Carômetro', route: 'carometro' },
-  { text: 'Planilha de Registros' , route: 'carometro' },
-  { text: 'Formulários' , route: 'carometro' },
-  { text: 'Horário Escolar' , route: 'carometro' },
-  { text: 'Calendário Escolar' , route: 'carometro' },
-  { text: 'Proposta Pedagógica' , route: 'carometro' },
-  { text: 'Plano Escolar' , route: 'carometro' },
-  { text: 'Coordenação' , route: 'carometro' },
-  { text: 'Regimento SENAI' , route: 'carometro' },
-  { text: 'Educacional Plano' , route: 'carometro' }
+  { text: 'Carômetro', route: 'carometro/login', icon: 'mdi-account-group', badge: 'Novo' },
+  { text: 'Planilha de Registros', route: 'registros', icon: 'mdi-table-large' },
+  { text: 'Formulários', route: 'formularios', icon: 'mdi-form-select' },
+  { text: 'Horário Escolar', route: 'horarios', icon: 'mdi-calendar-clock' },
+  { text: 'Calendário Escolar', route: 'calendario', icon: 'mdi-calendar' },
+  { text: 'Proposta Pedagógica', route: 'proposta', icon: 'mdi-book-open-variant' },
+  { text: 'Plano Escolar', route: 'plano', icon: 'mdi-file-document-outline' },
+  { text: 'Coordenação', route: 'coordenacao', icon: 'mdi-account-supervisor' },
+  { text: 'Regimento SENAI', route: 'regimento', icon: 'mdi-gavel' },
+  { text: 'Educacional Plano', route: 'educacional', icon: 'mdi-school' }
 ]
+
+const getIconColor = (routeName) => {
+  if (process.client && route && route.path) {
+    return route.path.includes(routeName) ? 'senai-red' : 'senai-navy'
+  }
+  return 'senai-navy'
+}
+
+const openHelp = () => {
+  console.log('Abrindo ajuda...')
+}
+
+onMounted(() => {
+  if (process.client) {
+    const updateWidth = () => {
+      navigationWidth.value = window.innerWidth < 960 ? 260 : 280
+    }
+
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+
+    onUnmounted(() => {
+      window.removeEventListener('resize', updateWidth)
+    })
+  }
+})
 </script>

@@ -1,6 +1,7 @@
 <template>
-  <v-container>
-    <v-row>
+  <v-container fluid>
+    <!-- Grid Responsivo Moderno -->
+    <v-row class="d-flex">
       <v-col
         v-for="pessoa in pessoas"
         :key="pessoa.nome"
@@ -8,11 +9,57 @@
         sm="6"
         md="4"
         lg="3"
+        xl="2"
+        class="d-flex"
       >
-        <v-card @click="abrirModal(pessoa)" class="hover-scale">
-          <v-img :src="pessoa.foto" height="200px" cover></v-img>
-          <v-card-title>{{ pessoa.nome }}</v-card-title>
-          <v-card-subtitle>{{ pessoa.cargo }}</v-card-subtitle>
+        <v-card
+          @click="abrirModal(pessoa)"
+          hover
+          rounded="xl"
+          elevation="4"
+          class="person-card flex-grow-1"
+        >
+          <!-- Avatar/Foto -->
+          <div class="text-center pt-6 pb-2">
+            <v-avatar size="80" class="elevation-4">
+              <v-img :src="pessoa.foto" cover />
+            </v-avatar>
+          </div>
+
+          <!-- Informações -->
+          <v-card-title class="text-center text-h6 font-weight-bold text-senai-navy px-4 pb-1">
+            {{ pessoa.nome }}
+          </v-card-title>
+
+          <v-card-subtitle class="text-center text-body-2 text-medium-emphasis px-4 pb-2">
+            {{ pessoa.cargo }}
+          </v-card-subtitle>
+
+          <!-- Badge de Status -->
+          <div class="text-center pb-4">
+            <v-chip
+              size="small"
+              color="success"
+              variant="outlined"
+            >
+              <v-icon start size="small">mdi-check-circle</v-icon>
+              Ativo
+            </v-chip>
+          </div>
+
+          <!-- Informações Rápidas -->
+          <v-card-text class="px-4 pt-0 pb-4">
+            <v-row dense>
+              <v-col cols="6" class="text-center">
+                <div class="text-caption text-medium-emphasis">Matrícula</div>
+                <div class="text-body-2 font-weight-medium">{{ pessoa.matricula }}</div>
+              </v-col>
+              <v-col cols="6" class="text-center">
+                <div class="text-caption text-medium-emphasis">Turma</div>
+                <div class="text-body-2 font-weight-medium">{{ pessoa.turma }}</div>
+              </v-col>
+            </v-row>
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -20,9 +67,9 @@
 </template>
 
 <script setup>
-const emit = defineEmits(["selectPessoa"])
+const emit = defineEmits(['selectPessoa'])
 
-const pessoas = [
+const pessoas = ref([
   {
     nome: "Ana Souza",
     cargo: "Coordenadora Pedagógica",
@@ -71,20 +118,72 @@ const pessoas = [
       "Faltou em reunião dia 14/04/2025",
       "Entregou relatório pedagógico em 10/06/2025"
     ]
+  },
+  {
+    nome: "Maria Silva",
+    cargo: "Professora de Português",
+    foto: "https://randomuser.me/api/portraits/women/25.jpg",
+    matricula: "2025003",
+    turma: "P1",
+    curso: "Licenciatura em Letras",
+    endereco: "Rua da Consolação, 800",
+    bairro: "Consolação",
+    cidade: "São Paulo",
+    estado: "SP",
+    cep: "01302-000",
+    telefone: "(11) 4444-5555",
+    celular: "(11) 96666-7777",
+    rg: "11.222.333-4",
+    cpf: "111.222.333-44",
+    mae: "Rosa Silva",
+    pai: "José Silva",
+    empresa: "SENAI",
+    ocorrencias: [
+      "Ministrou palestra em 15/02/2025",
+      "Participou de formação continuada"
+    ]
+  },
+  {
+    nome: "João Santos",
+    cargo: "Aluno",
+    foto: "https://randomuser.me/api/portraits/men/35.jpg",
+    matricula: "2025004",
+    turma: "T1",
+    curso: "Técnico em Informática",
+    endereco: "Rua Augusta, 200",
+    bairro: "Jardins",
+    cidade: "São Paulo",
+    estado: "SP",
+    cep: "01305-000",
+    telefone: "(11) 5555-6666",
+    celular: "(11) 95555-6666",
+    rg: "22.333.444-5",
+    cpf: "222.333.444-55",
+    mae: "Ana Santos",
+    pai: "Pedro Santos",
+    empresa: "SENAI",
+    ocorrencias: [
+      "Excelente desempenho em projeto",
+      "Participou de olimpíada de programação"
+    ]
   }
-]
+])
 
-function abrirModal(pessoa) {
-  emit("selectPessoa", pessoa)
+const abrirModal = (pessoa) => {
+  emit('selectPessoa', pessoa)
 }
 </script>
 
 <style scoped>
-.hover-scale {
-  transition: transform 0.2s;
-}
-.hover-scale:hover {
-  transform: scale(1.03);
+.person-card {
   cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.person-card:hover {
+  transform: translateY(-8px);
+  border-color: rgb(var(--v-theme-senai-red));
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 </style>

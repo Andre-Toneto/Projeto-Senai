@@ -1,21 +1,95 @@
 <template>
-  <v-app-bar app color="blue lighten-1" dark>
-    <v-toolbar-title class="text-h6">Segunda, 28 de Julho de 2025</v-toolbar-title>
-    <v-spacer></v-spacer>
-    <v-btn text v-for="item in menuItems" :key="item.text" class="text-white">
-      {{ item.text }}
-    </v-btn>
+  <v-app-bar app color="senai-navy" dark elevation="4" density="comfortable">
+    <!-- Logo Section -->
+    <template v-slot:prepend>
+      <v-img
+        src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMTIwIDQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRTUzRTNFIi8+Cjx0ZXh0IHg9IjYwIiB5PSIyNiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNFTkFJPC90ZXh0Pgo8L3N2Zz4="
+        alt="SENAI"
+        max-height="36"
+        max-width="120"
+        class="mr-4"
+      />
+    </template>
+
+    <v-divider vertical class="mx-2 opacity-30" />
+
+    <!-- Date Section -->
+    <v-icon size="small" class="mr-2">mdi-calendar</v-icon>
+    <ClientOnly fallback-tag="span" class="text-body-2">
+      <span class="text-body-2 font-weight-medium text-capitalize">{{ currentDate }}</span>
+      <template #fallback>
+        <span class="text-body-2">Portal SENAI</span>
+      </template>
+    </ClientOnly>
+
+    <v-spacer />
+
+    <!-- Desktop Menu Items -->
+    <template v-slot:append>
+      <div class="d-none d-lg-flex">
+        <v-btn
+          v-for="item in menuItems"
+          :key="item.text"
+          :href="item.link"
+          target="_blank"
+          variant="text"
+          size="small"
+          class="text-caption opacity-90"
+        >
+          <v-icon size="small" class="mr-1">{{ item.icon }}</v-icon>
+          {{ item.text }}
+        </v-btn>
+      </div>
+
+      <!-- Mobile Menu -->
+      <v-menu class="d-flex d-lg-none">
+        <template v-slot:activator="{ props }">
+          <v-btn
+            icon="mdi-dots-vertical"
+            v-bind="props"
+            variant="text"
+          />
+        </template>
+        <v-list>
+          <v-list-item
+            v-for="item in menuItems"
+            :key="item.text"
+            :href="item.link"
+            target="_blank"
+          >
+            <template v-slot:prepend>
+              <v-icon>{{ item.icon }}</v-icon>
+            </template>
+            <v-list-item-title>{{ item.text }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </template>
   </v-app-bar>
 </template>
 
 <script setup>
+const currentDate = ref('Portal SENAI')
+
+onMounted(() => {
+  if (process.client) {
+    const date = new Date()
+    currentDate.value = date.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+})
+
 const menuItems = [
-  { text: 'INTRANET SENAI/SP' },
-  { text: 'PORTAL EDUCACIONAL' },
-  { text: 'ART RH SAP' },
-  { text: 'GED SENAI-SP' },
-  { text: 'OUTLOOK' },
-  { text: 'SGSET-SP' },
-  { text: 'EMPREGRA+' }
+  { text: 'INTRANET', icon: 'mdi-web', link: '#' },
+  { text: 'PORTAL EDU', icon: 'mdi-school', link: '#' },
+  { text: 'RH SAP', icon: 'mdi-account-group', link: '#' },
+  { text: 'GED', icon: 'mdi-file-document', link: '#' },
+  { text: 'OUTLOOK', icon: 'mdi-email', link: '#' },
+  { text: 'SGSET', icon: 'mdi-cog', link: '#' },
+  { text: 'EMPREGRA+', icon: 'mdi-briefcase', link: '#' }
 ]
 </script>
