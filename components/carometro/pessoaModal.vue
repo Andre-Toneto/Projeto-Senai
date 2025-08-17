@@ -3,8 +3,10 @@
     <v-card rounded="lg" elevation="8">
       <!-- Header -->
       <v-card-title class="pa-4 pb-0">
-        <div class="d-flex align-center justify-space-between">
-          <h2 class="text-h5 text-senai-navy font-weight-bold">{{ pessoa.nome?.toUpperCase() }}</h2>
+        <div class="d-flex align-center justify-space-between w-100">
+          <h2 class="text-h6 text-senai-navy font-weight-bold">
+            {{ pessoa.nome?.toUpperCase() }}
+          </h2>
           <v-btn
             icon="mdi-close"
             variant="text"
@@ -16,155 +18,163 @@
 
       <v-card-text class="pa-4">
         <!-- Layout Principal - Foto + Dados -->
-        <v-row>
+        <v-row dense>
           <!-- Foto -->
-          <v-col cols="12" md="3">
-            <div class="text-center">
-              <v-img
-                :src="pessoa.foto"
-                height="200"
-                width="150"
-                class="mx-auto rounded-lg elevation-4"
-                cover
-              />
-            </div>
+          <v-col cols="12" md="3" class="d-flex justify-center">
+            <v-img
+              :src="pessoa.foto"
+              height="200"
+              width="150"
+              class="rounded-lg elevation-4"
+              cover
+            />
           </v-col>
 
           <!-- Informações Principais -->
           <v-col cols="12" md="9">
-            <div class="info-grid">
-              <!-- Linha 1 -->
-              <v-row dense class="mb-2">
-                <v-col cols="12" sm="6">
-                  <div class="info-item">
-                    <span class="info-label">Matrícula:</span>
-                    <span class="info-value">{{ pessoa.matricula }}</span>
+            <v-sheet
+              rounded="md"
+              elevation="0"
+              class="pa-2 bg-grey-lighten-4"
+            >
+              <!-- Matrícula / Turma -->
+              <v-row dense class="mb-1">
+                <v-col cols="12" sm="6" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">Matrícula:</span>
+                    <span class="text-body-2">{{ pessoa.matricula }}</span>
                   </div>
                 </v-col>
-                <v-col cols="12" sm="6">
-                  <div class="info-item">
-                    <span class="info-label">Turma:</span>
-                    <span class="info-value">{{ pessoa.turma }}</span>
-                  </div>
-                </v-col>
-              </v-row>
-
-              <!-- Linha 2 -->
-              <v-row dense class="mb-2">
-                <v-col cols="12">
-                  <div class="info-item">
-                    <span class="info-label">Curso:</span>
-                    <span class="info-value">{{ pessoa.curso }}</span>
+                <v-col cols="12" sm="6" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">Turma:</span>
+                    <span class="text-body-2">{{ pessoa.turma }}</span>
                   </div>
                 </v-col>
               </v-row>
 
-              <!-- Linha 3 -->
-              <v-row dense class="mb-2">
-                <v-col cols="12">
-                  <div class="info-item">
-                    <span class="info-label">Endereço:</span>
-                    <span class="info-value">{{ pessoa.endereco }}, {{ pessoa.bairro }}</span>
+              <!-- Curso -->
+              <v-row dense class="mb-1">
+                <v-col cols="12" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">Curso:</span>
+                    <span class="text-body-2">{{ pessoa.curso }}</span>
                   </div>
                 </v-col>
               </v-row>
 
-              <!-- Linha 4 -->
-              <v-row dense class="mb-2">
-                <v-col cols="12" sm="8">
-                  <div class="info-item">
-                    <span class="info-label">Cidade:</span>
-                    <span class="info-value">{{ pessoa.cidade }} - {{ pessoa.estado }}</span>
-                  </div>
-                </v-col>
-                <v-col cols="12" sm="4">
-                  <div class="info-item">
-                    <span class="info-label">CEP:</span>
-                    <span class="info-value">{{ pessoa.cep }}</span>
+              <!-- Endereço -->
+              <v-row dense class="mb-1">
+                <v-col cols="12" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">Endereço:</span>
+                    <span class="text-body-2">{{ pessoa.endereco }}, {{ pessoa.bairro }}</span>
                   </div>
                 </v-col>
               </v-row>
 
-              <!-- Linha 5 -->
-              <v-row dense class="mb-2">
-                <v-col cols="12" sm="6">
-                  <div class="info-item">
-                    <span class="info-label">Telefone:</span>
-                    <span class="info-value">{{ pessoa.telefone }}</span>
+              <!-- Cidade / CEP -->
+              <v-row dense class="mb-1">
+                <v-col cols="12" sm="8" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">Cidade:</span>
+                    <span class="text-body-2">{{ pessoa.cidade }} - {{ pessoa.estado }}</span>
                   </div>
                 </v-col>
-                <v-col cols="12" sm="6">
-                  <div class="info-item">
-                    <span class="info-label">Celular:</span>
-                    <span class="info-value">{{ pessoa.celular }}</span>
-                  </div>
-                </v-col>
-              </v-row>
-
-              <!-- Linha 6 -->
-              <v-row dense class="mb-2">
-                <v-col cols="12" sm="6">
-                  <div class="info-item">
-                    <span class="info-label">RG:</span>
-                    <span class="info-value">{{ pessoa.rg }}</span>
-                  </div>
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <div class="info-item">
-                    <span class="info-label">CPF:</span>
-                    <span class="info-value">{{ pessoa.cpf }}</span>
+                <v-col cols="12" sm="4" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">CEP:</span>
+                    <span class="text-body-2">{{ pessoa.cep }}</span>
                   </div>
                 </v-col>
               </v-row>
 
-              <!-- Linha 7 -->
-              <v-row dense class="mb-2">
-                <v-col cols="12" sm="6">
-                  <div class="info-item">
-                    <span class="info-label">Mãe:</span>
-                    <span class="info-value">{{ pessoa.mae }}</span>
+              <!-- Telefones -->
+              <v-row dense class="mb-1">
+                <v-col cols="12" sm="6" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">Telefone:</span>
+                    <span class="text-body-2">{{ pessoa.telefone }}</span>
                   </div>
                 </v-col>
-                <v-col cols="12" sm="6">
-                  <div class="info-item">
-                    <span class="info-label">Pai:</span>
-                    <span class="info-value">{{ pessoa.pai }}</span>
+                <v-col cols="12" sm="6" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">Celular:</span>
+                    <span class="text-body-2">{{ pessoa.celular }}</span>
                   </div>
                 </v-col>
               </v-row>
 
-              <!-- Linha 8 -->
+              <!-- RG / CPF -->
+              <v-row dense class="mb-1">
+                <v-col cols="12" sm="6" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">RG:</span>
+                    <span class="text-body-2">{{ pessoa.rg }}</span>
+                  </div>
+                </v-col>
+                <v-col cols="12" sm="6" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">CPF:</span>
+                    <span class="text-body-2">{{ pessoa.cpf }}</span>
+                  </div>
+                </v-col>
+              </v-row>
+
+              <!-- Pais -->
+              <v-row dense class="mb-1">
+                <v-col cols="12" sm="6" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">Mãe:</span>
+                    <span class="text-body-2">{{ pessoa.mae }}</span>
+                  </div>
+                </v-col>
+                <v-col cols="12" sm="6" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">Pai:</span>
+                    <span class="text-body-2">{{ pessoa.pai }}</span>
+                  </div>
+                </v-col>
+              </v-row>
+
+              <!-- Empresa -->
               <v-row dense>
-                <v-col cols="12">
-                  <div class="info-item">
-                    <span class="info-label">Empresa:</span>
-                    <span class="info-value">{{ pessoa.empresa }} - Nascimento: 17/01/2007</span>
+                <v-col cols="12" class="py-1">
+                  <div class="d-flex align-center">
+                    <span class="font-weight-medium text-senai-navy mr-2">Empresa:</span>
+                    <span class="text-body-2">
+                      {{ pessoa.empresa }} - Nascimento: 17/01/2007
+                    </span>
                   </div>
                 </v-col>
               </v-row>
-            </div>
+            </v-sheet>
           </v-col>
         </v-row>
 
-        <v-divider class="my-4" />
+        <v-divider class="my-3" />
 
         <!-- Seção de Ocorrências -->
-        <div class="ocorrencias-section">
-          <h3 class="text-h6 text-senai-navy font-weight-bold mb-3">Histórico de Ocorrências</h3>
+        <div>
+          <h3 class="text-subtitle-1 text-senai-navy font-weight-bold mb-2">
+            Histórico de Ocorrências
+          </h3>
 
           <!-- Lista de Ocorrências -->
-          <div v-if="pessoa.ocorrencias && pessoa.ocorrencias.length > 0" class="mb-4">
+          <div v-if="pessoa.ocorrencias && pessoa.ocorrencias.length > 0" class="mb-3">
             <v-card
               v-for="(ocorrencia, index) in pessoa.ocorrencias"
               :key="index"
               variant="outlined"
-              class="mb-2 pa-3"
+              class="mb-2 pa-2"
             >
               <div class="d-flex align-start">
                 <v-icon color="senai-red" size="small" class="mr-2 mt-1">mdi-circle</v-icon>
                 <div class="flex-grow-1">
                   <p class="text-body-2 mb-1">{{ ocorrencia }}</p>
-                  <p class="text-caption text-medium-emphasis">Registrado em: {{ new Date().toLocaleDateString('pt-BR') }}</p>
+                  <p class="text-caption text-medium-emphasis">
+                    Registrado em: {{ new Date().toLocaleDateString('pt-BR') }}
+                  </p>
                 </div>
               </div>
             </v-card>
@@ -173,12 +183,19 @@
           <!-- Mensagem quando não há ocorrências -->
           <div v-else class="text-center pa-4">
             <v-icon size="48" color="success" class="mb-2">mdi-check-circle</v-icon>
-            <p class="text-body-1 text-medium-emphasis">Nenhuma ocorrência registrada para {{ pessoa.nome }}.</p>
+            <p class="text-body-2 text-medium-emphasis">
+              Nenhuma ocorrência registrada para {{ pessoa.nome }}.
+            </p>
           </div>
 
-          <!-- Formulário para Nova Ocorrência -->
-          <v-card variant="tonal" color="senai-light-blue" class="pa-4" v-if="showAddForm">
-            <h4 class="text-subtitle-1 font-weight-bold mb-3">Registrar Nova Ocorrência</h4>
+          <!-- Formulário Nova Ocorrência -->
+          <v-card
+            variant="tonal"
+            color="senai-light-blue"
+            class="pa-3"
+            v-if="showAddForm"
+          >
+            <h4 class="text-subtitle-2 font-weight-bold mb-2">Registrar Nova Ocorrência</h4>
             <v-form ref="form" v-model="formValid" @submit.prevent="adicionarOcorrencia">
               <v-textarea
                 v-model="novaOcorrencia"
@@ -186,20 +203,13 @@
                 variant="outlined"
                 rows="3"
                 :rules="[v => !!v || 'Descrição é obrigatória']"
-                class="mb-3"
+                class="mb-2"
               />
-              <div class="d-flex gap-2">
-                <v-btn
-                  color="senai-red"
-                  :disabled="!formValid"
-                  type="submit"
-                >
+              <div class="d-flex ga-2">
+                <v-btn color="senai-red" :disabled="!formValid" type="submit">
                   Registrar
                 </v-btn>
-                <v-btn
-                  variant="outlined"
-                  @click="cancelarRegistro"
-                >
+                <v-btn variant="outlined" @click="cancelarRegistro">
                   Cancelar
                 </v-btn>
               </div>
@@ -208,13 +218,9 @@
         </div>
       </v-card-text>
 
-      <!-- Footer com Botões -->
-      <v-card-actions class="pa-4 pt-0">
-        <v-btn
-          variant="outlined"
-          color="senai-navy"
-          @click="isOpen = false"
-        >
+      <!-- Footer -->
+      <v-card-actions class="pa-3 pt-0">
+        <v-btn variant="outlined" color="senai-navy" @click="isOpen = false">
           Voltar p/ Carômetro
         </v-btn>
         <v-spacer />
