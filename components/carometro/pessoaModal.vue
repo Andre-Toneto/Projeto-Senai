@@ -134,6 +134,13 @@ defineProps({
 
 defineEmits(['update:modelValue'])
 
+const props = defineProps({
+  modelValue: { type: Boolean, required: true },
+  pessoa: { type: Object, default: () => ({}) }
+})
+
+const emit = defineEmits(['update:modelValue'])
+
 const isOpen = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val)
