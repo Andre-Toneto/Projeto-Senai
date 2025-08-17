@@ -72,45 +72,31 @@
   </v-app>
 </template>
 
-<script>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+<script setup>
+definePageMeta({
+  layout: false
+})
 
-export default {
-  name: 'LoginPage',
-  layout: false,
-  setup() {
-    const router = useRouter()
+const router = useRouter()
 
-    const username = ref('')
-    const password = ref('')
-    const valid = ref(false)
+const username = ref('')
+const password = ref('')
+const valid = ref(false)
 
-    const usernameRules = [
-      v => !!v || 'NIF é obrigatório'
-    ]
+const usernameRules = [
+  v => !!v || 'NIF é obrigatório'
+]
 
-    const passwordRules = [
-      v => !!v || 'Senha é obrigatória'
-    ]
+const passwordRules = [
+  v => !!v || 'Senha é obrigatória'
+]
 
-    const login = () => {
-      if (username.value === 'admin' && password.value === '1234') {
-        alert('Login bem-sucedido!')
-        router.push('/home')
-      } else {
-        alert('Usuário ou senha incorretos.')
-      }
-    }
-
-    return {
-      username,
-      password,
-      valid,
-      usernameRules,
-      passwordRules,
-      login
-    }
+const login = () => {
+  if (username.value === 'admin' && password.value === '1234') {
+    alert('Login bem-sucedido!')
+    router.push('/home')
+  } else {
+    alert('Usuário ou senha incorretos.')
   }
 }
 </script>
