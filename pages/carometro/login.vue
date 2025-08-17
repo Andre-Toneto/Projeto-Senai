@@ -53,54 +53,37 @@
   </v-container>
 </template>
 
-<script>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+<script setup>
+const router = useRouter()
+const valid = ref(false)
+const loading = ref(false)
 
-export default {
-  name: 'CarometroLogin',
-  setup() {
-    const router = useRouter()
-    const valid = ref(false)
-    const loading = ref(false)
+const credentials = ref({
+  usuario: '',
+  senha: ''
+})
 
-    const credentials = ref({
-      usuario: '',
-      senha: ''
-    })
+const usuarioRules = [
+  v => !!v || 'Usuário é obrigatório'
+]
 
-    const usuarioRules = [
-      v => !!v || 'Usuário é obrigatório'
-    ]
+const senhaRules = [
+  v => !!v || 'Senha é obrigatória'
+]
 
-    const senhaRules = [
-      v => !!v || 'Senha é obrigatória'
-    ]
+const authenticate = () => {
+  loading.value = true
 
-    const authenticate = () => {
-      loading.value = true
-
-      setTimeout(() => {
-        if (credentials.value.usuario === 'professor' && credentials.value.senha === '123456') {
-          if (process.client) {
-            sessionStorage.setItem('carometro_authenticated', 'true')
-          }
-          router.push('/carometro/turma')
-        } else {
-          alert('Credenciais inválidas. Use: professor/123456')
-        }
-        loading.value = false
-      }, 1000)
+  setTimeout(() => {
+    if (credentials.value.usuario === 'professor' && credentials.value.senha === '123456') {
+      if (process.client) {
+        sessionStorage.setItem('carometro_authenticated', 'true')
+      }
+      router.push('/carometro')
+    } else {
+      alert('Credenciais inválidas. Use: professor/123456')
     }
-
-    return {
-      valid,
-      loading,
-      credentials,
-      usuarioRules,
-      senhaRules,
-      authenticate
-    }
-  }
+    loading.value = false
+  }, 1000)
 }
 </script>
