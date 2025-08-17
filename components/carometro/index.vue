@@ -169,8 +169,6 @@ const pessoas = ref([
   }
 ])
 
-const emit = defineEmits(['selectPessoa'])
-
 const abrirModal = (pessoa) => {
   emit('selectPessoa', pessoa)
 }
