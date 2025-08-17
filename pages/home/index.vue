@@ -119,64 +119,49 @@
   </v-container>
 </template>
 
-<script>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+<script setup>
+const router = useRouter()
 
-export default {
-  name: 'HomePage',
-  setup() {
-    const router = useRouter()
-
-    const mainTools = ref([
-      {
-        name: 'Carômetro',
-        description: 'Gestão de alunos',
-        icon: 'mdi-account-group',
-        color: 'senai-red',
-        route: '/carometro/login'
-      },
-      {
-        name: 'Calendário',
-        description: 'Cronograma escolar',
-        icon: 'mdi-calendar',
-        color: 'primary',
-        route: '/calendario'
-      },
-      {
-        name: 'Formulários',
-        description: 'Documentos digitais',
-        icon: 'mdi-form-select',
-        color: 'success',
-        route: '/formularios'
-      },
-      {
-        name: 'Coordenação',
-        description: 'Gestão administrativa',
-        icon: 'mdi-account-supervisor',
-        color: 'warning',
-        route: '/coordenacao'
-      }
-    ])
-
-    const openPowerBI = () => {
-      console.log('Abrindo Power BI...')
-    }
-
-    const openPlanning = () => {
-      console.log('Abrindo Planejamento...')
-    }
-
-    const openTool = (tool) => {
-      router.push(tool.route)
-    }
-
-    return {
-      mainTools,
-      openPowerBI,
-      openPlanning,
-      openTool
-    }
+const mainTools = ref([
+  {
+    name: 'Carômetro',
+    description: 'Gestão de alunos',
+    icon: 'mdi-account-group',
+    color: 'senai-red',
+    route: '/carometro/login'
+  },
+  {
+    name: 'Calendário',
+    description: 'Cronograma escolar',
+    icon: 'mdi-calendar',
+    color: 'primary',
+    route: '/calendario'
+  },
+  {
+    name: 'Formulários',
+    description: 'Documentos digitais',
+    icon: 'mdi-form-select',
+    color: 'success',
+    route: '/formularios'
+  },
+  {
+    name: 'Coordenação',
+    description: 'Gestão administrativa',
+    icon: 'mdi-account-supervisor',
+    color: 'warning',
+    route: '/coordenacao'
   }
+])
+
+const openPowerBI = () => {
+  console.log('Abrindo Power BI...')
+}
+
+const openPlanning = () => {
+  console.log('Abrindo Planejamento...')
+}
+
+const openTool = (tool) => {
+  router.push(tool.route)
 }
 </script>
