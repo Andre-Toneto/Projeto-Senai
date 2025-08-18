@@ -31,6 +31,11 @@ export default defineNuxtPlugin((app) => {
           }
         }
       }
+    },
+    defaults: {
+      global: {
+        ripple: false
+      }
     }
   })
   app.vueApp.use(vuetify)
