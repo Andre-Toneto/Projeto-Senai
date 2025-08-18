@@ -1,5 +1,15 @@
 <template>
   <v-app-bar app color="senai-navy" dark elevation="4" density="comfortable">
+    <!-- Menu Toggle Button -->
+    <v-btn
+      @click="toggleNavigation"
+      icon
+      variant="text"
+      class="mr-2"
+    >
+      <v-icon>{{ isNavigationVisible ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
+    </v-btn>
+
     <!-- Logo Section -->
     <template v-slot:prepend>
       <v-img
