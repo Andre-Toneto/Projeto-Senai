@@ -80,14 +80,31 @@
     <!-- Footer -->
     <template v-slot:append>
       <v-divider />
-      <v-list-item
-        prepend-icon="mdi-help-circle"
-        title="Ajuda"
-        subtitle="Suporte técnico"
-        density="compact"
-        @click="openHelp"
-        class="pa-4"
-      />
+      <template v-if="isNavigationRail && !isMobile">
+        <v-tooltip location="end" text="Ajuda">
+          <template v-slot:activator="{ props }">
+            <v-list-item
+              v-bind="props"
+              @click="openHelp"
+              class="pa-4 justify-center"
+            >
+              <template v-slot:prepend>
+                <v-icon>mdi-help-circle</v-icon>
+              </template>
+            </v-list-item>
+          </template>
+        </v-tooltip>
+      </template>
+      <template v-else>
+        <v-list-item
+          prepend-icon="mdi-help-circle"
+          title="Ajuda"
+          subtitle="Suporte técnico"
+          density="compact"
+          @click="openHelp"
+          class="pa-4"
+        />
+      </template>
     </template>
   </v-navigation-drawer>
 </template>
