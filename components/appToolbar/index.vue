@@ -114,4 +114,12 @@ const menuItems = [
   { text: 'SGSET', icon: 'mdi-cog', link: '#' },
   { text: 'EMPREGRA+', icon: 'mdi-briefcase', link: '#' }
 ]
+
+const handleLogout = () => {
+  // Implementar lógica de logout aqui
+  if (confirm('Tem certeza que deseja sair do sistema?')) {
+    // Redirecionar para página de login ou limpar sessão
+    navigateTo('/carometro/login')
+  }
+}
 </script>
