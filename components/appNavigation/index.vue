@@ -15,7 +15,23 @@
       <template v-slot:prepend>
         <v-icon color="senai-navy" size="large">mdi-view-dashboard</v-icon>
       </template>
-      <v-list-item-title class="text-h6 font-weight-medium">Menu Principal</v-list-item-title>
+      <v-list-item-title
+        v-if="!isNavigationRail || isMobile"
+        class="text-h6 font-weight-medium"
+      >
+        Menu Principal
+      </v-list-item-title>
+      <template v-slot:append v-if="!isMobile">
+        <v-btn
+          @click="toggleNavigationRail"
+          icon
+          variant="text"
+          size="small"
+          color="senai-navy"
+        >
+          <v-icon>{{ isNavigationRail ? 'mdi-chevron-right' : 'mdi-chevron-left' }}</v-icon>
+        </v-btn>
+      </template>
     </v-list-item>
 
     <v-divider />
