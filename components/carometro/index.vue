@@ -17,7 +17,8 @@
           hover
           rounded="xl"
           elevation="4"
-          class="person-card flex-grow-1"
+          class="flex-grow-1 cursor-pointer"
+          :border="false"
         >
           <!-- Avatar/Foto -->
           <div class="text-center pt-6 pb-2">
@@ -163,17 +164,3 @@ const abrirModal = (pessoa) => {
   emit('selectPessoa', pessoa)
 }
 </script>
-
-<style scoped>
-.person-card {
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-}
-
-.person-card:hover {
-  transform: translateY(-8px);
-  border-color: rgb(var(--v-theme-senai-red));
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-}
-</style>

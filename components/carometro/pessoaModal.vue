@@ -1,14 +1,14 @@
 <template>
   <v-dialog v-model="isOpen" max-width="1000" persistent>
-    <v-card elevation="24" rounded="xl" :style="{ background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)' }">
+    <v-card elevation="24" rounded="xl" color="surface">
       <!-- Header com gradiente -->
       <v-sheet
         class="d-flex align-center justify-space-between pa-2"
         rounded="t-xl"
-        :style="{ background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #6366f1 100%)' }"
+        color="senai-navy"
       >
         <div class="d-flex align-center">
-          <v-avatar size="64" class="elevation-8" :style="{ border: '4px solid rgba(255,255,255,0.3)' }">
+          <v-avatar size="64" class="elevation-8" color="white">
             <v-img :src="pessoa.foto" />
           </v-avatar>
           <div class="ml-4">

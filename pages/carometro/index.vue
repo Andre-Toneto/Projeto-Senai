@@ -52,7 +52,7 @@
                       color="senai-light-blue"
                       variant="outlined"
                       @click="selectRecentTurma(turma)"
-                      style="cursor: pointer"
+                      clickable
                     >
                       {{ turma }}
                     </v-chip>

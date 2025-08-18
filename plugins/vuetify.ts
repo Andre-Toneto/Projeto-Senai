@@ -2,6 +2,7 @@
 import '@mdi/font/css/materialdesignicons.css'
 
 import 'vuetify/styles'
+import '~/assets/css/main.css'
 import { createVuetify } from 'vuetify'
 
 export default defineNuxtPlugin((app) => {
@@ -30,6 +31,11 @@ export default defineNuxtPlugin((app) => {
             'senai-gray': '#f1f5f9'
           }
         }
+      }
+    },
+    defaults: {
+      global: {
+        ripple: false
       }
     }
   })
