@@ -101,6 +101,7 @@
 </template>
 
 <script setup>
+const { toggleNavigation, isNavigationVisible } = useNavigation()
 const currentDate = ref('Portal SENAI')
 
 onMounted(() => {
