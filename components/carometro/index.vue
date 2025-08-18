@@ -8,9 +8,9 @@
         cols="12"
         sm="6"
         md="4"
-        lg="3"
+        lg="2"
         xl="2"
-        class="d-flex"
+        class="d-flex pa-1"
       >
         <v-card
           @click="abrirModal(pessoa)"
@@ -36,7 +36,7 @@
           </v-card-subtitle>
 
           <!-- Badge de Status -->
-          <div class="text-center pb-4">
+          <div class="d-flex justify-center text-center pb-4 ">
             <v-chip
               size="small"
               color="success"
@@ -45,21 +45,11 @@
               <v-icon start size="small">mdi-check-circle</v-icon>
               Ativo
             </v-chip>
-          </div>
-
-          <!-- Informações Rápidas -->
-          <v-card-text class="px-4 pt-0 pb-4">
-            <v-row dense>
-              <v-col cols="6" class="text-center">
+             <div class="ml-3 text-center">
                 <div class="text-caption text-medium-emphasis">Matrícula</div>
                 <div class="text-body-2 font-weight-medium">{{ pessoa.matricula }}</div>
-              </v-col>
-              <v-col cols="6" class="text-center">
-                <div class="text-caption text-medium-emphasis">Turma</div>
-                <div class="text-body-2 font-weight-medium">{{ pessoa.turma }}</div>
-              </v-col>
-            </v-row>
-          </v-card-text>
+              </div>
+          </div>
         </v-card>
       </v-col>
     </v-row>

@@ -13,7 +13,7 @@
                   max-width="200"
                   class="mb-8"
                 />
-                <h1 class="text-h3 text-white font-weight-light mb-4">DIÁRIO FIC</h1>
+                <h1 class="text-h3 text-white font-weight-light mb-4"></h1>
                 <v-icon size="120" color="rgba(255,255,255,0.3)">mdi-school</v-icon>
               </div>
             </v-sheet>
