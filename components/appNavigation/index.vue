@@ -1,8 +1,11 @@
 <template>
   <v-navigation-drawer
+    v-model="isNavigationVisible"
     app
-    permanent
+    :permanent="!isMobile"
+    :temporary="isMobile"
     :width="navigationWidth"
+    :rail="isNavigationRail && !isMobile"
     color="surface"
     elevation="4"
     border="0"
