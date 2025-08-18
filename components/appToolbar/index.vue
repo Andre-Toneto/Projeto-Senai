@@ -26,7 +26,7 @@
 
     <!-- Desktop Menu Items -->
     <template v-slot:append>
-      <div class="d-none d-lg-flex">
+      <div class="d-none d-lg-flex align-center">
         <v-btn
           v-for="item in menuItems"
           :key="item.text"
@@ -38,6 +38,19 @@
         >
           <v-icon size="small" class="mr-1">{{ item.icon }}</v-icon>
           {{ item.text }}
+        </v-btn>
+
+        <v-divider vertical class="mx-2 opacity-30" />
+
+        <v-btn
+          @click="handleLogout"
+          variant="text"
+          size="small"
+          class="text-caption"
+          color="white"
+        >
+          <v-icon size="small" class="mr-1">mdi-logout</v-icon>
+          Sair
         </v-btn>
       </div>
 
@@ -61,6 +74,15 @@
               <v-icon>{{ item.icon }}</v-icon>
             </template>
             <v-list-item-title>{{ item.text }}</v-list-item-title>
+          </v-list-item>
+
+          <v-divider />
+
+          <v-list-item @click="handleLogout">
+            <template v-slot:prepend>
+              <v-icon>mdi-logout</v-icon>
+            </template>
+            <v-list-item-title>Sair</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
