@@ -17,7 +17,8 @@
           hover
           rounded="xl"
           elevation="4"
-          class="person-card flex-grow-1"
+          class="flex-grow-1 cursor-pointer"
+          :border="false"
         >
           <!-- Avatar/Foto -->
           <div class="text-center pt-6 pb-2">
