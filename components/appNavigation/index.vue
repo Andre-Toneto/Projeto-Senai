@@ -73,8 +73,22 @@
 </template>
 
 <script setup>
+import { useDisplay } from 'vuetify'
+
 const route = useRoute()
-const navigationWidth = ref(280)
+const { xs, mobile } = useDisplay()
+const { isNavigationVisible, isNavigationRail, toggleNavigationRail } = useNavigation()
+
+// Computed para detectar dispositivos móveis
+const isMobile = computed(() => xs.value)
+
+// Largura dinâmica baseada no estado
+const navigationWidth = computed(() => {
+  if (isNavigationRail.value && !isMobile.value) {
+    return 72
+  }
+  return isMobile.value ? 280 : 280
+})
 
 const navItems = [
   { text: 'Carômetro', route: 'carometro/login', icon: 'mdi-account-group', badge: 'Novo' },
@@ -100,18 +114,10 @@ const openHelp = () => {
   console.log('Abrindo ajuda...')
 }
 
-onMounted(() => {
-  if (process.client) {
-    const updateWidth = () => {
-      navigationWidth.value = window.innerWidth < 960 ? 260 : 280
-    }
-
-    updateWidth()
-    window.addEventListener('resize', updateWidth)
-
-    onUnmounted(() => {
-      window.removeEventListener('resize', updateWidth)
-    })
+// Fechar navegação automático em mobile quando navegar
+watch(() => route.path, () => {
+  if (isMobile.value && isNavigationVisible.value) {
+    isNavigationVisible.value = false
   }
 })
 </script>
