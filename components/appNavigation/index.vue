@@ -38,23 +38,43 @@
 
     <!-- Navigation Items -->
     <v-list density="comfortable" nav class="pa-2">
-      <v-list-item
-        v-for="item in navItems"
-        :key="item.text"
-        :to="`/${item.route}`"
-        rounded="xl"
-        class="mb-1"
-      >
-        <template v-slot:prepend>
-          <v-icon :color="getIconColor(item.route)">{{ item.icon }}</v-icon>
-        </template>
-        <v-list-item-title class="font-weight-medium">{{ item.text }}</v-list-item-title>
-        <template v-slot:append v-if="item.badge">
-          <v-chip size="x-small" color="senai-red" text-color="white">
-            {{ item.badge }}
-          </v-chip>
-        </template>
-      </v-list-item>
+      <template v-for="item in navItems" :key="item.text">
+        <v-tooltip
+          v-if="isNavigationRail && !isMobile"
+          location="end"
+          :text="item.text"
+        >
+          <template v-slot:activator="{ props }">
+            <v-list-item
+              v-bind="props"
+              :to="`/${item.route}`"
+              rounded="xl"
+              class="mb-1 justify-center"
+            >
+              <template v-slot:prepend>
+                <v-icon :color="getIconColor(item.route)">{{ item.icon }}</v-icon>
+              </template>
+            </v-list-item>
+          </template>
+        </v-tooltip>
+
+        <v-list-item
+          v-else
+          :to="`/${item.route}`"
+          rounded="xl"
+          class="mb-1"
+        >
+          <template v-slot:prepend>
+            <v-icon :color="getIconColor(item.route)">{{ item.icon }}</v-icon>
+          </template>
+          <v-list-item-title class="font-weight-medium">{{ item.text }}</v-list-item-title>
+          <template v-slot:append v-if="item.badge">
+            <v-chip size="x-small" color="senai-red" text-color="white">
+              {{ item.badge }}
+            </v-chip>
+          </template>
+        </v-list-item>
+      </template>
     </v-list>
 
     <!-- Footer -->
