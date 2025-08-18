@@ -116,8 +116,9 @@ const openHelp = () => {
 
 // Fechar navegação automático em mobile quando navegar
 watch(() => route.path, () => {
-  if (isMobile.value && isNavigationVisible.value) {
-    isNavigationVisible.value = false
+  if (isMobile.value && unref(isNavigationVisible)) {
+    const { hideNavigation } = useNavigation()
+    hideNavigation()
   }
 })
 </script>
