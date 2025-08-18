@@ -164,17 +164,3 @@ const abrirModal = (pessoa) => {
   emit('selectPessoa', pessoa)
 }
 </script>
-
-<style scoped>
-.person-card {
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-}
-
-.person-card:hover {
-  transform: translateY(-8px);
-  border-color: rgb(var(--v-theme-senai-red));
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-}
-</style>
