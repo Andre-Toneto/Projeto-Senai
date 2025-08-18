@@ -57,7 +57,7 @@
               rounded="lg"
               hover
               @click="openPowerBI"
-              style="cursor: pointer"
+              class="cursor-pointer"
             >
               <v-sheet color="warning" class="pa-4 text-center">
                 <v-icon size="40" color="white" class="mb-2">mdi-chart-bar</v-icon>
@@ -74,7 +74,7 @@
               rounded="lg"
               hover
               @click="openPlanning"
-              style="cursor: pointer"
+              class="cursor-pointer"
             >
               <v-sheet color="info" class="pa-4 text-center">
                 <v-icon size="40" color="white" class="mb-2">mdi-calendar-edit</v-icon>
@@ -106,7 +106,7 @@
           rounded="lg"
           hover
           @click="openTool(tool)"
-          style="cursor: pointer"
+          class="cursor-pointer"
         >
           <v-card-text class="pa-4 text-center">
             <v-icon :color="tool.color" size="36" class="mb-3">{{ tool.icon }}</v-icon>
