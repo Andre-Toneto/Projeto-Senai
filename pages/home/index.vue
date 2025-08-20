@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <!-- Welcome Section -->
-    <v-card color="senai-navy" dark elevation="8" rounded="lg" class="mb-6">
+    <v-card color="senai-red" dark elevation="8" rounded="lg" class="mb-6">
       <v-card-text class="pa-6">
         <v-row align="center">
           <v-col cols="12" md="8">
@@ -90,7 +90,7 @@
     <!-- Additional Tools Section -->
     <v-row class="mt-6">
       <v-col cols="12">
-        <h2 class="text-h4 text-senai-navy font-weight-medium mb-4">Ferramentas Principais</h2>
+        <h2 class="text-h4 text-senai-red font-weight-medium mb-4">Ferramentas Principais</h2>
       </v-col>
 
       <v-col
@@ -110,7 +110,7 @@
         >
           <v-card-text class="pa-4 text-center">
             <v-icon :color="tool.color" size="36" class="mb-3">{{ tool.icon }}</v-icon>
-            <h4 class="text-h6 text-senai-navy font-weight-medium">{{ tool.name }}</h4>
+            <h4 class="text-h6 text-senai-red font-weight-medium">{{ tool.name }}</h4>
             <p class="text-body-2 text-medium-emphasis mb-0">{{ tool.description }}</p>
           </v-card-text>
         </v-card>
@@ -128,7 +128,7 @@ const mainTools = ref([
     description: 'Gestão de alunos',
     icon: 'mdi-account-group',
     color: 'senai-red',
-    route: '/carometro/login'
+    route: '/carometro'
   },
   {
     name: 'Calendário',
