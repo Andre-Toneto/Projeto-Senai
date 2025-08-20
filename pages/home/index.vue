@@ -128,7 +128,7 @@ const mainTools = ref([
     description: 'Gestão de alunos',
     icon: 'mdi-account-group',
     color: 'senai-red',
-    route: '/carometro'
+    route: '/carometro/login'
   },
   {
     name: 'Calendário',
