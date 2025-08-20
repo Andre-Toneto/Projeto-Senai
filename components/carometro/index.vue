@@ -27,7 +27,7 @@
           </div>
 
           <!-- Informações -->
-          <v-card-title class="text-center text-h6 font-weight-bold text-senai-navy px-4 pb-1">
+          <v-card-title class="text-center text-h6 font-weight-bold text-senai-red px-4 pb-1">
             {{ pessoa.nome }}
           </v-card-title>
 
