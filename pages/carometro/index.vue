@@ -128,6 +128,12 @@ const turmaRules = [
 
 onMounted(() => {
   if (process.client) {
+    const isAuthenticated = sessionStorage.getItem('carometro_authenticated')
+    if (!isAuthenticated) {
+      router.push('/carometro/login')
+      return
+    }
+
     const turma = sessionStorage.getItem('turma_selecionada')
     if (turma) {
       turmaSelecionada.value = turma
