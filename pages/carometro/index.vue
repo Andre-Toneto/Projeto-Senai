@@ -9,7 +9,7 @@
               <v-card-title class="text-center pb-4">
                 <div class="text-center">
                   <v-icon size="56" color="senai-red" class="mb-3">mdi-school</v-icon>
-                  <h2 class="text-h4 text-senai-navy font-weight-medium mb-2">Selecionar Turma</h2>
+                  <h2 class="text-h4 text-senai-red font-weight-medium mb-2">Selecionar Turma</h2>
                   <p class="text-body-1 text-medium-emphasis">Digite o código da turma para visualizar os alunos</p>
                 </div>
               </v-card-title>
@@ -31,7 +31,7 @@
                   <v-btn
                     :disabled="!valid"
                     :loading="loading"
-                    color="senai-navy"
+                    color="senai-red"
                     size="large"
                     block
                     type="submit"
@@ -44,7 +44,7 @@
                 <!-- Turmas Recentes -->
                 <div v-if="recentTurmas.length > 0" class="mt-6 text-center">
                   <v-divider class="mb-4" />
-                  <h3 class="text-h6 text-senai-navy font-weight-medium mb-3">Turmas Recentes</h3>
+                  <h3 class="text-h6 text-senai-red font-weight-medium mb-3">Turmas Recentes</h3>
                   <v-chip-group>
                     <v-chip
                       v-for="turma in recentTurmas"
@@ -69,7 +69,7 @@
     <div v-else>
       <!-- Header da Turma -->
       <v-container fluid>
-        <v-card color="senai-navy" dark elevation="4" rounded="lg" class="mb-4">
+        <v-card color="senai-red" dark elevation="4" rounded="lg" class="mb-4">
           <v-card-text class="pa-4">
             <v-row align="center">
               <v-col>
@@ -128,12 +128,6 @@ const turmaRules = [
 
 onMounted(() => {
   if (process.client) {
-    const isAuthenticated = sessionStorage.getItem('carometro_authenticated')
-    if (!isAuthenticated) {
-      router.push('/carometro/login')
-      return
-    }
-
     const turma = sessionStorage.getItem('turma_selecionada')
     if (turma) {
       turmaSelecionada.value = turma
