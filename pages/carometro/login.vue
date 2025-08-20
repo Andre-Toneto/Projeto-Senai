@@ -6,7 +6,7 @@
           <v-card-title class="text-center pb-4">
             <div class="text-center">
               <v-icon size="48" color="senai-red" class="mb-2">mdi-account-group</v-icon>
-              <h2 class="text-h4 text-senai-navy font-weight-medium mb-2">Acesso ao Carômetro</h2>
+              <h2 class="text-h4 text-senai-red font-weight-medium mb-2">Acesso ao Carômetro</h2>
               <p class="text-body-1 text-medium-emphasis">Autenticação necessária</p>
             </div>
           </v-card-title>
@@ -37,7 +37,7 @@
               <v-btn
                 :disabled="!valid"
                 :loading="loading"
-                color="senai-navy"
+                color="senai-red"
                 size="large"
                 block
                 type="submit"
