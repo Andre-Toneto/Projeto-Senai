@@ -32,10 +32,11 @@ export const useGoogleSheets = () => {
   // Verificar se está usando URL de exemplo
   const isUsingExampleUrl = () => {
     const url = getSheetUrl()
-    return url.includes('1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO') ||
-           url.includes('example') ||
+    // A planilha 1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO agora é real, não mais exemplo
+    return url.includes('example') ||
            !url ||
-           url === ''
+           url === '' ||
+           url.includes('EXEMPLO')
   }
 
   // Salvar nova URL da planilha
