@@ -16,7 +16,7 @@
     <!-- Date Section -->
     <v-icon size="small" class="mr-2">mdi-calendar</v-icon>
     <ClientOnly fallback-tag="span" class="text-body-2">
-      <span class="text-body-2 font-weight-medium text-capitalize">{{ currentDate }}</span>
+      <span class="text-body-2 font-weight-medium text-capitalize">{{ formattedDate }}</span>
       <template #fallback>
         <span class="text-body-2">Portal SENAI</span>
       </template>
@@ -69,18 +69,17 @@
 </template>
 
 <script setup>
-const currentDate = ref('Portal SENAI')
-
-onMounted(() => {
+const formattedDate = computed(() => {
   if (process.client) {
     const date = new Date()
-    currentDate.value = date.toLocaleDateString('pt-BR', {
+    return date.toLocaleDateString('pt-BR', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     })
   }
+  return 'Portal SENAI'
 })
 
 const menuItems = [
