@@ -187,111 +187,90 @@
 </template>
 
 <script setup>
+const props = defineProps({
+  turma: String
+})
+
 const emit = defineEmits(['selectPessoa'])
 
-const pessoas = ref([
-  {
-    nome: "Ana Souza",
-    cargo: "Coordenadora Pedagógica",
-    foto: "https://randomuser.me/api/portraits/women/10.jpg",
-    matricula: "2025001",
-    turma: "T1",
-    curso: "Pedagogia",
-    endereco: "Rua das Flores, 123",
-    bairro: "Centro",
-    cidade: "São Paulo",
-    estado: "SP",
-    cep: "01000-000",
-    telefone: "(11) 3333-4444",
-    celular: "(11) 98888-7777",
-    rg: "12.345.678-9",
-    cpf: "123.456.789-00",
-    mae: "Maria Souza",
-    pai: "João Souza",
-    empresa: "SENAI",
-    ocorrencias: [
-      "Atraso no dia 12/03/2025",
-      "Participou de evento interno em 20/05/2025",
-      "Recebeu elogio por desempenho em 01/07/2025"
-    ]
-  },
-  {
-    nome: "Carlos Pereira",
-    cargo: "Professor de Matemática",
-    foto: "https://randomuser.me/api/portraits/men/12.jpg",
-    matricula: "2025002",
-    turma: "M2",
-    curso: "Licenciatura em Matemática",
-    endereco: "Av. Paulista, 500",
-    bairro: "Bela Vista",
-    cidade: "São Paulo",
-    estado: "SP",
-    cep: "01310-000",
-    telefone: "(11) 3555-6666",
-    celular: "(11) 97777-8888",
-    rg: "98.765.432-1",
-    cpf: "987.654.321-00",
-    mae: "Clara Pereira",
-    pai: "Roberto Pereira",
-    empresa: "SENAI",
-    ocorrencias: [
-      "Faltou em reunião dia 14/04/2025",
-      "Entregou relatório pedagógico em 10/06/2025"
-    ]
-  },
-  {
-    nome: "Maria Silva",
-    cargo: "Professora de Português",
-    foto: "https://randomuser.me/api/portraits/women/25.jpg",
-    matricula: "2025003",
-    turma: "P1",
-    curso: "Licenciatura em Letras",
-    endereco: "Rua da Consolação, 800",
-    bairro: "Consolação",
-    cidade: "São Paulo",
-    estado: "SP",
-    cep: "01302-000",
-    telefone: "(11) 4444-5555",
-    celular: "(11) 96666-7777",
-    rg: "11.222.333-4",
-    cpf: "111.222.333-44",
-    mae: "Rosa Silva",
-    pai: "José Silva",
-    empresa: "SENAI",
-    ocorrencias: [
-      "Ministrou palestra em 15/02/2025",
-      "Participou de formação continuada"
-    ]
-  },
-  {
-    nome: "João Santos",
-    cargo: "Aluno",
-    foto: "https://randomuser.me/api/portraits/men/35.jpg",
-    matricula: "2025004",
-    turma: "T1",
-    curso: "Técnico em Informática",
-    endereco: "Rua Augusta, 200",
-    bairro: "Jardins",
-    cidade: "São Paulo",
-    estado: "SP",
-    cep: "01305-000",
-    telefone: "(11) 5555-6666",
-    celular: "(11) 95555-6666",
-    rg: "22.333.444-5",
-    cpf: "222.333.444-55",
-    mae: "Ana Santos",
-    pai: "Pedro Santos",
-    empresa: "SENAI",
-    ocorrencias: [
-      "Excelente desempenho em projeto",
-      "Participou de olimpíada de programação"
-    ]
+const pessoas = ref([])
+const loading = ref(false)
+const modalAlunoAberto = ref(false)
+const alunoEditando = ref(null)
+const dialogExclusao = ref(false)
+const pessoaParaExcluir = ref(null)
+const excluindo = ref(false)
+
+const carregarAlunos = async () => {
+  if (!props.turma) return
+
+  loading.value = true
+  try {
+    const response = await $fetch(`/api/alunos/load?turma=${props.turma}`)
+    pessoas.value = response.alunos || []
+  } catch (error) {
+    console.error('Erro ao carregar alunos:', error)
+    pessoas.value = []
+  } finally {
+    loading.value = false
   }
-])
+}
 
 const abrirModal = (pessoa) => {
   emit('selectPessoa', pessoa)
 }
+
+const abrirModalAdicionar = () => {
+  alunoEditando.value = null
+  modalAlunoAberto.value = true
+}
+
+const editarPessoa = (pessoa) => {
+  alunoEditando.value = pessoa
+  modalAlunoAberto.value = true
+}
+
+const confirmarExclusao = (pessoa) => {
+  pessoaParaExcluir.value = pessoa
+  dialogExclusao.value = true
+}
+
+const excluirPessoa = async () => {
+  if (!pessoaParaExcluir.value) return
+
+  excluindo.value = true
+
+  try {
+    await $fetch('/api/alunos/delete', {
+      method: 'DELETE',
+      body: {
+        turma: props.turma,
+        matricula: pessoaParaExcluir.value.matricula
+      }
+    })
+
+    // Recarregar lista
+    await carregarAlunos()
+
+    dialogExclusao.value = false
+    pessoaParaExcluir.value = null
+
+  } catch (error) {
+    console.error('Erro ao excluir pessoa:', error)
+    alert('Erro ao excluir pessoa')
+  } finally {
+    excluindo.value = false
+  }
+}
+
+// Carregar alunos quando o componente for montado ou a turma mudar
+watch(() => props.turma, carregarAlunos, { immediate: true })
+
+onMounted(() => {
+  if (props.turma) {
+    carregarAlunos()
+  }
+})
 </script>
 
 <style scoped>
