@@ -102,39 +102,25 @@
           hover
           rounded="xl"
           elevation="4"
-          class="person-card flex-grow-1 position-relative"
+          class="person-card flex-grow-1"
+          @click="abrirModal(pessoa)"
+          style="cursor: pointer"
         >
-          <!-- Menu de ações -->
-          <v-menu location="bottom end">
-            <template v-slot:activator="{ props }">
-              <v-btn
-                v-bind="props"
-                icon="mdi-dots-vertical"
-                variant="text"
-                size="small"
-                class="position-absolute"
-                style="top: 8px; right: 8px; z-index: 1"
-              />
-            </template>
-            <v-list density="compact">
-              <v-list-item @click="editarPessoa(pessoa)">
-                <template v-slot:prepend>
-                  <v-icon color="senai-red">mdi-pencil</v-icon>
-                </template>
-                <v-list-item-title>Editar</v-list-item-title>
-              </v-list-item>
-              <v-list-item @click="confirmarExclusao(pessoa)">
-                <template v-slot:prepend>
-                  <v-icon color="error">mdi-delete</v-icon>
-                </template>
-                <v-list-item-title>Excluir</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+          <!-- Badge da planilha -->
+          <v-chip
+            size="x-small"
+            color="success"
+            variant="flat"
+            class="position-absolute"
+            style="top: 8px; right: 8px; z-index: 1"
+          >
+            <v-icon start size="x-small">mdi-google-spreadsheet</v-icon>
+            Planilha
+          </v-chip>
 
           <!-- Avatar/Foto -->
-          <div class="text-center pt-6 pb-2" @click="abrirModal(pessoa)">
-            <v-avatar size="80" class="elevation-4" style="cursor: pointer">
+          <div class="text-center pt-6 pb-2">
+            <v-avatar size="80" class="elevation-4">
               <v-img
                 v-if="pessoa.foto"
                 :src="pessoa.foto"
@@ -151,24 +137,16 @@
           </div>
 
           <!-- Informações -->
-          <v-card-title
-            class="text-center text-h6 font-weight-bold text-senai-red px-4 pb-1"
-            @click="abrirModal(pessoa)"
-            style="cursor: pointer"
-          >
+          <v-card-title class="text-center text-h6 font-weight-bold text-senai-red px-4 pb-1">
             {{ pessoa.nome }}
           </v-card-title>
 
-          <v-card-subtitle
-            class="text-center text-body-2 text-medium-emphasis px-4 pb-2"
-            @click="abrirModal(pessoa)"
-            style="cursor: pointer"
-          >
+          <v-card-subtitle class="text-center text-body-2 text-medium-emphasis px-4 pb-2">
             {{ pessoa.cargo }}
           </v-card-subtitle>
 
-          <!-- Badge de Status -->
-          <div class="d-flex justify-center text-center pb-4">
+          <!-- Badge de Status e Matrícula -->
+          <div class="d-flex justify-center align-center text-center pb-4 gap-2">
             <v-chip
               size="small"
               color="success"
@@ -177,7 +155,7 @@
               <v-icon start size="small">mdi-check-circle</v-icon>
               Ativo
             </v-chip>
-            <div class="ml-3 text-center">
+            <div class="text-center">
               <div class="text-caption text-medium-emphasis">Matrícula</div>
               <div class="text-body-2 font-weight-medium">{{ pessoa.matricula }}</div>
             </div>
