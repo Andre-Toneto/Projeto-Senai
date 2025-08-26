@@ -202,11 +202,14 @@ const pessoaParaExcluir = ref(null)
 const excluindo = ref(false)
 
 const carregarAlunos = async () => {
-  if (!props.turma) return
+  if (!props.turma || !process.client) return
 
   loading.value = true
   try {
-    const response = await $fetch(`/api/alunos/load?turma=${props.turma}`)
+    const response = await $fetch(`/api/alunos/load`, {
+      method: 'GET',
+      query: { turma: props.turma }
+    })
     pessoas.value = response.alunos || []
   } catch (error) {
     console.error('Erro ao carregar alunos:', error)
@@ -236,12 +239,12 @@ const confirmarExclusao = (pessoa) => {
 }
 
 const excluirPessoa = async () => {
-  if (!pessoaParaExcluir.value) return
+  if (!pessoaParaExcluir.value || !process.client) return
 
   excluindo.value = true
 
   try {
-    await $fetch('/api/alunos/delete', {
+    const response = await $fetch('/api/alunos/delete', {
       method: 'DELETE',
       body: {
         turma: props.turma,
@@ -249,25 +252,34 @@ const excluirPessoa = async () => {
       }
     })
 
-    // Recarregar lista
-    await carregarAlunos()
+    if (response.success) {
+      // Recarregar lista
+      await carregarAlunos()
 
-    dialogExclusao.value = false
-    pessoaParaExcluir.value = null
+      dialogExclusao.value = false
+      pessoaParaExcluir.value = null
+    }
 
   } catch (error) {
     console.error('Erro ao excluir pessoa:', error)
-    alert('Erro ao excluir pessoa')
+    if (process.client) {
+      alert('Erro ao excluir pessoa: ' + (error.message || 'Erro desconhecido'))
+    }
   } finally {
     excluindo.value = false
   }
 }
 
-// Carregar alunos quando o componente for montado ou a turma mudar
-watch(() => props.turma, carregarAlunos, { immediate: true })
-
+// Carregar alunos apenas no cliente
 onMounted(() => {
-  if (props.turma) {
+  if (process.client && props.turma) {
+    carregarAlunos()
+  }
+})
+
+// Watch para mudanças na turma, mas apenas no cliente
+watch(() => props.turma, (newTurma) => {
+  if (process.client && newTurma) {
     carregarAlunos()
   }
 })
