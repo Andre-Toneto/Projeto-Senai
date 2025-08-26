@@ -108,11 +108,13 @@ Os dados são salvos em formato JSON dentro de arquivos TXT:
 
 ## Observações Importantes
 
-- Os dados ficam salvos localmente no seu PC
-- Cada turma tem seu próprio arquivo de dados
-- As fotos são redimensionadas automaticamente
-- O sistema mantém histórico de todas as alterações
-- É possível fazer backup copiando a pasta `data/`
+- ✅ **Funciona no Builder.io e localmente**
+- 💾 **Dados salvos no localStorage do navegador**
+- 📱 **Cada turma tem armazenamento separado**
+- 🖼️ **Fotos convertidas para base64 (máx 2MB)**
+- 💾 **Backup automático via export/import JSON**
+- 🔄 **Sistema funciona offline após carregamento inicial**
+- ⚠️ **Dados ficam no navegador - faça backup regularmente**
 
 ## Credenciais de Acesso
 
