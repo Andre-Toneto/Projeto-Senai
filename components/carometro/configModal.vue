@@ -68,15 +68,48 @@
 
         <!-- Configuração da URL -->
         <v-form ref="form" v-model="valid">
+          <!-- Seletor de Aba -->
+          <v-card variant="outlined" class="mb-4">
+            <v-card-title class="text-h6 pa-4 pb-2">
+              <v-icon class="mr-2">mdi-tab</v-icon>
+              Selecionar Aba da Planilha
+            </v-card-title>
+            <v-card-text class="pt-0">
+              <v-radio-group
+                v-model="selectedSheetGid"
+                @update:model-value="onSheetChange"
+                class="mt-0"
+              >
+                <v-radio
+                  v-for="sheet in availableSheets"
+                  :key="sheet.gid"
+                  :label="sheet.name"
+                  :value="sheet.gid"
+                  color="senai-red"
+                >
+                  <template v-slot:label>
+                    <div>
+                      <strong>{{ sheet.name }}</strong>
+                      <div class="text-caption text-medium-emphasis">
+                        GID: {{ sheet.gid }}
+                      </div>
+                    </div>
+                  </template>
+                </v-radio>
+              </v-radio-group>
+            </v-card-text>
+          </v-card>
+
           <v-text-field
             v-model="sheetUrl"
-            label="URL da Planilha (formato CSV)"
+            label="URL da Planilha (Gerada Automaticamente)"
             variant="outlined"
             density="comfortable"
             :rules="urlRules"
             prepend-inner-icon="mdi-google-spreadsheet"
-            hint="Use o link de export CSV do Google Sheets"
+            hint="URL gerada automaticamente baseada na aba selecionada"
             persistent-hint
+            readonly
             class="mb-4"
           />
 
