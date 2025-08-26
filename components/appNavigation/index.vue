@@ -10,7 +10,7 @@
     <!-- Header -->
     <v-list-item class="pa-4">
       <template v-slot:prepend>
-        <v-icon color="senai-navy" size="large">mdi-view-dashboard</v-icon>
+        <v-icon color="senai-red" size="large">mdi-view-dashboard</v-icon>
       </template>
       <v-list-item-title class="text-h6 font-weight-medium">Menu Principal</v-list-item-title>
     </v-list-item>

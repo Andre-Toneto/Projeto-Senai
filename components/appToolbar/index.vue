@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app color="senai-navy" dark elevation="4" density="comfortable">
+  <v-app-bar app color="senai-red" dark elevation="4" density="comfortable">
     <!-- Logo Section -->
     <template v-slot:prepend>
       <v-img

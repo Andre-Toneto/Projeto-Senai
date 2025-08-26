@@ -1,10 +1,96 @@
 <template>
   <v-container fluid>
+    <!-- Cabeçalho com botões de ação -->
+    <v-row class="mb-4">
+      <v-col>
+        <div class="d-flex justify-space-between align-center flex-wrap ga-2">
+          <div>
+            <h3 class="text-h6 text-senai-red font-weight-medium">
+              {{ pessoas.length }} {{ pessoas.length === 1 ? 'pessoa cadastrada' : 'pessoas cadastradas' }}
+            </h3>
+            <p class="text-caption text-medium-emphasis mb-0">
+              <v-icon size="small" class="mr-1">mdi-google-spreadsheet</v-icon>
+              Dados sincronizados da planilha
+              <span v-if="cacheInfo">
+                • Última atualização: {{ cacheInfo.minutesAgo }}min atrás
+              </span>
+            </p>
+          </div>
+          <div class="d-flex ga-2 flex-wrap">
+            <!-- Status de sincronização -->
+            <v-chip
+              v-if="cacheInfo"
+              :color="cacheInfo.isStale ? 'warning' : 'success'"
+              :prepend-icon="cacheInfo.isStale ? 'mdi-clock-alert' : 'mdi-check-circle'"
+              size="small"
+              variant="outlined"
+            >
+              {{ cacheInfo.isStale ? 'Desatualizado' : 'Atualizado' }}
+            </v-chip>
+
+            <!-- Botões de ação -->
+            <v-btn
+              variant="outlined"
+              color="senai-red"
+              prepend-icon="mdi-cog"
+              size="small"
+              @click="abrirConfigModal"
+            >
+              Config
+            </v-btn>
+
+            <v-btn
+              variant="outlined"
+              color="primary"
+              prepend-icon="mdi-refresh"
+              size="small"
+              :loading="loadingRefresh"
+              @click="atualizarDados"
+            >
+              Atualizar
+            </v-btn>
+          </div>
+        </div>
+      </v-col>
+    </v-row>
+
+    <!-- Loading -->
+    <div v-if="loading" class="text-center py-8">
+      <v-progress-circular indeterminate color="senai-red" size="64" />
+      <p class="text-body-1 text-medium-emphasis mt-4">Carregando dados...</p>
+    </div>
+
+    <!-- Lista vazia -->
+    <div v-else-if="pessoas.length === 0" class="text-center py-12">
+      <v-icon size="80" color="grey-lighten-2" class="mb-4">mdi-google-spreadsheet</v-icon>
+      <h3 class="text-h6 text-medium-emphasis mb-2">Nenhuma pessoa encontrada</h3>
+      <p class="text-body-2 text-medium-emphasis mb-6">
+        Verifique se a turma <strong>{{ turma }}</strong> existe na planilha
+      </p>
+      <div class="d-flex gap-2 justify-center flex-wrap">
+        <v-btn
+          color="senai-red"
+          prepend-icon="mdi-cog"
+          @click="abrirConfigModal"
+        >
+          Configurar Planilha
+        </v-btn>
+        <v-btn
+          variant="outlined"
+          color="primary"
+          prepend-icon="mdi-refresh"
+          @click="atualizarDados"
+        >
+          Atualizar Dados
+        </v-btn>
+      </div>
+    </div>
+
     <!-- Grid Responsivo Moderno -->
-    <v-row class="d-flex">
+    <v-row v-else class="d-flex">
       <v-col
         v-for="pessoa in pessoas"
-        :key="pessoa.nome"
+        :key="pessoa.matricula"
         cols="12"
         sm="6"
         md="4"
@@ -13,21 +99,45 @@
         class="d-flex pa-1"
       >
         <v-card
-          @click="abrirModal(pessoa)"
           hover
           rounded="xl"
           elevation="4"
           class="person-card flex-grow-1"
+          @click="abrirModal(pessoa)"
+          style="cursor: pointer"
         >
+          <!-- Badge da planilha -->
+          <v-chip
+            size="x-small"
+            color="success"
+            variant="flat"
+            class="position-absolute"
+            style="top: 8px; right: 8px; z-index: 1"
+          >
+            <v-icon start size="x-small">mdi-google-spreadsheet</v-icon>
+            Planilha
+          </v-chip>
+
           <!-- Avatar/Foto -->
           <div class="text-center pt-6 pb-2">
             <v-avatar size="80" class="elevation-4">
-              <v-img :src="pessoa.foto" cover />
+              <v-img
+                v-if="pessoa.foto"
+                :src="pessoa.foto"
+                cover
+              />
+              <v-icon
+                v-else
+                size="40"
+                color="grey-lighten-1"
+              >
+                mdi-account
+              </v-icon>
             </v-avatar>
           </div>
 
           <!-- Informações -->
-          <v-card-title class="text-center text-h6 font-weight-bold text-senai-navy px-4 pb-1">
+          <v-card-title class="text-center text-h6 font-weight-bold text-senai-red px-4 pb-1">
             {{ pessoa.nome }}
           </v-card-title>
 
@@ -35,8 +145,8 @@
             {{ pessoa.cargo }}
           </v-card-subtitle>
 
-          <!-- Badge de Status -->
-          <div class="d-flex justify-center text-center pb-4 ">
+          <!-- Badge de Status e Matrícula -->
+          <div class="d-flex justify-center align-center text-center pb-4 gap-2">
             <v-chip
               size="small"
               color="success"
@@ -45,123 +155,104 @@
               <v-icon start size="small">mdi-check-circle</v-icon>
               Ativo
             </v-chip>
-             <div class="ml-3 text-center">
-                <div class="text-caption text-medium-emphasis">Matrícula</div>
-                <div class="text-body-2 font-weight-medium">{{ pessoa.matricula }}</div>
-              </div>
+            <div class="text-center">
+              <div class="text-caption text-medium-emphasis">Matrícula</div>
+              <div class="text-body-2 font-weight-medium">{{ pessoa.matricula }}</div>
+            </div>
           </div>
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Modal de configuração da planilha -->
+    <CarometroConfigModal
+      v-model="configModalAberto"
+      @dados-atualizados="onDadosAtualizados"
+    />
   </v-container>
 </template>
 
 <script setup>
-const emit = defineEmits(['selectPessoa'])
+const props = defineProps({
+  turma: String
+})
 
-const pessoas = ref([
-  {
-    nome: "Ana Souza",
-    cargo: "Coordenadora Pedagógica",
-    foto: "https://randomuser.me/api/portraits/women/10.jpg",
-    matricula: "2025001",
-    turma: "T1",
-    curso: "Pedagogia",
-    endereco: "Rua das Flores, 123",
-    bairro: "Centro",
-    cidade: "São Paulo",
-    estado: "SP",
-    cep: "01000-000",
-    telefone: "(11) 3333-4444",
-    celular: "(11) 98888-7777",
-    rg: "12.345.678-9",
-    cpf: "123.456.789-00",
-    mae: "Maria Souza",
-    pai: "João Souza",
-    empresa: "SENAI",
-    ocorrencias: [
-      "Atraso no dia 12/03/2025",
-      "Participou de evento interno em 20/05/2025",
-      "Recebeu elogio por desempenho em 01/07/2025"
-    ]
-  },
-  {
-    nome: "Carlos Pereira",
-    cargo: "Professor de Matemática",
-    foto: "https://randomuser.me/api/portraits/men/12.jpg",
-    matricula: "2025002",
-    turma: "M2",
-    curso: "Licenciatura em Matemática",
-    endereco: "Av. Paulista, 500",
-    bairro: "Bela Vista",
-    cidade: "São Paulo",
-    estado: "SP",
-    cep: "01310-000",
-    telefone: "(11) 3555-6666",
-    celular: "(11) 97777-8888",
-    rg: "98.765.432-1",
-    cpf: "987.654.321-00",
-    mae: "Clara Pereira",
-    pai: "Roberto Pereira",
-    empresa: "SENAI",
-    ocorrencias: [
-      "Faltou em reunião dia 14/04/2025",
-      "Entregou relatório pedagógico em 10/06/2025"
-    ]
-  },
-  {
-    nome: "Maria Silva",
-    cargo: "Professora de Português",
-    foto: "https://randomuser.me/api/portraits/women/25.jpg",
-    matricula: "2025003",
-    turma: "P1",
-    curso: "Licenciatura em Letras",
-    endereco: "Rua da Consolação, 800",
-    bairro: "Consolação",
-    cidade: "São Paulo",
-    estado: "SP",
-    cep: "01302-000",
-    telefone: "(11) 4444-5555",
-    celular: "(11) 96666-7777",
-    rg: "11.222.333-4",
-    cpf: "111.222.333-44",
-    mae: "Rosa Silva",
-    pai: "José Silva",
-    empresa: "SENAI",
-    ocorrencias: [
-      "Ministrou palestra em 15/02/2025",
-      "Participou de formação continuada"
-    ]
-  },
-  {
-    nome: "João Santos",
-    cargo: "Aluno",
-    foto: "https://randomuser.me/api/portraits/men/35.jpg",
-    matricula: "2025004",
-    turma: "T1",
-    curso: "Técnico em Informática",
-    endereco: "Rua Augusta, 200",
-    bairro: "Jardins",
-    cidade: "São Paulo",
-    estado: "SP",
-    cep: "01305-000",
-    telefone: "(11) 5555-6666",
-    celular: "(11) 95555-6666",
-    rg: "22.333.444-5",
-    cpf: "222.333.444-55",
-    mae: "Ana Santos",
-    pai: "Pedro Santos",
-    empresa: "SENAI",
-    ocorrencias: [
-      "Excelente desempenho em projeto",
-      "Participou de olimpíada de programação"
-    ]
+const emit = defineEmits(['selectPessoa', 'updateTotal'])
+
+const pessoas = ref([])
+const loading = ref(false)
+
+const { getAlunosByTurma, getCacheInfo, fetchSheetData } = useGoogleSheets()
+
+const cacheInfo = ref(null)
+const loadingRefresh = ref(false)
+const configModalAberto = ref(false)
+
+const atualizarCacheInfo = () => {
+  cacheInfo.value = getCacheInfo()
+}
+
+const carregarAlunos = async () => {
+  if (!props.turma || !process.client) return
+
+  loading.value = true
+  try {
+    // Buscar dados da planilha Google Sheets
+    pessoas.value = await getAlunosByTurma(props.turma)
+    emit('updateTotal', pessoas.value)
+    atualizarCacheInfo()
+  } catch (error) {
+    console.error('Erro ao carregar alunos:', error)
+    pessoas.value = []
+    emit('updateTotal', [])
+  } finally {
+    loading.value = false
   }
-])
+}
 
 const abrirModal = (pessoa) => {
   emit('selectPessoa', pessoa)
 }
+
+const abrirConfigModal = () => {
+  configModalAberto.value = true
+}
+
+const atualizarDados = async () => {
+  if (!process.client) return
+
+  loadingRefresh.value = true
+  try {
+    await fetchSheetData(true) // Force refresh
+    await carregarAlunos()
+  } catch (error) {
+    console.error('Erro ao atualizar dados:', error)
+    if (process.client) {
+      alert('Erro ao atualizar dados: ' + (error.message || 'Erro desconhecido'))
+    }
+  } finally {
+    loadingRefresh.value = false
+  }
+}
+
+const onDadosAtualizados = () => {
+  carregarAlunos()
+}
+
+// Carregar alunos apenas no cliente
+onMounted(() => {
+  if (process.client && props.turma) {
+    carregarAlunos()
+  }
+})
+
+// Watch para mudanças na turma, mas apenas no cliente
+watch(() => props.turma, (newTurma) => {
+  if (process.client && newTurma) {
+    carregarAlunos()
+  }
+})
+
 </script>
 
 <style scoped>
