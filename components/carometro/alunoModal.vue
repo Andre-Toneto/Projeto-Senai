@@ -303,6 +303,8 @@ const matriculaRules = [
 ]
 
 const uploadFoto = async (event) => {
+  if (!process.client) return
+
   const file = event.target.files[0]
   if (!file) return
 
@@ -317,17 +319,23 @@ const uploadFoto = async (event) => {
       body: formData
     })
 
-    aluno.value.foto = response.imageUrl
+    if (response.success) {
+      aluno.value.foto = response.imageUrl
+    } else {
+      throw new Error(response.message || 'Erro no upload')
+    }
   } catch (error) {
     console.error('Erro ao fazer upload:', error)
-    alert('Erro ao fazer upload da imagem')
+    if (process.client) {
+      alert('Erro ao fazer upload da imagem: ' + (error.message || 'Erro desconhecido'))
+    }
   } finally {
     uploadingPhoto.value = false
   }
 }
 
 const salvarAluno = async () => {
-  if (!valid.value) return
+  if (!valid.value || !process.client) return
 
   salvando.value = true
 
@@ -340,11 +348,17 @@ const salvarAluno = async () => {
       }
     })
 
-    emit('alunoSalvo', response.alunos)
-    fecharModal()
+    if (response.success) {
+      emit('alunoSalvo', response.alunos)
+      fecharModal()
+    } else {
+      throw new Error(response.message || 'Erro ao salvar')
+    }
   } catch (error) {
     console.error('Erro ao salvar aluno:', error)
-    alert('Erro ao salvar aluno')
+    if (process.client) {
+      alert('Erro ao salvar aluno: ' + (error.message || 'Erro desconhecido'))
+    }
   } finally {
     salvando.value = false
   }
