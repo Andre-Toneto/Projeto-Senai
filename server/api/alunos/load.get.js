@@ -2,6 +2,14 @@ import { readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 
 export default defineEventHandler(async (event) => {
+  // Verificar se é método GET
+  if (getMethod(event) !== 'GET') {
+    throw createError({
+      statusCode: 405,
+      statusMessage: 'Method not allowed'
+    })
+  }
+
   try {
     const query = getQuery(event)
     const { turma } = query
@@ -32,14 +40,14 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      alunos
+      alunos: Array.isArray(alunos) ? alunos : []
     }
 
   } catch (error) {
     console.error('Erro ao carregar alunos:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erro interno do servidor'
+      statusMessage: error.message || 'Erro interno do servidor'
     })
   }
 })
