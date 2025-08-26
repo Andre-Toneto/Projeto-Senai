@@ -120,12 +120,15 @@
 const router = useRouter()
 const modalAberto = ref(false)
 const pessoaSelecionada = ref({})
+const { getTurmas, getCacheInfo } = useGoogleSheets()
+
 const turmaSelecionada = ref('')
 const totalAlunos = ref(0)
 const valid = ref(false)
 const loading = ref(false)
 const turmaCode = ref('')
-const recentTurmas = ref(['T2025-001', 'ADM-2024', 'TEC-2025'])
+const turmasDisponiveis = ref([])
+const loadingTurmas = ref(false)
 
 const turmaRules = [
   v => !!v || 'Código da turma é obrigatório'
