@@ -9,61 +9,50 @@
               {{ pessoas.length }} {{ pessoas.length === 1 ? 'pessoa cadastrada' : 'pessoas cadastradas' }}
             </h3>
             <p class="text-caption text-medium-emphasis mb-0">
-              Dados salvos localmente no seu navegador
+              <v-icon size="small" class="mr-1">mdi-google-spreadsheet</v-icon>
+              Dados sincronizados da planilha
+              <span v-if="cacheInfo">
+                • Última atualização: {{ cacheInfo.minutesAgo }}min atrás
+              </span>
             </p>
           </div>
           <div class="d-flex ga-2 flex-wrap">
-            <!-- Botões de Export/Import -->
-            <v-menu>
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  v-bind="props"
-                  variant="outlined"
-                  color="senai-red"
-                  prepend-icon="mdi-download"
-                  size="small"
-                >
-                  Backup
-                </v-btn>
-              </template>
-              <v-list>
-                <v-list-item @click="exportarDados">
-                  <template v-slot:prepend>
-                    <v-icon color="success">mdi-export</v-icon>
-                  </template>
-                  <v-list-item-title>Exportar Dados</v-list-item-title>
-                </v-list-item>
-                <v-list-item @click="$refs.importInput.click()">
-                  <template v-slot:prepend>
-                    <v-icon color="primary">mdi-import</v-icon>
-                  </template>
-                  <v-list-item-title>Importar Dados</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
+            <!-- Status de sincronização -->
+            <v-chip
+              v-if="cacheInfo"
+              :color="cacheInfo.isStale ? 'warning' : 'success'"
+              :prepend-icon="cacheInfo.isStale ? 'mdi-clock-alert' : 'mdi-check-circle'"
+              size="small"
+              variant="outlined"
+            >
+              {{ cacheInfo.isStale ? 'Desatualizado' : 'Atualizado' }}
+            </v-chip>
+
+            <!-- Botões de ação -->
+            <v-btn
+              variant="outlined"
+              color="senai-red"
+              prepend-icon="mdi-cog"
+              size="small"
+              @click="abrirConfigModal"
+            >
+              Config
+            </v-btn>
 
             <v-btn
-              color="senai-red"
-              prepend-icon="mdi-plus"
-              @click="abrirModalAdicionar"
-              elevation="2"
-              rounded="lg"
+              variant="outlined"
+              color="primary"
+              prepend-icon="mdi-refresh"
+              size="small"
+              :loading="loadingRefresh"
+              @click="atualizarDados"
             >
-              Adicionar Pessoa
+              Atualizar
             </v-btn>
           </div>
         </div>
       </v-col>
     </v-row>
-
-    <!-- Input oculto para importar -->
-    <input
-      ref="importInput"
-      type="file"
-      accept=".json"
-      style="display: none"
-      @change="importarDados"
-    />
 
     <!-- Loading -->
     <div v-if="loading" class="text-center py-8">
