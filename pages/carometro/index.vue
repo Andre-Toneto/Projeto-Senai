@@ -103,6 +103,7 @@
         <Carometro
           :turma="turmaSelecionada"
           @selectPessoa="selecionarPessoa"
+          @updateTotal="atualizarTotal"
         />
       </ClientOnly>
     </div>
