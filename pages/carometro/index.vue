@@ -41,19 +41,44 @@
                   </v-btn>
                 </v-form>
 
-                <!-- Turmas Recentes -->
-                <div v-if="recentTurmas.length > 0" class="mt-6 text-center">
+                <!-- Turmas Disponíveis -->
+                <div class="mt-6 text-center">
                   <v-divider class="mb-4" />
-                  <h3 class="text-h6 text-senai-red font-weight-medium mb-3">Turmas Recentes</h3>
-                  <v-chip-group>
+                  <div class="d-flex justify-space-between align-center mb-3">
+                    <h3 class="text-h6 text-senai-red font-weight-medium">Turmas da Planilha</h3>
+                    <v-btn
+                      variant="text"
+                      size="small"
+                      :loading="loadingTurmas"
+                      @click="carregarTurmas"
+                      prepend-icon="mdi-refresh"
+                    >
+                      Atualizar
+                    </v-btn>
+                  </div>
+
+                  <div v-if="loadingTurmas" class="text-center py-4">
+                    <v-progress-circular indeterminate color="senai-red" size="32" />
+                    <p class="text-body-2 text-medium-emphasis mt-2">Carregando turmas...</p>
+                  </div>
+
+                  <div v-else-if="turmasDisponiveis.length === 0" class="text-center py-4">
+                    <v-icon size="48" color="grey-lighten-2" class="mb-2">mdi-google-spreadsheet</v-icon>
+                    <p class="text-body-2 text-medium-emphasis">
+                      Nenhuma turma encontrada na planilha
+                    </p>
+                  </div>
+
+                  <v-chip-group v-else>
                     <v-chip
-                      v-for="turma in recentTurmas"
+                      v-for="turma in turmasDisponiveis"
                       :key="turma"
-                      color="senai-light-blue"
+                      color="senai-red"
                       variant="outlined"
-                      @click="selectRecentTurma(turma)"
+                      @click="selectTurma(turma)"
                       style="cursor: pointer"
                     >
+                      <v-icon start size="small">mdi-google-spreadsheet</v-icon>
                       {{ turma }}
                     </v-chip>
                   </v-chip-group>
