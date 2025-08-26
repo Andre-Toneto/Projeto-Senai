@@ -1,10 +1,54 @@
 export const useGoogleSheets = () => {
+  // URLs das abas disponíveis na planilha
+  const getAvailableSheets = () => {
+    return [
+      {
+        name: 'CAI',
+        gid: '274325224',
+        url: 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=274325224'
+      },
+      {
+        name: 'SESI TÉC ADM',
+        gid: '174349623',
+        url: 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=174349623'
+      },
+      {
+        name: 'SEDUC TÉC ELETROMECÂNICA',
+        gid: '792022953',
+        url: 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=792022953'
+      }
+    ]
+  }
+
   // URL padrão da planilha (pode ser alterada)
   const getSheetUrl = () => {
     if (process.client) {
-      return localStorage.getItem('googleSheets_url') || 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=0'
+      return localStorage.getItem('googleSheets_url') || 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=274325224'
     }
-    return 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=0'
+    return 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=274325224'
+  }
+
+  // Obter aba selecionada
+  const getSelectedSheet = () => {
+    if (process.client) {
+      const selectedGid = localStorage.getItem('googleSheets_selectedGid') || '274325224'
+      return getAvailableSheets().find(sheet => sheet.gid === selectedGid) || getAvailableSheets()[0]
+    }
+    return getAvailableSheets()[0]
+  }
+
+  // Definir aba selecionada
+  const setSelectedSheet = (gid) => {
+    if (process.client) {
+      localStorage.setItem('googleSheets_selectedGid', gid)
+      const selectedSheet = getAvailableSheets().find(sheet => sheet.gid === gid)
+      if (selectedSheet) {
+        localStorage.setItem('googleSheets_url', selectedSheet.url)
+        // Limpar cache ao mudar aba
+        localStorage.removeItem('googleSheets_cache')
+        localStorage.removeItem('googleSheets_lastUpdate')
+      }
+    }
   }
 
   // Carregar dados de exemplo para desenvolvimento
@@ -287,6 +331,9 @@ export const useGoogleSheets = () => {
     clearCache,
     getCacheInfo,
     isUsingExampleUrl,
-    loadExampleData
+    loadExampleData,
+    getAvailableSheets,
+    getSelectedSheet,
+    setSelectedSheet
   }
 }

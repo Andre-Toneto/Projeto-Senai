@@ -231,19 +231,25 @@ const {
   clearCache,
   getCacheInfo,
   isUsingExampleUrl,
-  loadExampleData
+  loadExampleData,
+  getAvailableSheets,
+  getSelectedSheet,
+  setSelectedSheet
 } = useGoogleSheets()
 
 const form = ref(null)
-const valid = ref(false)
+const valid = ref(true) // Sempre válido agora pois a URL é gerada automaticamente
 const salvando = ref(false)
 const carregando = ref(false)
 const atualizando = ref(false)
 const usandoExemplo = ref(false)
 const sheetUrl = ref('')
+const planilhaUrl = ref('')
 const testeResultado = ref(null)
 const cacheInfo = ref(null)
 const isUsingExample = ref(false)
+const availableSheets = ref([])
+const selectedSheetGid = ref('')
 
 const urlRules = [
   v => !!v || 'URL é obrigatória',
@@ -386,10 +392,14 @@ const fecharModal = () => {
   testeResultado.value = null
 }
 
-// Carregar URL atual quando modal abrir
+// Carregar dados quando modal abrir
 watch(() => props.modelValue, (newVal) => {
   if (newVal) {
-    sheetUrl.value = getSheetUrl()
+    availableSheets.value = getAvailableSheets()
+    const selectedSheet = getSelectedSheet()
+    selectedSheetGid.value = selectedSheet.gid
+    planilhaUrl.value = selectedSheet.url
+    sheetUrl.value = selectedSheet.url
     isUsingExample.value = isUsingExampleUrl()
     atualizarCacheInfo()
   }
@@ -397,7 +407,11 @@ watch(() => props.modelValue, (newVal) => {
 
 onMounted(() => {
   if (props.modelValue) {
-    sheetUrl.value = getSheetUrl()
+    availableSheets.value = getAvailableSheets()
+    const selectedSheet = getSelectedSheet()
+    selectedSheetGid.value = selectedSheet.gid
+    planilhaUrl.value = selectedSheet.url
+    sheetUrl.value = selectedSheet.url
     isUsingExample.value = isUsingExampleUrl()
     atualizarCacheInfo()
   }
