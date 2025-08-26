@@ -302,6 +302,8 @@ const matriculaRules = [
   v => v.length >= 3 || 'Matrícula deve ter pelo menos 3 caracteres'
 ]
 
+const { uploadImage, saveAluno: saveAlunoComposable } = useCarometro()
+
 const uploadFoto = async (event) => {
   if (!process.client) return
 
@@ -311,13 +313,7 @@ const uploadFoto = async (event) => {
   uploadingPhoto.value = true
 
   try {
-    const formData = new FormData()
-    formData.append('file', file)
-
-    const response = await $fetch('/api/upload/image', {
-      method: 'POST',
-      body: formData
-    })
+    const response = await uploadImage(file)
 
     if (response.success) {
       aluno.value.foto = response.imageUrl
@@ -340,13 +336,7 @@ const salvarAluno = async () => {
   salvando.value = true
 
   try {
-    const response = await $fetch('/api/alunos/save', {
-      method: 'POST',
-      body: {
-        turma: props.turma,
-        aluno: aluno.value
-      }
-    })
+    const response = saveAlunoComposable(props.turma, aluno.value)
 
     if (response.success) {
       emit('alunoSalvo', response.alunos)
