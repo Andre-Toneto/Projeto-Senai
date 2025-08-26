@@ -164,44 +164,11 @@
       </v-col>
     </v-row>
 
-    <!-- Modal de adicionar/editar aluno -->
-    <CarometroAlunoModal
-      v-model="modalAlunoAberto"
-      :aluno-editar="alunoEditando"
-      :turma="turma"
-      @aluno-salvo="carregarAlunos"
+    <!-- Modal de configuração da planilha -->
+    <CarometroConfigModal
+      v-model="configModalAberto"
+      @dados-atualizados="onDadosAtualizados"
     />
-
-    <!-- Dialog de confirmação de exclusão -->
-    <v-dialog v-model="dialogExclusao" max-width="400">
-      <v-card rounded="lg">
-        <v-card-title class="pa-6 pb-2">
-          <div class="text-center">
-            <v-icon size="48" color="error" class="mb-2">mdi-alert-circle</v-icon>
-            <h2 class="text-h6 text-error">Confirmar Exclusão</h2>
-          </div>
-        </v-card-title>
-
-        <v-card-text class="text-center px-6 pb-2">
-          <p class="text-body-1">
-            Tem certeza que deseja excluir <strong>{{ pessoaParaExcluir?.nome }}</strong>?
-          </p>
-          <p class="text-body-2 text-medium-emphasis">
-            Esta ação não pode ser desfeita.
-          </p>
-        </v-card-text>
-
-        <v-card-actions class="pa-6 pt-2">
-          <v-spacer />
-          <v-btn variant="outlined" @click="dialogExclusao = false">
-            Cancelar
-          </v-btn>
-          <v-btn color="error" :loading="excluindo" @click="excluirPessoa">
-            Excluir
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-container>
 </template>
 
