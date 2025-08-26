@@ -175,6 +175,20 @@ onMounted(() => {
   }
 })
 
+const carregarTurmas = async () => {
+  if (!process.client) return
+
+  loadingTurmas.value = true
+  try {
+    turmasDisponiveis.value = await getTurmas(true) // Force refresh
+  } catch (error) {
+    console.error('Erro ao carregar turmas:', error)
+    turmasDisponiveis.value = []
+  } finally {
+    loadingTurmas.value = false
+  }
+}
+
 const loadTurma = () => {
   if (!process.client) return
 
@@ -183,12 +197,6 @@ const loadTurma = () => {
   setTimeout(() => {
     if (turmaCode.value.trim()) {
       sessionStorage.setItem('turma_selecionada', turmaCode.value)
-
-      if (!recentTurmas.value.includes(turmaCode.value)) {
-        recentTurmas.value.unshift(turmaCode.value)
-        recentTurmas.value = recentTurmas.value.slice(0, 5)
-      }
-
       turmaSelecionada.value = turmaCode.value
       totalAlunos.value = 0 // Será atualizado pelo componente carômetro
     }
@@ -196,7 +204,7 @@ const loadTurma = () => {
   }, 800)
 }
 
-const selectRecentTurma = (turma) => {
+const selectTurma = (turma) => {
   if (!process.client) return
   turmaCode.value = turma
   loadTurma()
