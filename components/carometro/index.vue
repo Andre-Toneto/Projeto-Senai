@@ -10,9 +10,10 @@
             </h3>
             <p class="text-caption text-medium-emphasis mb-0">
               <v-icon size="small" class="mr-1">mdi-google-spreadsheet</v-icon>
-              Dados sincronizados da planilha
+              <span v-if="dadosExemplo">Dados de exemplo para teste</span>
+              <span v-else>Dados sincronizados da planilha</span>
               <ClientOnly>
-                <span v-if="cacheInfo">
+                <span v-if="cacheInfo && !dadosExemplo">
                   • Última atualização: {{ cacheInfo.minutesAgo }}min atrás
                 </span>
               </ClientOnly>
@@ -185,8 +186,9 @@ const emit = defineEmits(['selectPessoa', 'updateTotal'])
 
 const pessoas = ref([])
 const loading = ref(false)
+const dadosExemplo = ref(false)
 
-const { getAlunosByTurma, getCacheInfo, fetchSheetData } = useGoogleSheets()
+const { getAlunosByTurma, getCacheInfo, fetchSheetData, isUsingExampleUrl } = useGoogleSheets()
 
 const cacheInfo = ref(null)
 const loadingRefresh = ref(false)
@@ -203,6 +205,9 @@ const carregarAlunos = async () => {
 
   loading.value = true
   try {
+    // Verificar se está usando dados de exemplo
+    dadosExemplo.value = isUsingExampleUrl()
+
     // Buscar dados da planilha Google Sheets
     pessoas.value = await getAlunosByTurma(props.turma)
     emit('updateTotal', pessoas.value)
