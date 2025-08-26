@@ -2,27 +2,29 @@
 
 ## Funcionalidades Implementadas
 
-✅ **Adicionar Alunos Manualmente**
-- Interface completa para cadastro de novos alunos
-- Campos para todos os dados pessoais
-- Upload de foto dos alunos (base64)
+✅ **Integração com Google Sheets**
+- Busca dados diretamente de planilha do Google Sheets
+- Sincronização automática de turmas e alunos
+- Cache inteligente para performance
+- URL da planilha configurável
 
-✅ **Gerenciamento de Dados**
-- Salvar dados no localStorage do navegador
-- Carregar dados automaticamente
-- Editar informações existentes
-- Excluir alunos
+✅ **Visualização de Dados**
+- Lista de alunos por turma da planilha
+- Informações detalhadas de cada aluno
+- Interface moderna e responsiva
+- Indicadores de status de sincronização
 
-✅ **Armazenamento Local**
-- Dados salvos no localStorage do navegador
-- Fotos convertidas para base64 e salvas junto
-- Funciona tanto no Builder.io quanto localmente
-- Sistema de backup/restore com arquivos JSON
+✅ **Gerenciamento de Cache**
+- Cache local para melhor performance
+- Atualização manual dos dados
+- Indicadores de quando os dados foram atualizados
+- Limpeza de cache quando necessário
 
-✅ **Backup e Restore**
-- Exportar dados da turma como arquivo JSON
-- Importar dados de arquivo JSON
-- Backup automático no localStorage
+✅ **Configuração Flexível**
+- Interface para configurar URL da planilha
+- Validação de conexão com a planilha
+- Instruções detalhadas para configuração
+- Suporte a diferentes estruturas de planilha
 
 ## Como Usar
 
