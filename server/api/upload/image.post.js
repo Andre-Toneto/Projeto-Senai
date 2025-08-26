@@ -2,9 +2,17 @@ import { writeFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
 
 export default defineEventHandler(async (event) => {
+  // Verificar se é método POST
+  if (getMethod(event) !== 'POST') {
+    throw createError({
+      statusCode: 405,
+      statusMessage: 'Method not allowed'
+    })
+  }
+
   try {
     const formData = await readMultipartFormData(event)
-    
+
     if (!formData || formData.length === 0) {
       throw createError({
         statusCode: 400,
@@ -13,7 +21,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const file = formData[0]
-    
+
     if (!file.filename || !file.data) {
       throw createError({
         statusCode: 400,
@@ -27,6 +35,14 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 400,
         statusMessage: 'Tipo de arquivo não permitido. Use JPG, PNG, GIF ou WebP'
+      })
+    }
+
+    // Verificar tamanho do arquivo (máximo 5MB)
+    if (file.data.length > 5 * 1024 * 1024) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Arquivo muito grande. Máximo 5MB permitido'
       })
     }
 
@@ -58,7 +74,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erro ao fazer upload:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erro ao fazer upload da imagem'
+      statusMessage: error.message || 'Erro ao fazer upload da imagem'
     })
   }
 })
