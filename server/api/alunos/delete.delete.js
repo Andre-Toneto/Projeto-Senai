@@ -2,6 +2,14 @@ import { writeFileSync, readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 
 export default defineEventHandler(async (event) => {
+  // Verificar se é método DELETE
+  if (getMethod(event) !== 'DELETE') {
+    throw createError({
+      statusCode: 405,
+      statusMessage: 'Method not allowed'
+    })
+  }
+
   try {
     const body = await readBody(event)
     const { turma, matricula } = body
@@ -17,34 +25,37 @@ export default defineEventHandler(async (event) => {
     const filePath = join(dataDir, `turma-${turma}.txt`)
 
     if (!existsSync(filePath)) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Arquivo da turma não encontrado'
-      })
+      return {
+        success: true,
+        message: 'Arquivo da turma não encontrado, nenhuma ação necessária',
+        alunos: []
+      }
     }
 
     let alunos = []
-    
+
     try {
       const fileContent = readFileSync(filePath, 'utf-8')
       if (fileContent.trim()) {
         alunos = JSON.parse(fileContent)
       }
     } catch (error) {
+      console.error('Erro ao ler arquivo:', error)
       throw createError({
         statusCode: 500,
-        statusMessage: 'Erro ao ler arquivo'
+        statusMessage: 'Erro ao ler arquivo de dados'
       })
     }
 
     // Remover aluno
     const alunoIndex = alunos.findIndex(a => a.matricula === matricula)
-    
+
     if (alunoIndex === -1) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Aluno não encontrado'
-      })
+      return {
+        success: true,
+        message: 'Aluno não encontrado, nenhuma ação necessária',
+        alunos
+      }
     }
 
     alunos.splice(alunoIndex, 1)
@@ -62,7 +73,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erro ao deletar aluno:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erro interno do servidor'
+      statusMessage: error.message || 'Erro interno do servidor'
     })
   }
 })
