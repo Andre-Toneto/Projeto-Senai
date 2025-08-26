@@ -50,23 +50,25 @@
 2. Selecione "Excluir"
 3. Confirme a exclusão
 
-## Estrutura de Arquivos
+## Armazenamento de Dados
 
-### Dados dos Alunos
+### LocalStorage (Principal)
+Os dados são salvos diretamente no localStorage do seu navegador:
 ```
-data/
-├── turma-T2025-001.txt    # Dados da turma T2025-001
-├── turma-ADM-2024.txt     # Dados da turma ADM-2024
-└── exemplo-estrutura.txt  # Exemplo da estrutura dos dados
+localStorage:
+├── carometro_turma_T2025-001    # Dados da turma T2025-001
+├── carometro_turma_ADM-2024     # Dados da turma ADM-2024
+└── carometro_turma_TEC-2025     # Dados da turma TEC-2025
 ```
+
+### Backup via Download
+- **Exportar**: Baixa arquivo JSON com todos os dados da turma
+- **Importar**: Carrega dados de arquivo JSON para a turma
 
 ### Fotos dos Alunos
-```
-public/uploads/fotos/
-├── 1234567890-abc123.jpg  # Foto do aluno 1
-├── 1234567891-def456.png  # Foto do aluno 2
-└── .gitkeep
-```
+- Convertidas para **base64** e salvas no localStorage
+- Tamanho máximo: **2MB por foto**
+- Formatos suportados: JPG, PNG, GIF, WebP
 
 ## Formato dos Dados
 
