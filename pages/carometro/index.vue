@@ -77,7 +77,9 @@
                   <v-icon size="large" class="mr-3">mdi-school</v-icon>
                   <div>
                     <h2 class="text-h5 font-weight-medium mb-1">Turma: {{ turmaSelecionada }}</h2>
-                    <p class="text-body-2 opacity-80 mb-0">{{ totalAlunos }} alunos cadastrados</p>
+                    <ClientOnly fallback-tag="p" fallback="Carregando dados...">
+                      <p class="text-body-2 opacity-80 mb-0">{{ totalAlunos }} pessoas cadastradas</p>
+                    </ClientOnly>
                   </div>
                 </div>
               </v-col>
@@ -97,10 +99,12 @@
       </v-container>
 
       <!-- Componente Carômetro -->
-      <Carometro
-        :turma="turmaSelecionada"
-        @selectPessoa="selecionarPessoa"
-      />
+      <ClientOnly fallback-tag="div" fallback="<v-container class='text-center py-8'><v-progress-circular indeterminate color='senai-red' size='64' /><p class='text-body-1 text-medium-emphasis mt-4'>Carregando carômetro...</p></v-container>">
+        <Carometro
+          :turma="turmaSelecionada"
+          @selectPessoa="selecionarPessoa"
+        />
+      </ClientOnly>
     </div>
 
     <!-- Modal de Pessoa -->
