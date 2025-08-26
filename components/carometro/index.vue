@@ -62,19 +62,28 @@
 
     <!-- Lista vazia -->
     <div v-else-if="pessoas.length === 0" class="text-center py-12">
-      <v-icon size="80" color="grey-lighten-2" class="mb-4">mdi-account-plus</v-icon>
-      <h3 class="text-h6 text-medium-emphasis mb-2">Nenhuma pessoa cadastrada</h3>
+      <v-icon size="80" color="grey-lighten-2" class="mb-4">mdi-google-spreadsheet</v-icon>
+      <h3 class="text-h6 text-medium-emphasis mb-2">Nenhuma pessoa encontrada</h3>
       <p class="text-body-2 text-medium-emphasis mb-6">
-        Adicione a primeira pessoa da turma {{ turma }}
+        Verifique se a turma <strong>{{ turma }}</strong> existe na planilha
       </p>
-      <v-btn
-        color="senai-red"
-        size="large"
-        prepend-icon="mdi-plus"
-        @click="abrirModalAdicionar"
-      >
-        Adicionar Primeira Pessoa
-      </v-btn>
+      <div class="d-flex gap-2 justify-center flex-wrap">
+        <v-btn
+          color="senai-red"
+          prepend-icon="mdi-cog"
+          @click="abrirConfigModal"
+        >
+          Configurar Planilha
+        </v-btn>
+        <v-btn
+          variant="outlined"
+          color="primary"
+          prepend-icon="mdi-refresh"
+          @click="atualizarDados"
+        >
+          Atualizar Dados
+        </v-btn>
+      </div>
     </div>
 
     <!-- Grid Responsivo Moderno -->
