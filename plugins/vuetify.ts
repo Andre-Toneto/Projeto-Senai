@@ -6,6 +6,7 @@ import { createVuetify } from 'vuetify'
 
 export default defineNuxtPlugin((app) => {
   const vuetify = createVuetify({
+    ssr: true,
     theme: {
       defaultTheme: 'senaiTheme',
       themes: {
@@ -30,6 +31,14 @@ export default defineNuxtPlugin((app) => {
             'senai-gray': '#f1f5f9'
           }
         }
+      }
+    },
+    defaults: {
+      global: {
+        ripple: false
+      },
+      VSheet: {
+        elevation: 0
       }
     }
   })
