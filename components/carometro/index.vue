@@ -11,22 +11,26 @@
             <p class="text-caption text-medium-emphasis mb-0">
               <v-icon size="small" class="mr-1">mdi-google-spreadsheet</v-icon>
               Dados sincronizados da planilha
-              <span v-if="cacheInfo">
-                • Última atualização: {{ cacheInfo.minutesAgo }}min atrás
-              </span>
+              <ClientOnly>
+                <span v-if="cacheInfo">
+                  • Última atualização: {{ cacheInfo.minutesAgo }}min atrás
+                </span>
+              </ClientOnly>
             </p>
           </div>
           <div class="d-flex ga-2 flex-wrap">
             <!-- Status de sincronização -->
-            <v-chip
-              v-if="cacheInfo"
-              :color="cacheInfo.isStale ? 'warning' : 'success'"
-              :prepend-icon="cacheInfo.isStale ? 'mdi-clock-alert' : 'mdi-check-circle'"
-              size="small"
-              variant="outlined"
-            >
-              {{ cacheInfo.isStale ? 'Desatualizado' : 'Atualizado' }}
-            </v-chip>
+            <ClientOnly>
+              <v-chip
+                v-if="cacheInfo"
+                :color="cacheInfo.isStale ? 'warning' : 'success'"
+                :prepend-icon="cacheInfo.isStale ? 'mdi-clock-alert' : 'mdi-check-circle'"
+                size="small"
+                variant="outlined"
+              >
+                {{ cacheInfo.isStale ? 'Desatualizado' : 'Atualizado' }}
+              </v-chip>
+            </ClientOnly>
 
             <!-- Botões de ação -->
             <v-btn
@@ -189,7 +193,9 @@ const loadingRefresh = ref(false)
 const configModalAberto = ref(false)
 
 const atualizarCacheInfo = () => {
-  cacheInfo.value = getCacheInfo()
+  if (process.client) {
+    cacheInfo.value = getCacheInfo()
+  }
 }
 
 const carregarAlunos = async () => {
