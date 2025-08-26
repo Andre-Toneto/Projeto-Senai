@@ -191,7 +191,7 @@ const props = defineProps({
   turma: String
 })
 
-const emit = defineEmits(['selectPessoa'])
+const emit = defineEmits(['selectPessoa', 'updateTotal'])
 
 const pessoas = ref([])
 const loading = ref(false)
