@@ -322,6 +322,46 @@ watch(() => props.turma, (newTurma) => {
     carregarAlunos()
   }
 })
+
+// Funções de backup
+const exportarDados = () => {
+  if (!process.client || !props.turma) return
+
+  try {
+    const sucesso = exportarTurma(props.turma)
+    if (sucesso) {
+      // Mostrar feedback de sucesso
+      console.log('Dados exportados com sucesso!')
+    } else {
+      alert('Erro ao exportar dados')
+    }
+  } catch (error) {
+    console.error('Erro ao exportar:', error)
+    alert('Erro ao exportar dados: ' + error.message)
+  }
+}
+
+const importarDados = async (event) => {
+  if (!process.client || !props.turma) return
+
+  const file = event.target.files[0]
+  if (!file) return
+
+  try {
+    const response = await importarTurma(props.turma, file)
+    if (response.success) {
+      // Recarregar dados
+      await carregarAlunos()
+      alert(response.message)
+    }
+  } catch (error) {
+    console.error('Erro ao importar:', error)
+    alert('Erro ao importar dados: ' + error.message)
+  }
+
+  // Limpar input
+  event.target.value = ''
+}
 </script>
 
 <style scoped>
