@@ -233,16 +233,25 @@ const dialogExclusao = ref(false)
 const pessoaParaExcluir = ref(null)
 const excluindo = ref(false)
 
-const { getAlunosTurma, deleteAluno, exportarTurma, importarTurma } = useCarometro()
+const { getAlunosByTurma, getCacheInfo, fetchSheetData } = useGoogleSheets()
+
+const cacheInfo = ref(null)
+const loadingRefresh = ref(false)
+const configModalAberto = ref(false)
+
+const atualizarCacheInfo = () => {
+  cacheInfo.value = getCacheInfo()
+}
 
 const carregarAlunos = async () => {
   if (!props.turma || !process.client) return
 
   loading.value = true
   try {
-    // Usar localStorage em vez de API
-    pessoas.value = getAlunosTurma(props.turma)
+    // Buscar dados da planilha Google Sheets
+    pessoas.value = await getAlunosByTurma(props.turma)
     emit('updateTotal', pessoas.value)
+    atualizarCacheInfo()
   } catch (error) {
     console.error('Erro ao carregar alunos:', error)
     pessoas.value = []
