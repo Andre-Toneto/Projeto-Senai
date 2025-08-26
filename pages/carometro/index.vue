@@ -167,14 +167,18 @@ onMounted(() => {
       return
     }
 
-    // Carregar turmas da planilha
-    carregarTurmas()
-
     const turma = sessionStorage.getItem('turma_selecionada')
     if (turma) {
       turmaSelecionada.value = turma
       totalAlunos.value = 0
     }
+
+    // Carregar turmas da planilha após um pequeno delay para evitar problemas de hidratação
+    nextTick(() => {
+      setTimeout(() => {
+        carregarTurmas()
+      }, 100)
+    })
   }
 })
 
@@ -183,9 +187,10 @@ const carregarTurmas = async () => {
 
   loadingTurmas.value = true
   try {
-    turmasDisponiveis.value = await getTurmas(true) // Force refresh
+    const turmas = await getTurmas(false) // Não forçar refresh por padrão
+    turmasDisponiveis.value = Array.isArray(turmas) ? turmas : []
   } catch (error) {
-    console.error('Erro ao carregar turmas:', error)
+    console.warn('Erro ao carregar turmas:', error.message)
     turmasDisponiveis.value = []
   } finally {
     loadingTurmas.value = false

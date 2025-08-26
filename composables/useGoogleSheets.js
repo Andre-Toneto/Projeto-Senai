@@ -41,7 +41,8 @@ export const useGoogleSheets = () => {
 
   // Buscar dados da planilha
   const fetchSheetData = async (forceRefresh = false) => {
-    if (!process.client) return { turmas: [], alunos: [] }
+    // Não executar durante SSR
+    if (!process.client) return { turmas: [], alunos: [], error: null }
 
     const cacheKey = 'googleSheets_cache'
     const lastUpdateKey = 'googleSheets_lastUpdate'
@@ -51,7 +52,7 @@ export const useGoogleSheets = () => {
     if (!forceRefresh) {
       const cached = localStorage.getItem(cacheKey)
       const lastUpdate = localStorage.getItem(lastUpdateKey)
-      
+
       if (cached && lastUpdate) {
         const timeSinceUpdate = Date.now() - parseInt(lastUpdate)
         if (timeSinceUpdate < cacheTimeout) {
@@ -62,41 +63,74 @@ export const useGoogleSheets = () => {
 
     try {
       const url = getSheetUrl()
-      
-      // Buscar dados da planilha
+
+      // Verificar se a URL está configurada adequadamente
+      if (!url || url.includes('1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO')) {
+        throw new Error('URL da planilha não configurada ou usando exemplo padrão')
+      }
+
+      // Buscar dados da planilha com timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 segundos timeout
+
       const response = await fetch(url, {
+        signal: controller.signal,
         mode: 'cors',
         headers: {
-          'Accept': 'text/csv'
+          'Accept': 'text/csv',
+          'Cache-Control': 'no-cache'
         }
       })
 
+      clearTimeout(timeoutId)
+
       if (!response.ok) {
-        throw new Error(`Erro HTTP: ${response.status}`)
+        throw new Error(`Erro HTTP: ${response.status} - ${response.statusText}`)
       }
 
       const csvText = await response.text()
+
+      if (!csvText || csvText.trim().length === 0) {
+        throw new Error('Planilha vazia ou inacessível')
+      }
+
       const { headers, data } = parseCSV(csvText)
 
       // Processar dados para extrair turmas e alunos
       const result = processSheetData(data, headers)
 
-      // Salvar no cache
-      localStorage.setItem(cacheKey, JSON.stringify(result))
-      localStorage.setItem(lastUpdateKey, Date.now().toString())
+      // Salvar no cache apenas se tiver dados válidos
+      if (result.turmas.length > 0 || result.alunos.length > 0) {
+        localStorage.setItem(cacheKey, JSON.stringify(result))
+        localStorage.setItem(lastUpdateKey, Date.now().toString())
+      }
 
       return result
 
     } catch (error) {
-      console.error('Erro ao buscar dados da planilha:', error)
-      
+      console.warn('Erro ao buscar dados da planilha:', error.message)
+
       // Tentar retornar dados do cache em caso de erro
       const cached = localStorage.getItem(cacheKey)
       if (cached) {
-        return JSON.parse(cached)
+        try {
+          const cachedData = JSON.parse(cached)
+          return { ...cachedData, error: error.message }
+        } catch {
+          // Cache corrompido, limpar
+          localStorage.removeItem(cacheKey)
+          localStorage.removeItem(lastUpdateKey)
+        }
       }
-      
-      throw error
+
+      // Retornar estrutura vazia com erro em vez de lançar exceção
+      return {
+        turmas: [],
+        alunos: [],
+        error: error.message,
+        lastUpdate: null,
+        totalRecords: 0
+      }
     }
   }
 
@@ -154,24 +188,26 @@ export const useGoogleSheets = () => {
 
   // Buscar alunos de uma turma específica
   const getAlunosByTurma = async (turma, forceRefresh = false) => {
-    if (!turma) return []
+    if (!process.client || !turma) return []
 
     try {
       const data = await fetchSheetData(forceRefresh)
-      return data.alunos.filter(aluno => aluno.turma === turma)
+      return (data.alunos || []).filter(aluno => aluno.turma === turma)
     } catch (error) {
-      console.error('Erro ao buscar alunos da turma:', error)
+      console.warn('Erro ao buscar alunos da turma:', error.message)
       return []
     }
   }
 
   // Buscar lista de turmas
   const getTurmas = async (forceRefresh = false) => {
+    if (!process.client) return []
+
     try {
       const data = await fetchSheetData(forceRefresh)
-      return data.turmas
+      return data.turmas || []
     } catch (error) {
-      console.error('Erro ao buscar turmas:', error)
+      console.warn('Erro ao buscar turmas:', error.message)
       return []
     }
   }
