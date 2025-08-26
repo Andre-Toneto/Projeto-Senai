@@ -167,10 +167,13 @@ onMounted(() => {
       return
     }
 
+    // Carregar turmas da planilha
+    carregarTurmas()
+
     const turma = sessionStorage.getItem('turma_selecionada')
     if (turma) {
       turmaSelecionada.value = turma
-      totalAlunos.value = 2
+      totalAlunos.value = 0
     }
   }
 })
