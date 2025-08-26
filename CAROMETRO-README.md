@@ -28,29 +28,36 @@
 
 ## Como Usar
 
-### 1. Acessar o Carômetro
+### 1. Configurar a Planilha
 1. Faça login no sistema
 2. Acesse "Carômetro" no menu
 3. Faça login no carômetro (professor/123456)
-4. Digite o código da turma
+4. Clique em "Config" para configurar a planilha
+5. Cole a URL da planilha do Google Sheets
+6. Teste a conexão e salve
 
-### 2. Adicionar Novo Aluno
-1. Clique em "Adicionar Pessoa"
-2. Preencha os dados obrigatórios (Nome e Matrícula)
-3. Adicione uma foto clicando no ícone da câmera
-4. Preencha outros dados conforme necessário
-5. Clique em "Salvar"
+### 2. Preparar a Planilha do Google Sheets
+1. Crie uma planilha no Google Sheets
+2. Na primeira linha, adicione os cabeçalhos:
+   - **Turma** (obrigatório)
+   - **Nome** (obrigatório)
+   - **Matricula** (recomendado)
+   - Outros campos opcionais: Cargo, Curso, Telefone, Email, etc.
+3. Preencha os dados dos alunos nas linhas seguintes
+4. Publique a planilha: Arquivo → Compartilhar → Publicar na web
+5. Escolha formato CSV e copie o link
 
-### 3. Editar Aluno
-1. Clique nos 3 pontos no cartão do aluno
-2. Selecione "Editar"
-3. Modifique os dados necessários
-4. Clique em "Atualizar"
+### 3. Visualizar Turmas e Alunos
+1. Na tela inicial, veja as turmas disponíveis da planilha
+2. Clique em uma turma para visualizar os alunos
+3. Clique em um aluno para ver detalhes completos
+4. Use "Atualizar" para buscar dados mais recentes
 
-### 4. Excluir Aluno
-1. Clique nos 3 pontos no cartão do aluno
-2. Selecione "Excluir"
-3. Confirme a exclusão
+### 4. Gerenciar Dados
+1. Use "Config" para alterar a URL da planilha
+2. Use "Atualizar" para sincronizar com a planilha
+3. Monitore o status de sincronização no cabeçalho
+4. Configure nova planilha quando necessário
 
 ## Armazenamento de Dados
 
