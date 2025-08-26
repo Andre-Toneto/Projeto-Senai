@@ -1,26 +1,69 @@
 <template>
   <v-container fluid>
-    <!-- Cabeçalho com botão de adicionar -->
+    <!-- Cabeçalho com botões de ação -->
     <v-row class="mb-4">
       <v-col>
-        <div class="d-flex justify-space-between align-center">
+        <div class="d-flex justify-space-between align-center flex-wrap ga-2">
           <div>
             <h3 class="text-h6 text-senai-red font-weight-medium">
               {{ pessoas.length }} {{ pessoas.length === 1 ? 'pessoa cadastrada' : 'pessoas cadastradas' }}
             </h3>
+            <p class="text-caption text-medium-emphasis mb-0">
+              Dados salvos localmente no seu navegador
+            </p>
           </div>
-          <v-btn
-            color="senai-red"
-            prepend-icon="mdi-plus"
-            @click="abrirModalAdicionar"
-            elevation="2"
-            rounded="lg"
-          >
-            Adicionar Pessoa
-          </v-btn>
+          <div class="d-flex ga-2 flex-wrap">
+            <!-- Botões de Export/Import -->
+            <v-menu>
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  variant="outlined"
+                  color="senai-red"
+                  prepend-icon="mdi-download"
+                  size="small"
+                >
+                  Backup
+                </v-btn>
+              </template>
+              <v-list>
+                <v-list-item @click="exportarDados">
+                  <template v-slot:prepend>
+                    <v-icon color="success">mdi-export</v-icon>
+                  </template>
+                  <v-list-item-title>Exportar Dados</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="$refs.importInput.click()">
+                  <template v-slot:prepend>
+                    <v-icon color="primary">mdi-import</v-icon>
+                  </template>
+                  <v-list-item-title>Importar Dados</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+
+            <v-btn
+              color="senai-red"
+              prepend-icon="mdi-plus"
+              @click="abrirModalAdicionar"
+              elevation="2"
+              rounded="lg"
+            >
+              Adicionar Pessoa
+            </v-btn>
+          </div>
         </div>
       </v-col>
     </v-row>
+
+    <!-- Input oculto para importar -->
+    <input
+      ref="importInput"
+      type="file"
+      accept=".json"
+      style="display: none"
+      @change="importarDados"
+    />
 
     <!-- Loading -->
     <div v-if="loading" class="text-center py-8">
