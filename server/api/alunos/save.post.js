@@ -1,7 +1,15 @@
-import { writeFileSync, readFileSync, existsSync } from 'fs'
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
 
 export default defineEventHandler(async (event) => {
+  // Verificar se é método POST
+  if (getMethod(event) !== 'POST') {
+    throw createError({
+      statusCode: 405,
+      statusMessage: 'Method not allowed'
+    })
+  }
+
   try {
     const body = await readBody(event)
     const { turma, aluno } = body
@@ -19,11 +27,11 @@ export default defineEventHandler(async (event) => {
 
     // Criar diretório se não existir
     if (!existsSync(dataDir)) {
-      await $fetch('/api/alunos/create-dir', { method: 'POST' })
+      mkdirSync(dataDir, { recursive: true })
     }
 
     let alunos = []
-    
+
     // Ler arquivo existente se existir
     if (existsSync(filePath)) {
       try {
@@ -39,7 +47,7 @@ export default defineEventHandler(async (event) => {
 
     // Verificar se é edição ou novo aluno
     const alunoIndex = alunos.findIndex(a => a.matricula === aluno.matricula)
-    
+
     if (alunoIndex >= 0) {
       // Atualizar aluno existente
       alunos[alunoIndex] = { ...alunos[alunoIndex], ...aluno }
@@ -61,7 +69,7 @@ export default defineEventHandler(async (event) => {
     console.error('Erro ao salvar aluno:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erro interno do servidor'
+      statusMessage: error.message || 'Erro interno do servidor'
     })
   }
 })
