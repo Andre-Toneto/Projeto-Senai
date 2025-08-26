@@ -211,9 +211,11 @@ const carregarAlunos = async () => {
       query: { turma: props.turma }
     })
     pessoas.value = response.alunos || []
+    emit('updateTotal', pessoas.value)
   } catch (error) {
     console.error('Erro ao carregar alunos:', error)
     pessoas.value = []
+    emit('updateTotal', [])
   } finally {
     loading.value = false
   }
