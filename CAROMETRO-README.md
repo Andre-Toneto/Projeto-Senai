@@ -5,18 +5,24 @@
 ✅ **Adicionar Alunos Manualmente**
 - Interface completa para cadastro de novos alunos
 - Campos para todos os dados pessoais
-- Upload de foto dos alunos
+- Upload de foto dos alunos (base64)
 
 ✅ **Gerenciamento de Dados**
-- Salvar dados em arquivo TXT (formato JSON)
+- Salvar dados no localStorage do navegador
 - Carregar dados automaticamente
 - Editar informações existentes
 - Excluir alunos
 
 ✅ **Armazenamento Local**
-- Dados salvos em `data/turma-{CODIGO_TURMA}.txt`
-- Fotos salvas em `public/uploads/fotos/`
-- Tudo fica armazenado no seu PC
+- Dados salvos no localStorage do navegador
+- Fotos convertidas para base64 e salvas junto
+- Funciona tanto no Builder.io quanto localmente
+- Sistema de backup/restore com arquivos JSON
+
+✅ **Backup e Restore**
+- Exportar dados da turma como arquivo JSON
+- Importar dados de arquivo JSON
+- Backup automático no localStorage
 
 ## Como Usar
 
