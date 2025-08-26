@@ -25,19 +25,33 @@
       </v-card-title>
 
       <v-card-text class="pa-6">
+        <!-- Alerta sobre URL de exemplo -->
+        <v-alert
+          v-if="isUsingExample"
+          color="warning"
+          icon="mdi-alert"
+          variant="tonal"
+          class="mb-4"
+          prominent
+        >
+          <strong>URL de Exemplo Detectada!</strong><br>
+          Você está usando uma URL de exemplo que não contém dados reais.
+          Configure sua própria planilha do Google Sheets para ver suas turmas.
+        </v-alert>
+
         <!-- Status da Conexão -->
         <v-alert
-          v-if="cacheInfo"
+          v-else-if="cacheInfo"
           :color="cacheInfo.isStale ? 'warning' : 'success'"
           :icon="cacheInfo.isStale ? 'mdi-clock-alert' : 'mdi-check-circle'"
           variant="tonal"
           class="mb-4"
         >
           <div class="text-body-2">
-            <strong>Última atualização:</strong> 
+            <strong>Última atualização:</strong>
             {{ cacheInfo.minutesAgo }} {{ cacheInfo.minutesAgo === 1 ? 'minuto' : 'minutos' }} atrás
             <br>
-            <strong>Status:</strong> 
+            <strong>Status:</strong>
             {{ cacheInfo.isStale ? 'Dados podem estar desatualizados' : 'Dados atualizados' }}
           </div>
         </v-alert>
@@ -54,15 +68,48 @@
 
         <!-- Configuração da URL -->
         <v-form ref="form" v-model="valid">
+          <!-- Seletor de Aba -->
+          <v-card variant="outlined" class="mb-4">
+            <v-card-title class="text-h6 pa-4 pb-2">
+              <v-icon class="mr-2">mdi-tab</v-icon>
+              Selecionar Aba da Planilha
+            </v-card-title>
+            <v-card-text class="pt-0">
+              <v-radio-group
+                v-model="selectedSheetGid"
+                @update:model-value="onSheetChange"
+                class="mt-0"
+              >
+                <v-radio
+                  v-for="sheet in availableSheets"
+                  :key="sheet.gid"
+                  :label="sheet.name"
+                  :value="sheet.gid"
+                  color="senai-red"
+                >
+                  <template v-slot:label>
+                    <div>
+                      <strong>{{ sheet.name }}</strong>
+                      <div class="text-caption text-medium-emphasis">
+                        GID: {{ sheet.gid }}
+                      </div>
+                    </div>
+                  </template>
+                </v-radio>
+              </v-radio-group>
+            </v-card-text>
+          </v-card>
+
           <v-text-field
             v-model="sheetUrl"
-            label="URL da Planilha (formato CSV)"
+            label="URL da Planilha (Gerada Automaticamente)"
             variant="outlined"
             density="comfortable"
             :rules="urlRules"
             prepend-inner-icon="mdi-google-spreadsheet"
-            hint="Use o link de export CSV do Google Sheets"
+            hint="URL gerada automaticamente baseada na aba selecionada"
             persistent-hint
+            readonly
             class="mb-4"
           />
 
@@ -74,16 +121,28 @@
               </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <div class="text-body-2">
+                  <h4 class="text-senai-red mb-2">📋 Passo a passo para sua planilha:</h4>
                   <ol>
-                    <li>Abra sua planilha no Google Sheets</li>
-                    <li>Vá em <strong>Arquivo → Compartilhar → Publicar na web</strong></li>
-                    <li>Selecione a aba que contém os dados dos alunos</li>
-                    <li>Escolha <strong>CSV (valores separados por vírgula)</strong></li>
-                    <li>Clique em <strong>Publicar</strong></li>
-                    <li>Copie o link gerado e cole acima</li>
+                    <li class="mb-1">Abra sua planilha: <code class="text-caption">1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO</code></li>
+                    <li class="mb-1">Vá em <strong>Arquivo → Compartilhar → Publicar na web</strong></li>
+                    <li class="mb-1">Em <strong>"Publicar"</strong>, escolha uma das suas abas:
+                      <ul class="ml-4 mt-1">
+                        <li><strong>CAI</strong> (GID: 274325224)</li>
+                        <li><strong>SESI TÉC ADM</strong> (GID: 174349623)</li>
+                        <li><strong>SEDUC TÉC ELETROMECÂNICA</strong> (GID: 792022953)</li>
+                      </ul>
+                    </li>
+                    <li class="mb-1">Em <strong>"Formato"</strong>, escolha <strong>CSV (valores separados por vírgula)</strong></li>
+                    <li class="mb-1">Clique em <strong>Publicar</strong></li>
+                    <li>Confirme clicando <strong>"OK"</strong></li>
                   </ol>
-                  <v-alert color="warning" variant="tonal" class="mt-3">
-                    <strong>Importante:</strong> A planilha precisa estar publicada publicamente
+                  <v-alert color="error" variant="tonal" class="mt-3">
+                    <strong>⚠️ Problema Atual:</strong> Sua planilha ainda não está publicada.
+                    O sistema está recebendo redirecionamento em vez dos dados CSV.
+                  </v-alert>
+                  <v-alert color="info" variant="tonal" class="mt-2">
+                    <strong>💡 Dica:</strong> Apenas "compartilhar com link" não é suficiente.
+                    É necessário "publicar na web" especificamente em formato CSV.
                   </v-alert>
                 </div>
               </v-expansion-panel-text>
@@ -114,6 +173,52 @@
               </v-expansion-panel-text>
             </v-expansion-panel>
           </v-expansion-panels>
+
+          <!-- Testes das Abas -->
+          <v-card variant="outlined" class="mb-4">
+            <v-card-title class="text-h6 pa-4 pb-2">
+              <v-icon class="mr-2">mdi-test-tube</v-icon>
+              Testar Conexão das Abas
+            </v-card-title>
+            <v-card-text class="pt-0">
+              <p class="text-body-2 text-medium-emphasis mb-3">
+                Teste cada aba individualmente para verificar se está funcionando:
+              </p>
+              <div class="d-flex flex-column gap-2">
+                <v-btn
+                  v-for="sheet in availableSheets"
+                  :key="sheet.gid"
+                  variant="outlined"
+                  :color="testResults[sheet.gid]?.success ? 'success' : testResults[sheet.gid]?.error ? 'error' : 'primary'"
+                  :prepend-icon="testResults[sheet.gid]?.success ? 'mdi-check-circle' : testResults[sheet.gid]?.error ? 'mdi-alert-circle' : 'mdi-test-tube'"
+                  :loading="testingSheets[sheet.gid]"
+                  @click="testarAba(sheet)"
+                  block
+                  class="text-left justify-start"
+                >
+                  <div>
+                    <div class="font-weight-medium">{{ sheet.name }}</div>
+                    <div class="text-caption">
+                      {{ testResults[sheet.gid]?.message || `GID: ${sheet.gid}` }}
+                    </div>
+                  </div>
+                </v-btn>
+              </div>
+            </v-card-text>
+          </v-card>
+
+          <!-- Botão para dados de exemplo -->
+          <div class="text-center mb-4">
+            <v-btn
+              variant="outlined"
+              color="info"
+              prepend-icon="mdi-file-document-outline"
+              @click="usarDadosExemplo"
+              :loading="usandoExemplo"
+            >
+              Usar Dados de Exemplo para Teste
+            </v-btn>
+          </div>
 
           <!-- Ações -->
           <div class="d-flex gap-2 flex-wrap">
@@ -196,23 +301,35 @@ const dialogModel = computed({
   set: (value) => emit('update:modelValue', value)
 })
 
-const { 
-  getSheetUrl, 
-  setSheetUrl, 
-  fetchSheetData, 
-  hasCachedData, 
-  clearCache, 
-  getCacheInfo 
+const {
+  getSheetUrl,
+  setSheetUrl,
+  fetchSheetData,
+  hasCachedData,
+  clearCache,
+  getCacheInfo,
+  isUsingExampleUrl,
+  loadExampleData,
+  getAvailableSheets,
+  getSelectedSheet,
+  setSelectedSheet
 } = useGoogleSheets()
 
 const form = ref(null)
-const valid = ref(false)
+const valid = ref(true) // Sempre válido agora pois a URL é gerada automaticamente
 const salvando = ref(false)
 const carregando = ref(false)
 const atualizando = ref(false)
+const usandoExemplo = ref(false)
 const sheetUrl = ref('')
+const planilhaUrl = ref('')
 const testeResultado = ref(null)
 const cacheInfo = ref(null)
+const isUsingExample = ref(false)
+const availableSheets = ref([])
+const selectedSheetGid = ref('')
+const testResults = ref({})
+const testingSheets = ref({})
 
 const urlRules = [
   v => !!v || 'URL é obrigatória',
@@ -222,6 +339,108 @@ const urlRules = [
 
 const atualizarCacheInfo = () => {
   cacheInfo.value = getCacheInfo()
+}
+
+const onSheetChange = (gid) => {
+  if (gid) {
+    setSelectedSheet(gid)
+    const selectedSheet = availableSheets.value.find(sheet => sheet.gid === gid)
+    if (selectedSheet) {
+      sheetUrl.value = selectedSheet.url
+    }
+    // Limpar resultados anteriores
+    testeResultado.value = null
+  }
+}
+
+const testarAba = async (sheet) => {
+  testingSheets.value[sheet.gid] = true
+
+  try {
+    // Temporariamente definir esta aba para teste
+    const originalUrl = getSheetUrl()
+    setSheetUrl(sheet.url)
+
+    const dados = await fetchSheetData(true)
+
+    if (dados.error) {
+      testResults.value[sheet.gid] = {
+        success: false,
+        error: true,
+        message: `Erro: ${dados.error.substring(0, 50)}...`
+      }
+    } else if (dados.turmas && dados.turmas.length > 0) {
+      testResults.value[sheet.gid] = {
+        success: true,
+        error: false,
+        message: `✅ ${dados.turmas.length} turmas, ${dados.alunos.length} alunos`
+      }
+
+      // Se deu certo, usar esta aba
+      selectedSheetGid.value = sheet.gid
+      sheetUrl.value = sheet.url
+
+      testeResultado.value = {
+        sucesso: true,
+        mensagem: `Aba "${sheet.name}" funcionando!`,
+        detalhes: `Encontradas ${dados.turmas.length} turmas: ${dados.turmas.join(', ')}`
+      }
+
+      emit('dadosAtualizados', dados)
+
+    } else {
+      testResults.value[sheet.gid] = {
+        success: false,
+        error: true,
+        message: 'Aba vazia ou sem dados válidos'
+      }
+    }
+
+  } catch (error) {
+    testResults.value[sheet.gid] = {
+      success: false,
+      error: true,
+      message: `Erro: ${error.message.substring(0, 30)}...`
+    }
+  } finally {
+    testingSheets.value[sheet.gid] = false
+  }
+}
+
+const usarDadosExemplo = async () => {
+  usandoExemplo.value = true
+  testeResultado.value = null
+
+  try {
+    const dados = await loadExampleData()
+
+    if (dados.turmas && dados.turmas.length > 0) {
+      testeResultado.value = {
+        sucesso: true,
+        mensagem: 'Dados de exemplo carregados!',
+        detalhes: `Encontradas ${dados.turmas.length} turmas: ${dados.turmas.join(', ')}`
+      }
+
+      emit('dadosAtualizados', dados)
+
+      setTimeout(() => {
+        fecharModal()
+      }, 2000)
+    } else {
+      testeResultado.value = {
+        sucesso: false,
+        mensagem: 'Erro ao carregar dados de exemplo'
+      }
+    }
+  } catch (error) {
+    testeResultado.value = {
+      sucesso: false,
+      mensagem: 'Erro ao carregar dados de exemplo',
+      detalhes: error.message
+    }
+  } finally {
+    usandoExemplo.value = false
+  }
 }
 
 const salvarConfiguracao = () => {
@@ -319,17 +538,27 @@ const fecharModal = () => {
   testeResultado.value = null
 }
 
-// Carregar URL atual quando modal abrir
+// Carregar dados quando modal abrir
 watch(() => props.modelValue, (newVal) => {
   if (newVal) {
-    sheetUrl.value = getSheetUrl()
+    availableSheets.value = getAvailableSheets()
+    const selectedSheet = getSelectedSheet()
+    selectedSheetGid.value = selectedSheet.gid
+    planilhaUrl.value = selectedSheet.url
+    sheetUrl.value = selectedSheet.url
+    isUsingExample.value = isUsingExampleUrl()
     atualizarCacheInfo()
   }
 })
 
 onMounted(() => {
   if (props.modelValue) {
-    sheetUrl.value = getSheetUrl()
+    availableSheets.value = getAvailableSheets()
+    const selectedSheet = getSelectedSheet()
+    selectedSheetGid.value = selectedSheet.gid
+    planilhaUrl.value = selectedSheet.url
+    sheetUrl.value = selectedSheet.url
+    isUsingExample.value = isUsingExampleUrl()
     atualizarCacheInfo()
   }
 })

@@ -71,10 +71,8 @@ const navItems = [
 ]
 
 const getIconColor = (routeName) => {
-  if (process.client && route && route.path) {
-    return route.path.includes(routeName) ? 'senai-red' : 'senai-navy'
-  }
-  return 'senai-navy'
+  const currentRoute = route?.path || ''
+  return currentRoute.includes(routeName) ? 'senai-red' : 'senai-navy'
 }
 
 const openHelp = () => {

@@ -1,10 +1,86 @@
 export const useGoogleSheets = () => {
+  // URLs das abas disponíveis na planilha
+  const getAvailableSheets = () => {
+    return [
+      {
+        name: 'CAI',
+        gid: '274325224',
+        url: 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=274325224'
+      },
+      {
+        name: 'SESI TÉC ADM',
+        gid: '174349623',
+        url: 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=174349623'
+      },
+      {
+        name: 'SEDUC TÉC ELETROMECÂNICA',
+        gid: '792022953',
+        url: 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=792022953'
+      }
+    ]
+  }
+
   // URL padrão da planilha (pode ser alterada)
   const getSheetUrl = () => {
     if (process.client) {
-      return localStorage.getItem('googleSheets_url') || 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=0'
+      return localStorage.getItem('googleSheets_url') || 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=274325224'
     }
-    return 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=0'
+    return 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=274325224'
+  }
+
+  // Obter aba selecionada
+  const getSelectedSheet = () => {
+    if (process.client) {
+      const selectedGid = localStorage.getItem('googleSheets_selectedGid') || '274325224'
+      return getAvailableSheets().find(sheet => sheet.gid === selectedGid) || getAvailableSheets()[0]
+    }
+    return getAvailableSheets()[0]
+  }
+
+  // Definir aba selecionada
+  const setSelectedSheet = (gid) => {
+    if (process.client) {
+      localStorage.setItem('googleSheets_selectedGid', gid)
+      const selectedSheet = getAvailableSheets().find(sheet => sheet.gid === gid)
+      if (selectedSheet) {
+        localStorage.setItem('googleSheets_url', selectedSheet.url)
+        // Limpar cache ao mudar aba
+        localStorage.removeItem('googleSheets_cache')
+        localStorage.removeItem('googleSheets_lastUpdate')
+      }
+    }
+  }
+
+  // Carregar dados de exemplo para desenvolvimento
+  const loadExampleData = async () => {
+    if (!process.client) return { turmas: [], alunos: [], error: null }
+
+    try {
+      const response = await fetch('/data/dados-exemplo.json')
+      if (!response.ok) {
+        throw new Error('Dados de exemplo não encontrados')
+      }
+      return await response.json()
+    } catch (error) {
+      console.warn('Erro ao carregar dados de exemplo:', error.message)
+      return {
+        turmas: [],
+        alunos: [],
+        error: error.message,
+        isExample: true,
+        message: 'Erro ao carregar dados de exemplo'
+      }
+    }
+  }
+
+  // Verificar se está usando URL de exemplo
+  const isUsingExampleUrl = () => {
+    const url = getSheetUrl()
+    // A planilha 1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO agora é real, não mais exemplo
+    return url.includes('example') ||
+           !url ||
+           url === '' ||
+           url.includes('EXEMPLO')
   }
 
   // Salvar nova URL da planilha
@@ -41,7 +117,8 @@ export const useGoogleSheets = () => {
 
   // Buscar dados da planilha
   const fetchSheetData = async (forceRefresh = false) => {
-    if (!process.client) return { turmas: [], alunos: [] }
+    // Não executar durante SSR
+    if (!process.client) return { turmas: [], alunos: [], error: null }
 
     const cacheKey = 'googleSheets_cache'
     const lastUpdateKey = 'googleSheets_lastUpdate'
@@ -51,7 +128,7 @@ export const useGoogleSheets = () => {
     if (!forceRefresh) {
       const cached = localStorage.getItem(cacheKey)
       const lastUpdate = localStorage.getItem(lastUpdateKey)
-      
+
       if (cached && lastUpdate) {
         const timeSinceUpdate = Date.now() - parseInt(lastUpdate)
         if (timeSinceUpdate < cacheTimeout) {
@@ -62,41 +139,75 @@ export const useGoogleSheets = () => {
 
     try {
       const url = getSheetUrl()
-      
-      // Buscar dados da planilha
+
+      // Verificar se está usando URL de exemplo
+      if (isUsingExampleUrl()) {
+        console.info('Usando dados de exemplo - Configure sua planilha do Google Sheets')
+        return await loadExampleData()
+      }
+
+      // Buscar dados da planilha com timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 segundos timeout
+
       const response = await fetch(url, {
+        signal: controller.signal,
         mode: 'cors',
         headers: {
-          'Accept': 'text/csv'
+          'Accept': 'text/csv',
+          'Cache-Control': 'no-cache'
         }
       })
 
+      clearTimeout(timeoutId)
+
       if (!response.ok) {
-        throw new Error(`Erro HTTP: ${response.status}`)
+        throw new Error(`Erro HTTP: ${response.status} - ${response.statusText}`)
       }
 
       const csvText = await response.text()
+
+      if (!csvText || csvText.trim().length === 0) {
+        throw new Error('Planilha vazia ou inacessível')
+      }
+
       const { headers, data } = parseCSV(csvText)
 
       // Processar dados para extrair turmas e alunos
       const result = processSheetData(data, headers)
 
-      // Salvar no cache
-      localStorage.setItem(cacheKey, JSON.stringify(result))
-      localStorage.setItem(lastUpdateKey, Date.now().toString())
+      // Salvar no cache apenas se tiver dados válidos
+      if (result.turmas.length > 0 || result.alunos.length > 0) {
+        localStorage.setItem(cacheKey, JSON.stringify(result))
+        localStorage.setItem(lastUpdateKey, Date.now().toString())
+      }
 
       return result
 
     } catch (error) {
-      console.error('Erro ao buscar dados da planilha:', error)
-      
+      console.warn('Erro ao buscar dados da planilha:', error.message)
+
       // Tentar retornar dados do cache em caso de erro
       const cached = localStorage.getItem(cacheKey)
       if (cached) {
-        return JSON.parse(cached)
+        try {
+          const cachedData = JSON.parse(cached)
+          return { ...cachedData, error: error.message }
+        } catch {
+          // Cache corrompido, limpar
+          localStorage.removeItem(cacheKey)
+          localStorage.removeItem(lastUpdateKey)
+        }
       }
-      
-      throw error
+
+      // Retornar estrutura vazia com erro em vez de lançar exceção
+      return {
+        turmas: [],
+        alunos: [],
+        error: error.message,
+        lastUpdate: null,
+        totalRecords: 0
+      }
     }
   }
 
@@ -154,24 +265,26 @@ export const useGoogleSheets = () => {
 
   // Buscar alunos de uma turma específica
   const getAlunosByTurma = async (turma, forceRefresh = false) => {
-    if (!turma) return []
+    if (!process.client || !turma) return []
 
     try {
       const data = await fetchSheetData(forceRefresh)
-      return data.alunos.filter(aluno => aluno.turma === turma)
+      return (data.alunos || []).filter(aluno => aluno.turma === turma)
     } catch (error) {
-      console.error('Erro ao buscar alunos da turma:', error)
+      console.warn('Erro ao buscar alunos da turma:', error.message)
       return []
     }
   }
 
   // Buscar lista de turmas
   const getTurmas = async (forceRefresh = false) => {
+    if (!process.client) return []
+
     try {
       const data = await fetchSheetData(forceRefresh)
-      return data.turmas
+      return data.turmas || []
     } catch (error) {
-      console.error('Erro ao buscar turmas:', error)
+      console.warn('Erro ao buscar turmas:', error.message)
       return []
     }
   }
@@ -216,6 +329,11 @@ export const useGoogleSheets = () => {
     getTurmas,
     hasCachedData,
     clearCache,
-    getCacheInfo
+    getCacheInfo,
+    isUsingExampleUrl,
+    loadExampleData,
+    getAvailableSheets,
+    getSelectedSheet,
+    setSelectedSheet
   }
 }
