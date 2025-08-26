@@ -294,6 +294,18 @@ const atualizarCacheInfo = () => {
   cacheInfo.value = getCacheInfo()
 }
 
+const onSheetChange = (gid) => {
+  if (gid) {
+    setSelectedSheet(gid)
+    const selectedSheet = availableSheets.value.find(sheet => sheet.gid === gid)
+    if (selectedSheet) {
+      sheetUrl.value = selectedSheet.url
+    }
+    // Limpar resultados anteriores
+    testeResultado.value = null
+  }
+}
+
 const usarDadosExemplo = async () => {
   usandoExemplo.value = true
   testeResultado.value = null
