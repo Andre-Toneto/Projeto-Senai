@@ -181,11 +181,6 @@ const emit = defineEmits(['selectPessoa', 'updateTotal'])
 
 const pessoas = ref([])
 const loading = ref(false)
-const modalAlunoAberto = ref(false)
-const alunoEditando = ref(null)
-const dialogExclusao = ref(false)
-const pessoaParaExcluir = ref(null)
-const excluindo = ref(false)
 
 const { getAlunosByTurma, getCacheInfo, fetchSheetData } = useGoogleSheets()
 
