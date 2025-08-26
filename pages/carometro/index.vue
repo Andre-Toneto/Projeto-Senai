@@ -147,10 +147,12 @@ onMounted(() => {
 })
 
 const loadTurma = () => {
+  if (!process.client) return
+
   loading.value = true
 
   setTimeout(() => {
-    if (turmaCode.value.trim() && process.client) {
+    if (turmaCode.value.trim()) {
       sessionStorage.setItem('turma_selecionada', turmaCode.value)
 
       if (!recentTurmas.value.includes(turmaCode.value)) {
@@ -159,13 +161,14 @@ const loadTurma = () => {
       }
 
       turmaSelecionada.value = turmaCode.value
-      totalAlunos.value = 2
+      totalAlunos.value = 0 // Será atualizado pelo componente carômetro
     }
     loading.value = false
   }, 800)
 }
 
 const selectRecentTurma = (turma) => {
+  if (!process.client) return
   turmaCode.value = turma
   loadTurma()
 }
@@ -178,8 +181,14 @@ const selecionarPessoa = (pessoa) => {
 const changeTurma = () => {
   turmaSelecionada.value = ''
   turmaCode.value = ''
+  totalAlunos.value = 0
   if (process.client) {
     sessionStorage.removeItem('turma_selecionada')
   }
+}
+
+// Função para atualizar total de alunos
+const atualizarTotal = (alunos) => {
+  totalAlunos.value = Array.isArray(alunos) ? alunos.length : 0
 }
 </script>
