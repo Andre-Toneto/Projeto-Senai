@@ -244,7 +244,7 @@ const dialogExclusao = ref(false)
 const pessoaParaExcluir = ref(null)
 const excluindo = ref(false)
 
-const { getAlunosTurma, deleteAluno } = useCarometro()
+const { getAlunosTurma, deleteAluno, exportarTurma, importarTurma } = useCarometro()
 
 const carregarAlunos = async () => {
   if (!props.turma || !process.client) return
