@@ -201,16 +201,15 @@ const dialogExclusao = ref(false)
 const pessoaParaExcluir = ref(null)
 const excluindo = ref(false)
 
+const { getAlunosTurma, deleteAluno } = useCarometro()
+
 const carregarAlunos = async () => {
   if (!props.turma || !process.client) return
 
   loading.value = true
   try {
-    const response = await $fetch(`/api/alunos/load`, {
-      method: 'GET',
-      query: { turma: props.turma }
-    })
-    pessoas.value = response.alunos || []
+    // Usar localStorage em vez de API
+    pessoas.value = getAlunosTurma(props.turma)
     emit('updateTotal', pessoas.value)
   } catch (error) {
     console.error('Erro ao carregar alunos:', error)
