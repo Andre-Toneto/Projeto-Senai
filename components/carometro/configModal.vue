@@ -25,19 +25,33 @@
       </v-card-title>
 
       <v-card-text class="pa-6">
+        <!-- Alerta sobre URL de exemplo -->
+        <v-alert
+          v-if="isUsingExample"
+          color="warning"
+          icon="mdi-alert"
+          variant="tonal"
+          class="mb-4"
+          prominent
+        >
+          <strong>URL de Exemplo Detectada!</strong><br>
+          Você está usando uma URL de exemplo que não contém dados reais.
+          Configure sua própria planilha do Google Sheets para ver suas turmas.
+        </v-alert>
+
         <!-- Status da Conexão -->
         <v-alert
-          v-if="cacheInfo"
+          v-else-if="cacheInfo"
           :color="cacheInfo.isStale ? 'warning' : 'success'"
           :icon="cacheInfo.isStale ? 'mdi-clock-alert' : 'mdi-check-circle'"
           variant="tonal"
           class="mb-4"
         >
           <div class="text-body-2">
-            <strong>Última atualização:</strong> 
+            <strong>Última atualização:</strong>
             {{ cacheInfo.minutesAgo }} {{ cacheInfo.minutesAgo === 1 ? 'minuto' : 'minutos' }} atrás
             <br>
-            <strong>Status:</strong> 
+            <strong>Status:</strong>
             {{ cacheInfo.isStale ? 'Dados podem estar desatualizados' : 'Dados atualizados' }}
           </div>
         </v-alert>
@@ -114,6 +128,19 @@
               </v-expansion-panel-text>
             </v-expansion-panel>
           </v-expansion-panels>
+
+          <!-- Botão para dados de exemplo -->
+          <div class="text-center mb-4">
+            <v-btn
+              variant="outlined"
+              color="info"
+              prepend-icon="mdi-file-document-outline"
+              @click="usarDadosExemplo"
+              :loading="usandoExemplo"
+            >
+              Usar Dados de Exemplo para Teste
+            </v-btn>
+          </div>
 
           <!-- Ações -->
           <div class="d-flex gap-2 flex-wrap">
@@ -196,13 +223,15 @@ const dialogModel = computed({
   set: (value) => emit('update:modelValue', value)
 })
 
-const { 
-  getSheetUrl, 
-  setSheetUrl, 
-  fetchSheetData, 
-  hasCachedData, 
-  clearCache, 
-  getCacheInfo 
+const {
+  getSheetUrl,
+  setSheetUrl,
+  fetchSheetData,
+  hasCachedData,
+  clearCache,
+  getCacheInfo,
+  isUsingExampleUrl,
+  loadExampleData
 } = useGoogleSheets()
 
 const form = ref(null)
@@ -210,9 +239,11 @@ const valid = ref(false)
 const salvando = ref(false)
 const carregando = ref(false)
 const atualizando = ref(false)
+const usandoExemplo = ref(false)
 const sheetUrl = ref('')
 const testeResultado = ref(null)
 const cacheInfo = ref(null)
+const isUsingExample = ref(false)
 
 const urlRules = [
   v => !!v || 'URL é obrigatória',
@@ -222,6 +253,42 @@ const urlRules = [
 
 const atualizarCacheInfo = () => {
   cacheInfo.value = getCacheInfo()
+}
+
+const usarDadosExemplo = async () => {
+  usandoExemplo.value = true
+  testeResultado.value = null
+
+  try {
+    const dados = await loadExampleData()
+
+    if (dados.turmas && dados.turmas.length > 0) {
+      testeResultado.value = {
+        sucesso: true,
+        mensagem: 'Dados de exemplo carregados!',
+        detalhes: `Encontradas ${dados.turmas.length} turmas: ${dados.turmas.join(', ')}`
+      }
+
+      emit('dadosAtualizados', dados)
+
+      setTimeout(() => {
+        fecharModal()
+      }, 2000)
+    } else {
+      testeResultado.value = {
+        sucesso: false,
+        mensagem: 'Erro ao carregar dados de exemplo'
+      }
+    }
+  } catch (error) {
+    testeResultado.value = {
+      sucesso: false,
+      mensagem: 'Erro ao carregar dados de exemplo',
+      detalhes: error.message
+    }
+  } finally {
+    usandoExemplo.value = false
+  }
 }
 
 const salvarConfiguracao = () => {
@@ -323,6 +390,7 @@ const fecharModal = () => {
 watch(() => props.modelValue, (newVal) => {
   if (newVal) {
     sheetUrl.value = getSheetUrl()
+    isUsingExample.value = isUsingExampleUrl()
     atualizarCacheInfo()
   }
 })
@@ -330,6 +398,7 @@ watch(() => props.modelValue, (newVal) => {
 onMounted(() => {
   if (props.modelValue) {
     sheetUrl.value = getSheetUrl()
+    isUsingExample.value = isUsingExampleUrl()
     atualizarCacheInfo()
   }
 })
