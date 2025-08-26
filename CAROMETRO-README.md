@@ -59,25 +59,42 @@
 3. Monitore o status de sincronização no cabeçalho
 4. Configure nova planilha quando necessário
 
-## Armazenamento de Dados
+## Estrutura dos Dados
 
-### LocalStorage (Principal)
-Os dados são salvos diretamente no localStorage do seu navegador:
+### Google Sheets (Fonte Principal)
+Os dados vêm diretamente de uma planilha do Google Sheets com esta estrutura:
+
+```csv
+Turma,Nome,Matricula,Cargo,Curso,Telefone,Email
+T2025-001,João Silva,2025001,Aluno,Técnico em Informática,(11)99999-9999,joao@email.com
+T2025-001,Maria Santos,2025002,Aluna,Técnico em Informática,(11)88888-8888,maria@email.com
+ADM-2024,Pedro Costa,2024001,Aluno,Administração,(11)77777-7777,pedro@email.com
+```
+
+### Cache Local
+Para melhor performance, os dados são armazenados temporariamente no navegador:
 ```
 localStorage:
-├── carometro_turma_T2025-001    # Dados da turma T2025-001
-├── carometro_turma_ADM-2024     # Dados da turma ADM-2024
-└── carometro_turma_TEC-2025     # Dados da turma TEC-2025
+├── googleSheets_url           # URL da planilha configurada
+├── googleSheets_cache         # Cache dos dados da planilha
+└── googleSheets_lastUpdate    # Timestamp da última atualização
 ```
 
-### Backup via Download
-- **Exportar**: Baixa arquivo JSON com todos os dados da turma
-- **Importar**: Carrega dados de arquivo JSON para a turma
+### Colunas Reconhecidas
+**Obrigatórias:**
+- `Turma` - Código/nome da turma
+- `Nome` - Nome completo do aluno
 
-### Fotos dos Alunos
-- Convertidas para **base64** e salvas no localStorage
-- Tamanho máximo: **2MB por foto**
-- Formatos suportados: JPG, PNG, GIF, WebP
+**Opcionais:**
+- `Matricula` - Número de matrícula
+- `Cargo` - Função (Aluno, Professor, etc.)
+- `Curso` - Nome do curso
+- `Telefone` - Telefone de contato
+- `Celular` - Celular de contato
+- `Email` - Email de contato
+- `RG`, `CPF` - Documentos
+- `Endereco`, `Bairro`, `Cidade`, `Estado`, `CEP` - Endereço
+- `Mae`, `Pai` - Filiação
 
 ## Formato dos Dados
 
