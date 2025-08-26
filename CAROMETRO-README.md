@@ -135,12 +135,20 @@ Os dados são salvos em formato JSON dentro de arquivos TXT:
 ## Observações Importantes
 
 - ✅ **Funciona no Builder.io e localmente**
-- 💾 **Dados salvos no localStorage do navegador**
-- 📱 **Cada turma tem armazenamento separado**
-- 🖼️ **Fotos convertidas para base64 (máx 2MB)**
-- 💾 **Backup automático via export/import JSON**
-- 🔄 **Sistema funciona offline após carregamento inicial**
-- ⚠️ **Dados ficam no navegador - faça backup regularmente**
+- 📊 **Dados vêm diretamente do Google Sheets**
+- 🔄 **Sincronização automática com cache inteligente**
+- 📱 **Interface responsiva e moderna**
+- 🔒 **Planilha deve estar publicada publicamente**
+- ⚡ **Cache local para melhor performance**
+- 🔄 **Atualize os dados quando alterar a planilha**
+- 📝 **Primeira linha deve conter os cabeçalhos**
+- 🌐 **Funciona online (precisa de conexão para sincronizar)**
+
+### Limitações
+- A planilha precisa estar publicada como CSV
+- Máximo de 5 minutos de cache (para performance)
+- Não é possível editar dados pelo carômetro (somente visualizar)
+- Para alterar dados, edite diretamente na planilha do Google Sheets
 
 ## Credenciais de Acesso
 
