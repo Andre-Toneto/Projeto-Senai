@@ -245,13 +245,8 @@ const excluirPessoa = async () => {
   excluindo.value = true
 
   try {
-    const response = await $fetch('/api/alunos/delete', {
-      method: 'DELETE',
-      body: {
-        turma: props.turma,
-        matricula: pessoaParaExcluir.value.matricula
-      }
-    })
+    // Usar composable em vez de API
+    const response = deleteAluno(props.turma, pessoaParaExcluir.value.matricula)
 
     if (response.success) {
       // Recarregar lista
