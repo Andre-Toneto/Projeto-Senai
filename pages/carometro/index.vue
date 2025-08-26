@@ -64,8 +64,11 @@
 
                   <div v-else-if="turmasDisponiveis.length === 0" class="text-center py-4">
                     <v-icon size="48" color="grey-lighten-2" class="mb-2">mdi-google-spreadsheet</v-icon>
-                    <p class="text-body-2 text-medium-emphasis">
-                      Nenhuma turma encontrada na planilha
+                    <p class="text-body-2 text-medium-emphasis mb-2">
+                      Nenhuma turma encontrada
+                    </p>
+                    <p class="text-caption text-medium-emphasis">
+                      Configure sua planilha do Google Sheets ou use dados de exemplo para teste
                     </p>
                   </div>
 
