@@ -265,46 +265,29 @@ const abrirModal = (pessoa) => {
   emit('selectPessoa', pessoa)
 }
 
-const abrirModalAdicionar = () => {
-  alunoEditando.value = null
-  modalAlunoAberto.value = true
+const abrirConfigModal = () => {
+  configModalAberto.value = true
 }
 
-const editarPessoa = (pessoa) => {
-  alunoEditando.value = pessoa
-  modalAlunoAberto.value = true
-}
+const atualizarDados = async () => {
+  if (!process.client) return
 
-const confirmarExclusao = (pessoa) => {
-  pessoaParaExcluir.value = pessoa
-  dialogExclusao.value = true
-}
-
-const excluirPessoa = async () => {
-  if (!pessoaParaExcluir.value || !process.client) return
-
-  excluindo.value = true
-
+  loadingRefresh.value = true
   try {
-    // Usar composable em vez de API
-    const response = deleteAluno(props.turma, pessoaParaExcluir.value.matricula)
-
-    if (response.success) {
-      // Recarregar lista
-      await carregarAlunos()
-
-      dialogExclusao.value = false
-      pessoaParaExcluir.value = null
-    }
-
+    await fetchSheetData(true) // Force refresh
+    await carregarAlunos()
   } catch (error) {
-    console.error('Erro ao excluir pessoa:', error)
+    console.error('Erro ao atualizar dados:', error)
     if (process.client) {
-      alert('Erro ao excluir pessoa: ' + (error.message || 'Erro desconhecido'))
+      alert('Erro ao atualizar dados: ' + (error.message || 'Erro desconhecido'))
     }
   } finally {
-    excluindo.value = false
+    loadingRefresh.value = false
   }
+}
+
+const onDadosAtualizados = () => {
+  carregarAlunos()
 }
 
 // Carregar alunos apenas no cliente
