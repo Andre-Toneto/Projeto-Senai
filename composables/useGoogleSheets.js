@@ -7,6 +7,37 @@ export const useGoogleSheets = () => {
     return 'https://docs.google.com/spreadsheets/d/1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO/export?format=csv&gid=0'
   }
 
+  // Carregar dados de exemplo para desenvolvimento
+  const loadExampleData = async () => {
+    if (!process.client) return { turmas: [], alunos: [], error: null }
+
+    try {
+      const response = await fetch('/data/dados-exemplo.json')
+      if (!response.ok) {
+        throw new Error('Dados de exemplo não encontrados')
+      }
+      return await response.json()
+    } catch (error) {
+      console.warn('Erro ao carregar dados de exemplo:', error.message)
+      return {
+        turmas: [],
+        alunos: [],
+        error: error.message,
+        isExample: true,
+        message: 'Erro ao carregar dados de exemplo'
+      }
+    }
+  }
+
+  // Verificar se está usando URL de exemplo
+  const isUsingExampleUrl = () => {
+    const url = getSheetUrl()
+    return url.includes('1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO') ||
+           url.includes('example') ||
+           !url ||
+           url === ''
+  }
+
   // Salvar nova URL da planilha
   const setSheetUrl = (url) => {
     if (process.client) {
@@ -64,9 +95,10 @@ export const useGoogleSheets = () => {
     try {
       const url = getSheetUrl()
 
-      // Verificar se a URL está configurada adequadamente
-      if (!url || url.includes('1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO')) {
-        throw new Error('URL da planilha não configurada ou usando exemplo padrão')
+      // Verificar se está usando URL de exemplo
+      if (isUsingExampleUrl()) {
+        console.info('Usando dados de exemplo - Configure sua planilha do Google Sheets')
+        return await loadExampleData()
       }
 
       // Buscar dados da planilha com timeout
@@ -252,6 +284,8 @@ export const useGoogleSheets = () => {
     getTurmas,
     hasCachedData,
     clearCache,
-    getCacheInfo
+    getCacheInfo,
+    isUsingExampleUrl,
+    loadExampleData
   }
 }
