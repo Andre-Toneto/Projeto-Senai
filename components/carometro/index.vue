@@ -67,18 +67,33 @@
 
     <!-- Lista vazia -->
     <div v-else-if="pessoas.length === 0" class="text-center py-12">
-      <v-icon size="80" color="grey-lighten-2" class="mb-4">mdi-google-spreadsheet</v-icon>
+      <v-icon
+        size="80"
+        color="grey-lighten-2"
+        class="mb-4"
+      >
+        {{ dadosExemplo ? 'mdi-file-document-outline' : 'mdi-google-spreadsheet' }}
+      </v-icon>
+
       <h3 class="text-h6 text-medium-emphasis mb-2">Nenhuma pessoa encontrada</h3>
-      <p class="text-body-2 text-medium-emphasis mb-6">
-        Verifique se a turma <strong>{{ turma }}</strong> existe na planilha
+
+      <p v-if="dadosExemplo" class="text-body-2 text-medium-emphasis mb-6">
+        Você está usando dados de exemplo. A turma <strong>{{ turma }}</strong> não existe nos dados de exemplo.
+        <br>
+        <strong>Turmas disponíveis nos dados de exemplo:</strong> M2A, M2B, T2024-001, ADM-2025, TEC-INFO-01
       </p>
+
+      <p v-else class="text-body-2 text-medium-emphasis mb-6">
+        Verifique se a turma <strong>{{ turma }}</strong> existe na sua planilha do Google Sheets
+      </p>
+
       <div class="d-flex gap-2 justify-center flex-wrap">
         <v-btn
           color="senai-red"
           prepend-icon="mdi-cog"
           @click="abrirConfigModal"
         >
-          Configurar Planilha
+          {{ dadosExemplo ? 'Configurar Planilha Real' : 'Configurar Planilha' }}
         </v-btn>
         <v-btn
           variant="outlined"
@@ -111,16 +126,18 @@
           @click="abrirModal(pessoa)"
           style="cursor: pointer"
         >
-          <!-- Badge da planilha -->
+          <!-- Badge da planilha ou exemplo -->
           <v-chip
             size="x-small"
-            color="success"
+            :color="dadosExemplo ? 'info' : 'success'"
             variant="flat"
             class="position-absolute"
             style="top: 8px; right: 8px; z-index: 1"
           >
-            <v-icon start size="x-small">mdi-google-spreadsheet</v-icon>
-            Planilha
+            <v-icon start size="x-small">
+              {{ dadosExemplo ? 'mdi-file-document-outline' : 'mdi-google-spreadsheet' }}
+            </v-icon>
+            {{ dadosExemplo ? 'Exemplo' : 'Planilha' }}
           </v-chip>
 
           <!-- Avatar/Foto -->
