@@ -121,16 +121,28 @@
               </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <div class="text-body-2">
+                  <h4 class="text-senai-red mb-2">📋 Passo a passo para sua planilha:</h4>
                   <ol>
-                    <li>Abra sua planilha no Google Sheets</li>
-                    <li>Vá em <strong>Arquivo → Compartilhar → Publicar na web</strong></li>
-                    <li>Selecione a aba que contém os dados dos alunos</li>
-                    <li>Escolha <strong>CSV (valores separados por vírgula)</strong></li>
-                    <li>Clique em <strong>Publicar</strong></li>
-                    <li>Copie o link gerado e cole acima</li>
+                    <li class="mb-1">Abra sua planilha: <code class="text-caption">1BKSSU6khpPjJ7x8vsbRkwc7TJcAWk3yO</code></li>
+                    <li class="mb-1">Vá em <strong>Arquivo → Compartilhar → Publicar na web</strong></li>
+                    <li class="mb-1">Em <strong>"Publicar"</strong>, escolha uma das suas abas:
+                      <ul class="ml-4 mt-1">
+                        <li><strong>CAI</strong> (GID: 274325224)</li>
+                        <li><strong>SESI TÉC ADM</strong> (GID: 174349623)</li>
+                        <li><strong>SEDUC TÉC ELETROMECÂNICA</strong> (GID: 792022953)</li>
+                      </ul>
+                    </li>
+                    <li class="mb-1">Em <strong>"Formato"</strong>, escolha <strong>CSV (valores separados por vírgula)</strong></li>
+                    <li class="mb-1">Clique em <strong>Publicar</strong></li>
+                    <li>Confirme clicando <strong>"OK"</strong></li>
                   </ol>
-                  <v-alert color="warning" variant="tonal" class="mt-3">
-                    <strong>Importante:</strong> A planilha precisa estar publicada publicamente
+                  <v-alert color="error" variant="tonal" class="mt-3">
+                    <strong>⚠️ Problema Atual:</strong> Sua planilha ainda não está publicada.
+                    O sistema está recebendo redirecionamento em vez dos dados CSV.
+                  </v-alert>
+                  <v-alert color="info" variant="tonal" class="mt-2">
+                    <strong>💡 Dica:</strong> Apenas "compartilhar com link" não é suficiente.
+                    É necessário "publicar na web" especificamente em formato CSV.
                   </v-alert>
                 </div>
               </v-expansion-panel-text>
@@ -161,6 +173,39 @@
               </v-expansion-panel-text>
             </v-expansion-panel>
           </v-expansion-panels>
+
+          <!-- Testes das Abas -->
+          <v-card variant="outlined" class="mb-4">
+            <v-card-title class="text-h6 pa-4 pb-2">
+              <v-icon class="mr-2">mdi-test-tube</v-icon>
+              Testar Conexão das Abas
+            </v-card-title>
+            <v-card-text class="pt-0">
+              <p class="text-body-2 text-medium-emphasis mb-3">
+                Teste cada aba individualmente para verificar se está funcionando:
+              </p>
+              <div class="d-flex flex-column gap-2">
+                <v-btn
+                  v-for="sheet in availableSheets"
+                  :key="sheet.gid"
+                  variant="outlined"
+                  :color="testResults[sheet.gid]?.success ? 'success' : testResults[sheet.gid]?.error ? 'error' : 'primary'"
+                  :prepend-icon="testResults[sheet.gid]?.success ? 'mdi-check-circle' : testResults[sheet.gid]?.error ? 'mdi-alert-circle' : 'mdi-test-tube'"
+                  :loading="testingSheets[sheet.gid]"
+                  @click="testarAba(sheet)"
+                  block
+                  class="text-left justify-start"
+                >
+                  <div>
+                    <div class="font-weight-medium">{{ sheet.name }}</div>
+                    <div class="text-caption">
+                      {{ testResults[sheet.gid]?.message || `GID: ${sheet.gid}` }}
+                    </div>
+                  </div>
+                </v-btn>
+              </div>
+            </v-card-text>
+          </v-card>
 
           <!-- Botão para dados de exemplo -->
           <div class="text-center mb-4">
@@ -283,6 +328,8 @@ const cacheInfo = ref(null)
 const isUsingExample = ref(false)
 const availableSheets = ref([])
 const selectedSheetGid = ref('')
+const testResults = ref({})
+const testingSheets = ref({})
 
 const urlRules = [
   v => !!v || 'URL é obrigatória',
@@ -303,6 +350,60 @@ const onSheetChange = (gid) => {
     }
     // Limpar resultados anteriores
     testeResultado.value = null
+  }
+}
+
+const testarAba = async (sheet) => {
+  testingSheets.value[sheet.gid] = true
+
+  try {
+    // Temporariamente definir esta aba para teste
+    const originalUrl = getSheetUrl()
+    setSheetUrl(sheet.url)
+
+    const dados = await fetchSheetData(true)
+
+    if (dados.error) {
+      testResults.value[sheet.gid] = {
+        success: false,
+        error: true,
+        message: `Erro: ${dados.error.substring(0, 50)}...`
+      }
+    } else if (dados.turmas && dados.turmas.length > 0) {
+      testResults.value[sheet.gid] = {
+        success: true,
+        error: false,
+        message: `✅ ${dados.turmas.length} turmas, ${dados.alunos.length} alunos`
+      }
+
+      // Se deu certo, usar esta aba
+      selectedSheetGid.value = sheet.gid
+      sheetUrl.value = sheet.url
+
+      testeResultado.value = {
+        sucesso: true,
+        mensagem: `Aba "${sheet.name}" funcionando!`,
+        detalhes: `Encontradas ${dados.turmas.length} turmas: ${dados.turmas.join(', ')}`
+      }
+
+      emit('dadosAtualizados', dados)
+
+    } else {
+      testResults.value[sheet.gid] = {
+        success: false,
+        error: true,
+        message: 'Aba vazia ou sem dados válidos'
+      }
+    }
+
+  } catch (error) {
+    testResults.value[sheet.gid] = {
+      success: false,
+      error: true,
+      message: `Erro: ${error.message.substring(0, 30)}...`
+    }
+  } finally {
+    testingSheets.value[sheet.gid] = false
   }
 }
 
