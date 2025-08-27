@@ -85,6 +85,7 @@
 
         <!-- Área de drop/seleção de arquivo -->
         <div
+          v-show="!temDadosExistentes || mostrandoTrocaArquivo"
           class="upload-area pa-8 text-center rounded-lg border-dashed"
           :class="{
             'border-success': arquivoSelecionado,
