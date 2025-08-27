@@ -38,21 +38,23 @@
         </v-alert>
 
         <!-- Status dos dados existentes -->
-        <v-alert
-          v-if="temDadosExistentes"
-          type="success"
-          variant="tonal"
-          class="mb-6"
-        >
-          <template v-slot:prepend>
-            <v-icon>mdi-check-circle</v-icon>
-          </template>
-          <div>
-            <strong>Planilha já configurada!</strong><br>
-            {{ resumoDados.totalAlunos }} alunos em {{ resumoDados.totalCursos }} cursos.<br>
-            Última atualização: {{ formatarData(resumoDados.ultimaAtualizacao) }}
-          </div>
-        </v-alert>
+        <ClientOnly>
+          <v-alert
+            v-if="temDadosExistentes"
+            type="success"
+            variant="tonal"
+            class="mb-6"
+          >
+            <template v-slot:prepend>
+              <v-icon>mdi-check-circle</v-icon>
+            </template>
+            <div>
+              <strong>Planilha já configurada!</strong><br>
+              {{ resumoDados.totalAlunos }} alunos em {{ resumoDados.totalCursos }} cursos.<br>
+              Última atualização: {{ formatarData(resumoDados.ultimaAtualizacao) }}
+            </div>
+          </v-alert>
+        </ClientOnly>
 
         <!-- Área de drop/seleção de arquivo -->
         <div
@@ -166,18 +168,22 @@
           @click="fechar"
           :disabled="processando"
         >
-          {{ temDadosExistentes ? 'Fechar' : 'Cancelar' }}
+          <ClientOnly fallback="Cancelar">
+            {{ temDadosExistentes ? 'Fechar' : 'Cancelar' }}
+          </ClientOnly>
         </v-btn>
         
-        <v-btn
-          v-if="temDadosExistentes"
-          color="warning"
-          variant="outlined"
-          @click="removerDados"
-          :disabled="processando"
-        >
-          Remover Dados
-        </v-btn>
+        <ClientOnly>
+          <v-btn
+            v-if="temDadosExistentes"
+            color="warning"
+            variant="outlined"
+            @click="removerDados"
+            :disabled="processando"
+          >
+            Remover Dados
+          </v-btn>
+        </ClientOnly>
 
         <v-btn
           color="senai-red"
