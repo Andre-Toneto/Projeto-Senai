@@ -246,6 +246,7 @@ const dadosPreview = ref(null)
 const processando = ref(false)
 const erro = ref('')
 const dragOver = ref(false)
+const mostrandoTrocaArquivo = ref(false)
 
 // Dados existentes
 const temDadosExistentes = ref(false)
