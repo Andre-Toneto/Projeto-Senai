@@ -191,29 +191,32 @@
 
       <v-card-actions class="pa-6 pt-0">
         <v-spacer />
+
+        <!-- Botão Cancelar para troca de arquivo -->
         <v-btn
+          v-if="mostrandoTrocaArquivo"
+          variant="outlined"
+          @click="mostrandoTrocaArquivo = false"
+          :disabled="processando"
+        >
+          Cancelar Troca
+        </v-btn>
+
+        <!-- Botão Fechar padrão -->
+        <v-btn
+          v-else
           variant="outlined"
           @click="fechar"
           :disabled="processando"
         >
           <ClientOnly fallback="Cancelar">
-            {{ temDadosExistentes ? 'Fechar' : 'Cancelar' }}
+            {{ temDadosExistentes && !mostrandoTrocaArquivo ? 'Fechar' : 'Cancelar' }}
           </ClientOnly>
         </v-btn>
-        
-        <ClientOnly>
-          <v-btn
-            v-if="temDadosExistentes"
-            color="warning"
-            variant="outlined"
-            @click="removerDados"
-            :disabled="processando"
-          >
-            Remover Dados
-          </v-btn>
-        </ClientOnly>
 
+        <!-- Botão Processar/Salvar -->
         <v-btn
+          v-if="!temDadosExistentes || mostrandoTrocaArquivo || dadosPreview"
           color="senai-red"
           :disabled="!arquivoSelecionado || processando"
           :loading="processando"
