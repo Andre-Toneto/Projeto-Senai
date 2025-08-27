@@ -1,12 +1,65 @@
 <template>
   <v-container fluid>
+    <!-- Campo de Busca -->
+    <v-row class="mb-4" v-if="pessoas.length > 0">
+      <v-col cols="12" md="6">
+        <v-text-field
+          v-model="termoBusca"
+          label="Buscar por nome ou matrícula"
+          placeholder="Digite o nome ou matrícula do aluno..."
+          variant="outlined"
+          density="comfortable"
+          prepend-inner-icon="mdi-magnify"
+          clearable
+          hide-details
+          class="rounded-lg"
+        >
+          <template v-slot:append-inner>
+            <v-fade-transition>
+              <v-chip
+                v-if="termoBusca && pessoasFiltradas.length !== pessoas.length"
+                size="small"
+                color="primary"
+                variant="flat"
+              >
+                {{ pessoasFiltradas.length }} de {{ pessoas.length }}
+              </v-chip>
+            </v-fade-transition>
+          </template>
+        </v-text-field>
+      </v-col>
+      <v-col cols="12" md="6" class="d-flex align-center">
+        <v-chip-group class="flex-wrap">
+          <v-chip
+            :color="!filtroAtivo ? 'primary' : 'default'"
+            :variant="!filtroAtivo ? 'flat' : 'outlined'"
+            size="small"
+            @click="limparFiltros"
+          >
+            <v-icon start size="small">mdi-account-group</v-icon>
+            Todos ({{ pessoas.length }})
+          </v-chip>
+          <v-chip
+            v-if="termoBusca"
+            color="success"
+            variant="flat"
+            size="small"
+            prepend-icon="mdi-filter"
+          >
+            Filtrados ({{ pessoasFiltradas.length }})
+          </v-chip>
+        </v-chip-group>
+      </v-col>
+    </v-row>
+
     <!-- Cabeçalho com botões de ação -->
     <v-row class="mb-4">
       <v-col>
         <div class="d-flex justify-space-between align-center flex-wrap ga-2">
           <div>
             <h3 class="text-h6 text-senai-red font-weight-medium">
-              {{ pessoas.length }} {{ pessoas.length === 1 ? 'pessoa cadastrada' : 'pessoas cadastradas' }}
+              {{ pessoasFiltradas.length }} {{ pessoasFiltradas.length === 1 ? 'pessoa encontrada' : 'pessoas encontradas' }}
+              <span v-if="termoBusca" class="text-body-2 text-medium-emphasis">de {{ pessoas.length }} total</span>
             </h3>
             <p class="text-caption text-medium-emphasis mb-0">
               <v-icon size="small" class="mr-1">
@@ -111,10 +164,37 @@
       </div>
     </div>
 
+    <!-- Mensagem quando nenhum resultado for encontrado -->
+    <div v-else-if="pessoas.length > 0 && pessoasFiltradas.length === 0" class="text-center py-12">
+      <v-icon
+        size="80"
+        color="grey-lighten-2"
+        class="mb-4"
+      >
+        mdi-account-search
+      </v-icon>
+
+      <h3 class="text-h6 text-medium-emphasis mb-2">Nenhum aluno encontrado</h3>
+
+      <p class="text-body-2 text-medium-emphasis mb-6">
+        Não foi possível encontrar alunos com o termo "<strong>{{ termoBusca }}</strong>"<br>
+        Verifique se digitou corretamente o nome ou matrícula.
+      </p>
+
+      <v-btn
+        color="primary"
+        variant="outlined"
+        prepend-icon="mdi-filter-remove"
+        @click="limparFiltros"
+      >
+        Limpar Busca
+      </v-btn>
+    </div>
+
     <!-- Grid Responsivo Moderno -->
-    <v-row v-else class="d-flex">
+    <v-row v-else-if="pessoasFiltradas.length > 0" class="d-flex">
       <v-col
-        v-for="pessoa in pessoas"
+        v-for="pessoa in pessoasFiltradas"
         :key="pessoa.matricula"
         cols="12"
         sm="6"
@@ -212,6 +292,9 @@ const loading = ref(false)
 const dadosExemplo = ref(false)
 const temDadosExcel = ref(false)
 
+// Busca e filtros
+const termoBusca = ref('')
+
 const { getAlunosTurma } = useCarometro()
 const { getAlunosPorCursoTurma, temDadosPlanilha } = useExcelData()
 
@@ -237,6 +320,23 @@ const getGoogleSheetsComposable = () => {
 const cacheInfo = ref(null)
 const loadingRefresh = ref(false)
 const configModalAberto = ref(false)
+
+// Computed para filtros
+const pessoasFiltradas = computed(() => {
+  if (!termoBusca.value) return pessoas.value
+
+  const termo = termoBusca.value.toLowerCase().trim()
+  return pessoas.value.filter(pessoa => {
+    const nome = pessoa.nome?.toLowerCase() || ''
+    const matricula = pessoa.matricula?.toString().toLowerCase() || ''
+
+    return nome.includes(termo) || matricula.includes(termo)
+  })
+})
+
+const filtroAtivo = computed(() => {
+  return !!termoBusca.value
+})
 
 const atualizarCacheInfo = () => {
   if (process.client) {
@@ -340,6 +440,10 @@ const onDadosAtualizados = () => {
   carregarAlunos()
 }
 
+const limparFiltros = () => {
+  termoBusca.value = ''
+}
+
 // Carregar alunos apenas no cliente
 onMounted(() => {
   if (process.client) {
@@ -396,5 +500,45 @@ const atualizarEstadoExcel = () => {
   transform: translateY(-8px);
   border-color: rgb(var(--v-theme-senai-red));
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Transições para busca e filtros */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.4s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
+}
+
+.fade-slide-move {
+  transition: transform 0.4s ease;
+}
+
+/* Estilo para campo de busca */
+.v-text-field {
+  transition: all 0.3s ease;
+}
+
+.v-text-field:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--v-theme-primary-rgb), 0.15);
+}
+
+/* Animação para chips de filtro */
+.v-chip {
+  transition: all 0.3s ease;
+}
+
+.v-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 </style>

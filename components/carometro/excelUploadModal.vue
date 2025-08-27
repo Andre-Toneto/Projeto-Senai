@@ -39,25 +39,53 @@
 
         <!-- Status dos dados existentes -->
         <ClientOnly>
-          <v-alert
+          <v-card
             v-if="temDadosExistentes"
-            type="success"
-            variant="tonal"
+            variant="outlined"
+            color="success"
             class="mb-6"
           >
-            <template v-slot:prepend>
-              <v-icon>mdi-check-circle</v-icon>
-            </template>
-            <div>
-              <strong>Planilha já configurada!</strong><br>
-              {{ resumoDados.totalAlunos }} alunos em {{ resumoDados.totalCursos }} cursos.<br>
-              Última atualização: {{ formatarData(resumoDados.ultimaAtualizacao) }}
-            </div>
-          </v-alert>
+            <v-card-title class="bg-success text-white pa-4">
+              <v-icon class="mr-2">mdi-check-circle</v-icon>
+              Planilha Configurada
+            </v-card-title>
+            <v-card-text class="pa-4">
+              <div class="d-flex align-center justify-space-between">
+                <div>
+                  <p class="text-body-1 font-weight-medium mb-1">
+                    <strong>{{ resumoDados.totalAlunos }}</strong> alunos em <strong>{{ resumoDados.totalCursos }}</strong> cursos
+                  </p>
+                  <p class="text-body-2 text-medium-emphasis mb-0">
+                    <v-icon size="small" class="mr-1">mdi-clock</v-icon>
+                    Última atualização: {{ formatarData(resumoDados.ultimaAtualizacao) }}
+                  </p>
+                </div>
+                <div class="d-flex gap-2">
+                  <v-btn
+                    color="warning"
+                    variant="outlined"
+                    prepend-icon="mdi-swap-horizontal"
+                    @click="mostrarTrocaArquivo"
+                  >
+                    Trocar Planilha
+                  </v-btn>
+                  <v-btn
+                    color="error"
+                    variant="outlined"
+                    prepend-icon="mdi-delete"
+                    @click="confirmarRemocao"
+                  >
+                    Remover
+                  </v-btn>
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
         </ClientOnly>
 
         <!-- Área de drop/seleção de arquivo -->
         <div
+          v-show="!temDadosExistentes || mostrandoTrocaArquivo"
           class="upload-area pa-8 text-center rounded-lg border-dashed"
           :class="{
             'border-success': arquivoSelecionado,
@@ -163,29 +191,32 @@
 
       <v-card-actions class="pa-6 pt-0">
         <v-spacer />
+
+        <!-- Botão Cancelar para troca de arquivo -->
         <v-btn
+          v-if="mostrandoTrocaArquivo"
+          variant="outlined"
+          @click="mostrandoTrocaArquivo = false"
+          :disabled="processando"
+        >
+          Cancelar Troca
+        </v-btn>
+
+        <!-- Botão Fechar padrão -->
+        <v-btn
+          v-else
           variant="outlined"
           @click="fechar"
           :disabled="processando"
         >
           <ClientOnly fallback="Cancelar">
-            {{ temDadosExistentes ? 'Fechar' : 'Cancelar' }}
+            {{ temDadosExistentes && !mostrandoTrocaArquivo ? 'Fechar' : 'Cancelar' }}
           </ClientOnly>
         </v-btn>
-        
-        <ClientOnly>
-          <v-btn
-            v-if="temDadosExistentes"
-            color="warning"
-            variant="outlined"
-            @click="removerDados"
-            :disabled="processando"
-          >
-            Remover Dados
-          </v-btn>
-        </ClientOnly>
 
+        <!-- Botão Processar/Salvar -->
         <v-btn
+          v-if="!temDadosExistentes || mostrandoTrocaArquivo || dadosPreview"
           color="senai-red"
           :disabled="!arquivoSelecionado || processando"
           :loading="processando"
@@ -218,6 +249,7 @@ const dadosPreview = ref(null)
 const processando = ref(false)
 const erro = ref('')
 const dragOver = ref(false)
+const mostrandoTrocaArquivo = ref(false)
 
 // Dados existentes
 const temDadosExistentes = ref(false)
@@ -300,16 +332,28 @@ const processarArquivo = async () => {
   }
 }
 
-const removerDados = () => {
-  if (confirm('Tem certeza que deseja remover todos os dados da planilha?')) {
-    if (process.client) {
-      localStorage.removeItem('carometro_dados_excel')
-      localStorage.removeItem('carometro_excel_timestamp')
-    }
-    temDadosExistentes.value = false
-    resumoDados.value = {}
-    emit('dados-configurados')
+const mostrarTrocaArquivo = () => {
+  mostrandoTrocaArquivo.value = true
+  arquivoSelecionado.value = null
+  dadosPreview.value = null
+  erro.value = ''
+}
+
+const confirmarRemocao = () => {
+  if (confirm('⚠️ ATENÇÃO!\n\nTem certeza que deseja remover TODOS os dados da planilha?\n\nEsta ação não pode ser desfeita e você precisará fazer upload da planilha novamente.')) {
+    removerDados()
   }
+}
+
+const removerDados = () => {
+  if (process.client) {
+    localStorage.removeItem('carometro_dados_excel')
+    localStorage.removeItem('carometro_excel_timestamp')
+  }
+  temDadosExistentes.value = false
+  resumoDados.value = {}
+  mostrandoTrocaArquivo.value = false
+  emit('dados-configurados')
 }
 
 const fechar = () => {
@@ -319,6 +363,7 @@ const fechar = () => {
   dadosPreview.value = null
   erro.value = ''
   dragOver.value = false
+  mostrandoTrocaArquivo.value = false
 }
 
 const formatarTamanho = (bytes) => {
