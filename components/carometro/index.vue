@@ -12,9 +12,9 @@
               <v-icon size="small" class="mr-1">
                 {{ temDadosPlanilha() && props.curso ? 'mdi-file-excel' : 'mdi-google-spreadsheet' }}
               </v-icon>
-              <span v-if="dadosExemplo">Dados de exemplo para teste</span>
               <ClientOnly fallback="<span>Carregando...</span>">
-                <span v-if="temDadosExcel && props.curso">Dados da planilha Excel</span>
+                <span v-if="dadosExemplo">Dados de exemplo para teste</span>
+                <span v-else-if="temDadosExcel && props.curso">Dados da planilha Excel</span>
                 <span v-else>Dados locais ou sincronizados</span>
               </ClientOnly>
               <ClientOnly>
