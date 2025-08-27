@@ -360,6 +360,7 @@ const fechar = () => {
   dadosPreview.value = null
   erro.value = ''
   dragOver.value = false
+  mostrandoTrocaArquivo.value = false
 }
 
 const formatarTamanho = (bytes) => {
