@@ -501,4 +501,44 @@ const atualizarEstadoExcel = () => {
   border-color: rgb(var(--v-theme-senai-red));
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
+
+/* Transições para busca e filtros */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.4s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
+}
+
+.fade-slide-move {
+  transition: transform 0.4s ease;
+}
+
+/* Estilo para campo de busca */
+.v-text-field {
+  transition: all 0.3s ease;
+}
+
+.v-text-field:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--v-theme-primary-rgb), 0.15);
+}
+
+/* Animação para chips de filtro */
+.v-chip {
+  transition: all 0.3s ease;
+}
+
+.v-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 </style>
