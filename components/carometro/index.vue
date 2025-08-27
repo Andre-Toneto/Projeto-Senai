@@ -413,6 +413,10 @@ const onDadosAtualizados = () => {
   carregarAlunos()
 }
 
+const limparFiltros = () => {
+  termoBusca.value = ''
+}
+
 // Carregar alunos apenas no cliente
 onMounted(() => {
   if (process.client) {
