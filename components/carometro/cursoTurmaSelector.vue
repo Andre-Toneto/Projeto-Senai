@@ -77,13 +77,15 @@
       </v-col>
 
       <!-- Seleção de Turma -->
-      <v-col cols="12" md="6">
+      <v-col cols="12" lg="6">
         <v-card rounded="xl" elevation="2" class="h-100">
           <v-card-title class="bg-primary text-white pa-4">
-            <v-icon class="mr-2">mdi-account-group</v-icon>
-            Selecionar Turma
+            <div class="d-flex align-center">
+              <v-icon class="mr-2">mdi-account-group</v-icon>
+              <span class="text-h6">Selecionar Turma</span>
+            </div>
           </v-card-title>
-          <v-card-text class="pa-4">
+          <v-card-text class="pa-3 pa-md-4">
             <template v-if="!cursoSelecionado">
               <v-alert
                 type="info"
