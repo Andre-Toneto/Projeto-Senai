@@ -16,9 +16,9 @@
               <span v-else-if="temDadosPlanilha() && props.curso">Dados da planilha Excel</span>
               <span v-else>Dados locais ou sincronizados</span>
               <ClientOnly>
-                <span v-if="cacheInfo && !dadosExemplo && !temDadosPlanilha()">
-                  • Última atualização: {{ cacheInfo.minutesAgo }}min atrás
-                </span>
+                <span v-if="cacheInfo && !dadosExemplo && !temDadosPlanilha() && props.curso">
+                • Última atualização: {{ cacheInfo.minutesAgo }}min atrás
+              </span>
               </ClientOnly>
             </p>
           </div>
@@ -212,13 +212,37 @@ const dadosExemplo = ref(false)
 const { getAlunosTurma } = useCarometro()
 const { getAlunosPorCursoTurma, temDadosPlanilha } = useExcelData()
 
+// Google Sheets apenas quando necessário
+let googleSheetsComposable = null
+const getGoogleSheetsComposable = () => {
+  if (!googleSheetsComposable) {
+    try {
+      googleSheetsComposable = useGoogleSheets()
+    } catch (error) {
+      console.warn('Google Sheets não disponível:', error)
+      googleSheetsComposable = {
+        getAlunosByTurma: () => [],
+        getCacheInfo: () => null,
+        isUsingExampleUrl: () => false,
+        fetchSheetData: () => Promise.resolve()
+      }
+    }
+  }
+  return googleSheetsComposable
+}
+
 const cacheInfo = ref(null)
 const loadingRefresh = ref(false)
 const configModalAberto = ref(false)
 
 const atualizarCacheInfo = () => {
   if (process.client) {
-    cacheInfo.value = getCacheInfo()
+    try {
+      const googleSheets = getGoogleSheetsComposable()
+      cacheInfo.value = googleSheets.getCacheInfo()
+    } catch (error) {
+      cacheInfo.value = null
+    }
   }
 }
 
@@ -248,9 +272,9 @@ const carregarAlunos = async () => {
     if (alunosCarregados.length === 0) {
       // Tentar dados de exemplo se não encontrar nada
       try {
-        const { getAlunosByTurma, isUsingExampleUrl } = useGoogleSheets()
-        dadosExemplo.value = isUsingExampleUrl()
-        alunosCarregados = await getAlunosByTurma(props.turma)
+        const googleSheets = getGoogleSheetsComposable()
+        dadosExemplo.value = googleSheets.isUsingExampleUrl()
+        alunosCarregados = await googleSheets.getAlunosByTurma(props.turma)
       } catch (error) {
         console.warn('Erro ao carregar dados de exemplo:', error)
       }
@@ -287,8 +311,8 @@ const atualizarDados = async () => {
     } else {
       // Tentar atualizar Google Sheets se disponível
       try {
-        const { fetchSheetData } = useGoogleSheets()
-        await fetchSheetData(true) // Force refresh
+        const googleSheets = getGoogleSheetsComposable()
+        await googleSheets.fetchSheetData(true) // Force refresh
         await carregarAlunos()
       } catch (error) {
         console.warn('Erro ao atualizar Google Sheets:', error)
