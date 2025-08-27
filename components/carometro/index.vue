@@ -13,10 +13,12 @@
                 {{ temDadosPlanilha() && props.curso ? 'mdi-file-excel' : 'mdi-google-spreadsheet' }}
               </v-icon>
               <span v-if="dadosExemplo">Dados de exemplo para teste</span>
-              <span v-else-if="temDadosPlanilha() && props.curso">Dados da planilha Excel</span>
-              <span v-else>Dados locais ou sincronizados</span>
+              <ClientOnly fallback="<span>Carregando...</span>">
+                <span v-if="temDadosExcel && props.curso">Dados da planilha Excel</span>
+                <span v-else>Dados locais ou sincronizados</span>
+              </ClientOnly>
               <ClientOnly>
-                <span v-if="cacheInfo && !dadosExemplo && !temDadosPlanilha() && props.curso">
+                <span v-if="cacheInfo && !dadosExemplo && !temDadosExcel && props.curso">
                 • Última atualização: {{ cacheInfo.minutesAgo }}min atrás
               </span>
               </ClientOnly>
@@ -208,6 +210,7 @@ const emit = defineEmits(['selectPessoa', 'updateTotal'])
 const pessoas = ref([])
 const loading = ref(false)
 const dadosExemplo = ref(false)
+const temDadosExcel = ref(false)
 
 const { getAlunosTurma } = useCarometro()
 const { getAlunosPorCursoTurma, temDadosPlanilha } = useExcelData()
@@ -253,8 +256,11 @@ const carregarAlunos = async () => {
   try {
     let alunosCarregados = []
 
+    // Atualizar estado do Excel
+    atualizarEstadoExcel()
+
     // Primeiro tentar carregar da planilha Excel se curso for especificado
-    if (props.curso && temDadosPlanilha()) {
+    if (props.curso && temDadosExcel.value) {
       alunosCarregados = getAlunosPorCursoTurma(props.curso, props.turma)
       dadosExemplo.value = false
 
@@ -335,8 +341,11 @@ const onDadosAtualizados = () => {
 
 // Carregar alunos apenas no cliente
 onMounted(() => {
-  if (process.client && props.turma) {
-    carregarAlunos()
+  if (process.client) {
+    atualizarEstadoExcel()
+    if (props.turma) {
+      carregarAlunos()
+    }
   }
 })
 
@@ -350,20 +359,27 @@ watch(() => [props.turma, props.curso], ([newTurma, newCurso]) => {
 // Funções auxiliares para badge
 const getCorBadge = () => {
   if (dadosExemplo.value) return 'info'
-  if (temDadosPlanilha() && props.curso) return 'success'
+  if (temDadosExcel.value && props.curso) return 'success'
   return 'warning'
 }
 
 const getIconeBadge = () => {
   if (dadosExemplo.value) return 'mdi-file-document-outline'
-  if (temDadosPlanilha() && props.curso) return 'mdi-file-excel'
+  if (temDadosExcel.value && props.curso) return 'mdi-file-excel'
   return 'mdi-database'
 }
 
 const getTextoBadge = () => {
   if (dadosExemplo.value) return 'Exemplo'
-  if (temDadosPlanilha() && props.curso) return 'Excel'
+  if (temDadosExcel.value && props.curso) return 'Excel'
   return 'Local'
+}
+
+// Atualizar estado do Excel apenas no cliente
+const atualizarEstadoExcel = () => {
+  if (process.client) {
+    temDadosExcel.value = temDadosPlanilha()
+  }
 }
 
 </script>
