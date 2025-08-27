@@ -315,10 +315,50 @@ onMounted(() => {
 
 .v-list-item {
   transition: all 0.3s ease;
+  min-height: 64px;
 }
 
 .v-list-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsividade aprimorada */
+@media (max-width: 600px) {
+  .curso-item,
+  .turma-item {
+    min-height: 72px;
+    padding: 8px 12px;
+  }
+
+  .v-list-item:hover {
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Melhorar toque em dispositivos móveis */
+@media (pointer: coarse) {
+  .v-list-item {
+    min-height: 76px;
+  }
+
+  .curso-item,
+  .turma-item {
+    padding: 12px 16px;
+  }
+}
+
+/* Ocultar elementos em telas pequenas */
+@media (max-width: 599px) {
+  .hidden-xs {
+    display: none !important;
+  }
+}
+
+@media (max-width: 959px) {
+  .hidden-sm-and-down {
+    display: none !important;
+  }
 }
 </style>
