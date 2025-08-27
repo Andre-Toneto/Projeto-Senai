@@ -9,22 +9,26 @@
             Selecionar Curso
           </v-card-title>
           <v-card-text class="pa-4">
-            <v-alert
-              v-if="!temDadosPlanilha()"
-              type="warning"
-              variant="tonal"
-              class="mb-4"
-            >
+            <ClientOnly>
+              <v-alert
+                v-if="!temDadosExcel"
+                type="warning"
+                variant="tonal"
+                class="mb-4"
+              >
               <template v-slot:prepend>
                 <v-icon>mdi-alert</v-icon>
               </template>
-              Nenhuma planilha configurada. Configure primeiro sua planilha Excel.
-            </v-alert>
+                Nenhuma planilha configurada. Configure primeiro sua planilha Excel.
+              </v-alert>
+            </ClientOnly>
 
-            <div v-if="cursosDisponiveis.length === 0 && temDadosPlanilha()" class="text-center py-4">
+            <ClientOnly>
+              <div v-if="cursosDisponiveis.length === 0 && temDadosExcel" class="text-center py-4">
               <v-icon size="48" color="grey-lighten-2" class="mb-2">mdi-folder-open</v-icon>
-              <p class="text-body-2 text-medium-emphasis">Nenhum curso encontrado na planilha</p>
-            </div>
+                <p class="text-body-2 text-medium-emphasis">Nenhum curso encontrado na planilha</p>
+              </div>
+            </ClientOnly>
 
             <v-list v-else class="pa-0">
               <v-list-item
@@ -175,8 +179,9 @@
     </v-row>
 
     <!-- Botão para configurar planilha -->
-    <v-row v-if="!temDadosPlanilha()">
-      <v-col cols="12" class="text-center">
+    <ClientOnly>
+      <v-row v-if="!temDadosExcel">
+        <v-col cols="12" class="text-center">
         <v-btn
           color="senai-red"
           size="large"
@@ -185,9 +190,10 @@
           @click="abrirConfigExcel"
         >
           Configurar Planilha Excel
-        </v-btn>
-      </v-col>
-    </v-row>
+          </v-btn>
+        </v-col>
+      </v-row>
+    </ClientOnly>
   </v-container>
 </template>
 
@@ -200,12 +206,16 @@ const cursosDisponiveis = ref([])
 const turmasDisponiveis = ref([])
 const cursoSelecionado = ref(null)
 const turmaSelecionada = ref(null)
+const temDadosExcel = ref(false)
 
 const carregarCursos = () => {
-  if (temDadosPlanilha()) {
-    cursosDisponiveis.value = getCursosDisponiveis()
-  } else {
-    cursosDisponiveis.value = []
+  if (process.client) {
+    temDadosExcel.value = temDadosPlanilha()
+    if (temDadosExcel.value) {
+      cursosDisponiveis.value = getCursosDisponiveis()
+    } else {
+      cursosDisponiveis.value = []
+    }
   }
 }
 
@@ -241,6 +251,13 @@ onMounted(() => {
 // Expor método para recarregar cursos
 defineExpose({
   recarregarCursos: carregarCursos
+})
+
+// Inicializar no cliente
+onMounted(() => {
+  if (process.client) {
+    temDadosExcel.value = temDadosPlanilha()
+  }
 })
 </script>
 
