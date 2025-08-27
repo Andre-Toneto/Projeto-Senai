@@ -265,6 +265,9 @@ const loading = ref(false)
 const dadosExemplo = ref(false)
 const temDadosExcel = ref(false)
 
+// Busca e filtros
+const termoBusca = ref('')
+
 const { getAlunosTurma } = useCarometro()
 const { getAlunosPorCursoTurma, temDadosPlanilha } = useExcelData()
 
