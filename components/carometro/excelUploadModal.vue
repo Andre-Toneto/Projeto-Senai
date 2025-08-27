@@ -224,16 +224,21 @@ const temDadosExistentes = ref(false)
 const resumoDados = ref({})
 
 const verificarDadosExistentes = () => {
-  temDadosExistentes.value = temDadosPlanilha()
-  if (temDadosExistentes.value) {
-    const dados = carregarDadosProcessados()
-    if (dados) {
-      resumoDados.value = {
-        totalAlunos: dados.totalAlunos || 0,
-        totalCursos: Object.keys(dados.cursos || {}).length,
-        ultimaAtualizacao: dados.ultimaAtualizacao
+  if (process.client) {
+    temDadosExistentes.value = temDadosPlanilha()
+    if (temDadosExistentes.value) {
+      const dados = carregarDadosProcessados()
+      if (dados) {
+        resumoDados.value = {
+          totalAlunos: dados.totalAlunos || 0,
+          totalCursos: Object.keys(dados.cursos || {}).length,
+          ultimaAtualizacao: dados.ultimaAtualizacao
+        }
       }
     }
+  } else {
+    temDadosExistentes.value = false
+    resumoDados.value = {}
   }
 }
 
