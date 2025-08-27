@@ -182,33 +182,42 @@
     <v-row v-if="cursoSelecionado && turmaSelecionada">
       <v-col cols="12">
         <v-card rounded="xl" elevation="3" class="bg-gradient-primary">
-          <v-card-text class="pa-6">
-            <div class="d-flex align-center">
-              <v-avatar :color="cursoSelecionado.cor" size="60" class="mr-4">
-                <v-icon color="white" size="30">mdi-check-circle</v-icon>
+          <v-card-text class="pa-4 pa-md-6">
+            <div class="d-flex align-center flex-column flex-sm-row">
+              <v-avatar
+                :color="cursoSelecionado.cor"
+                :size="$vuetify.display.smAndDown ? 48 : 60"
+                :class="$vuetify.display.smAndDown ? 'mb-3' : 'mr-4'"
+              >
+                <v-icon color="white" :size="$vuetify.display.smAndDown ? 24 : 30">mdi-check-circle</v-icon>
               </v-avatar>
-              
-              <div class="flex-grow-1">
-                <h3 class="text-h5 font-weight-bold text-white mb-1">
+
+              <div class="flex-grow-1 text-center text-sm-left">
+                <h3 :class="$vuetify.display.smAndDown ? 'text-h6' : 'text-h5'" class="font-weight-bold text-white mb-1">
                   Seleção Confirmada
                 </h3>
-                <p class="text-h6 text-grey-lighten-3 mb-1">
-                  {{ cursoSelecionado.nome }} • Turma {{ turmaSelecionada.nome }}
+                <p :class="$vuetify.display.smAndDown ? 'text-body-1' : 'text-h6'" class="text-grey-lighten-3 mb-1">
+                  {{ cursoSelecionado.nome }}
+                </p>
+                <p class="text-body-2 text-grey-lighten-3 mb-1">
+                  Turma {{ turmaSelecionada.nome }}
                 </p>
                 <p class="text-body-2 text-grey-lighten-4 mb-0">
                   {{ turmaSelecionada.totalAlunos }} alunos cadastrados
                 </p>
               </div>
-              
+
               <v-btn
                 color="white"
                 variant="flat"
-                size="large"
-                prepend-icon="mdi-arrow-right"
+                :size="$vuetify.display.smAndDown ? 'default' : 'large'"
+                :prepend-icon="$vuetify.display.smAndDown ? undefined : 'mdi-arrow-right'"
+                :icon="$vuetify.display.smAndDown ? 'mdi-arrow-right' : undefined"
                 @click="confirmarSelecao"
                 rounded="xl"
+                :class="$vuetify.display.smAndDown ? 'mt-3' : ''"
               >
-                Visualizar Carômetro
+                <span class="hidden-xs">Visualizar Carômetro</span>
               </v-btn>
             </div>
           </v-card-text>
