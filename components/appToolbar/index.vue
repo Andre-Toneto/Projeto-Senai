@@ -83,12 +83,12 @@ const formattedDate = computed(() => {
 })
 
 const menuItems = [
-  { text: 'INTRANET', icon: 'mdi-web', link: '#' },
-  { text: 'PORTAL EDU', icon: 'mdi-school', link: '#' },
-  { text: 'RH SAP', icon: 'mdi-account-group', link: '#' },
+  { text: 'INTRANET', icon: 'mdi-web', link: 'https://sesisenaisp.sharepoint.com/sites/intranet/SitePages/Home.aspx' },
+  { text: 'PORTAL EDU', icon: 'mdi-school', link: 'https://pess.sesisenaispedu.org.br/' },
+  { text: 'RH SAP', icon: 'mdi-account-group', link: 'https://portalrh.sesisenaisp.org.br/arte/' },
   { text: 'GED', icon: 'mdi-file-document', link: '#' },
-  { text: 'OUTLOOK', icon: 'mdi-email', link: '#' },
+  { text: 'OUTLOOK', icon: 'mdi-email', link: 'https://mail.sesisenaisp.org.br/' },
   { text: 'SGSET', icon: 'mdi-cog', link: '#' },
-  { text: 'EMPREGRA+', icon: 'mdi-briefcase', link: '#' }
+  { text: 'EMPREGRA+', icon: 'mdi-briefcase', link: 'https://www.senaipr.org.br/' }
 ]
 </script>

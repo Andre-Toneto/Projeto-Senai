@@ -266,6 +266,7 @@ const carregarAlunos = async () => {
 
       if (alunosCarregados.length > 0) {
         pessoas.value = alunosCarregados
+        console.log("o que vem em pessoas", pessoas.value)
         emit('updateTotal', pessoas.value)
         atualizarCacheInfo()
         return

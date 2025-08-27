@@ -98,7 +98,7 @@ export const useExcelData = () => {
 
           // Extrair informações do aluno
           const aluno = extrairDadosAluno(registro, cursoId)
-          
+          console.log('o que vem no aluno agora', aluno)
           if (!aluno.turma) {
             console.warn('Turma não identificada para aluno:', aluno)
             return
@@ -159,24 +159,24 @@ export const useExcelData = () => {
   const extrairDadosAluno = (registro, cursoId) => {
     const aluno = {
       id: gerarIdAluno(registro),
-      matricula: extrairCampo(registro, ['matricula', 'Matricula', 'MATRICULA', 'número', 'numero']),
+      matricula: extrairCampo(registro, ['matricula', 'Matricula', 'MATRICULA', 'número', 'numero', "Nº de Matrícula"]),
       nome: extrairCampo(registro, ['nome', 'Nome', 'NOME', 'aluno', 'Aluno', 'ALUNO']),
       turma: extrairCampo(registro, ['turma', 'Turma', 'TURMA', 'classe', 'Classe', 'CLASSE']),
       curso: cursosDisponiveis.find(c => c.id === cursoId)?.nome || cursoId,
       cargo: 'Aluno',
-      telefone: extrairCampo(registro, ['telefone', 'Telefone', 'TELEFONE', 'tel']),
-      celular: extrairCampo(registro, ['celular', 'Celular', 'CELULAR', 'whatsapp', 'WhatsApp']),
+      telefone: extrairCampo(registro, ['telefone', 'Telefone', 'TELEFONE', 'tel', "Telefone - Emegência"]),
+      celular: extrairCampo(registro, ['celular', 'Celular', 'CELULAR', 'whatsapp', 'WhatsApp', 'Celular aluno']),
       email: extrairCampo(registro, ['email', 'Email', 'EMAIL', 'e-mail', 'E-mail']),
       rg: extrairCampo(registro, ['rg', 'RG', 'Rg']),
       cpf: extrairCampo(registro, ['cpf', 'CPF', 'Cpf']),
-      endereco: extrairCampo(registro, ['endereco', 'Endereco', 'ENDERECO', 'endereço', 'Endereço']),
+      endereco: extrairCampo(registro, ['endereco', 'Endereco', 'ENDERECO', 'endereço', 'Endereço', 'Endereço Aluno']),
       bairro: extrairCampo(registro, ['bairro', 'Bairro', 'BAIRRO']),
-      cidade: extrairCampo(registro, ['cidade', 'Cidade', 'CIDADE']),
+      cidade: extrairCampo(registro, ['cidade', 'Cidade', 'CIDADE','Município']),
       estado: extrairCampo(registro, ['estado', 'Estado', 'ESTADO', 'uf', 'UF']),
       cep: extrairCampo(registro, ['cep', 'CEP', 'Cep']),
-      mae: extrairCampo(registro, ['mae', 'Mae', 'MAE', 'mãe', 'Mãe', 'mae_nome']),
-      pai: extrairCampo(registro, ['pai', 'Pai', 'PAI', 'pai_nome']),
-      empresa: 'SENAI',
+      mae: extrairCampo(registro, ['mae', 'Mae', 'MAE', 'mãe', 'Mãe', 'mae_nome', 'Nome da Mãe']),
+      pai: extrairCampo(registro, ['pai', 'Pai', 'PAI', 'pai_nome', 'Nome do Pai']),
+      empresa: extrairCampo(registro, ['Empresa do contrato de aprendizagem']),
       foto: '',
       ocorrencias: [],
       fromSheet: true,
@@ -236,6 +236,7 @@ export const useExcelData = () => {
   // Função para obter alunos por curso e turma
   const getAlunosPorCursoTurma = (cursoId, turmaId) => {
     const dados = carregarDadosProcessados()
+    console.log('o que vem no dados', dados)
     if (!dados || !dados.cursos[cursoId] || !dados.cursos[cursoId].turmas[turmaId]) {
       return []
     }
