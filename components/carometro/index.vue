@@ -1,12 +1,65 @@
 <template>
   <v-container fluid>
+    <!-- Campo de Busca -->
+    <v-row class="mb-4" v-if="pessoas.length > 0">
+      <v-col cols="12" md="6">
+        <v-text-field
+          v-model="termoBusca"
+          label="Buscar por nome ou matrícula"
+          placeholder="Digite o nome ou matrícula do aluno..."
+          variant="outlined"
+          density="comfortable"
+          prepend-inner-icon="mdi-magnify"
+          clearable
+          hide-details
+          class="rounded-lg"
+        >
+          <template v-slot:append-inner>
+            <v-fade-transition>
+              <v-chip
+                v-if="termoBusca && pessoasFiltradas.length !== pessoas.length"
+                size="small"
+                color="primary"
+                variant="flat"
+              >
+                {{ pessoasFiltradas.length }} de {{ pessoas.length }}
+              </v-chip>
+            </v-fade-transition>
+          </template>
+        </v-text-field>
+      </v-col>
+      <v-col cols="12" md="6" class="d-flex align-center">
+        <v-chip-group class="flex-wrap">
+          <v-chip
+            :color="!filtroAtivo ? 'primary' : 'default'"
+            :variant="!filtroAtivo ? 'flat' : 'outlined'"
+            size="small"
+            @click="limparFiltros"
+          >
+            <v-icon start size="small">mdi-account-group</v-icon>
+            Todos ({{ pessoas.length }})
+          </v-chip>
+          <v-chip
+            v-if="termoBusca"
+            color="success"
+            variant="flat"
+            size="small"
+            prepend-icon="mdi-filter"
+          >
+            Filtrados ({{ pessoasFiltradas.length }})
+          </v-chip>
+        </v-chip-group>
+      </v-col>
+    </v-row>
+
     <!-- Cabeçalho com botões de ação -->
     <v-row class="mb-4">
       <v-col>
         <div class="d-flex justify-space-between align-center flex-wrap ga-2">
           <div>
             <h3 class="text-h6 text-senai-red font-weight-medium">
-              {{ pessoas.length }} {{ pessoas.length === 1 ? 'pessoa cadastrada' : 'pessoas cadastradas' }}
+              {{ pessoasFiltradas.length }} {{ pessoasFiltradas.length === 1 ? 'pessoa encontrada' : 'pessoas encontradas' }}
+              <span v-if="termoBusca" class="text-body-2 text-medium-emphasis">de {{ pessoas.length }} total</span>
             </h3>
             <p class="text-caption text-medium-emphasis mb-0">
               <v-icon size="small" class="mr-1">
