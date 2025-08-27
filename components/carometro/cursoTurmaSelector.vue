@@ -2,13 +2,15 @@
   <v-container fluid class="pa-0">
     <v-row class="mb-4">
       <!-- Seleção de Curso -->
-      <v-col cols="12" md="6">
+      <v-col cols="12" lg="6">
         <v-card rounded="xl" elevation="2" class="h-100">
           <v-card-title class="bg-senai-red text-white pa-4">
-            <v-icon class="mr-2">mdi-school</v-icon>
-            Selecionar Curso
+            <div class="d-flex align-center">
+              <v-icon class="mr-2">mdi-school</v-icon>
+              <span class="text-h6">Selecionar Curso</span>
+            </div>
           </v-card-title>
-          <v-card-text class="pa-4">
+          <v-card-text class="pa-3 pa-md-4">
             <ClientOnly>
               <template v-if="!temDadosExcel">
                 <v-alert
