@@ -1,8 +1,18 @@
 export const useCarometro = () => {
-  // Função para obter dados de uma turma
-  const getAlunosTurma = (turma) => {
+  const { getAlunosPorCursoTurma, getCursosDisponiveis, getTurmasPorCurso, temDadosPlanilha } = useExcelData()
+  // Função para obter dados de uma turma (integrada com Excel)
+  const getAlunosTurma = (turma, curso = null) => {
     if (!process.client || !turma) return []
-    
+
+    // Primeiro tentar buscar da planilha Excel se curso for especificado
+    if (curso && temDadosPlanilha()) {
+      const alunosExcel = getAlunosPorCursoTurma(curso, turma)
+      if (alunosExcel.length > 0) {
+        return alunosExcel
+      }
+    }
+
+    // Fallback para dados locais (localStorage)
     try {
       const key = `carometro_turma_${turma}`
       const data = localStorage.getItem(key)
@@ -225,6 +235,10 @@ export const useCarometro = () => {
     uploadImage,
     getTurmasExistentes,
     exportarTurma,
-    importarTurma
+    importarTurma,
+    // Novos métodos para Excel
+    getCursosDisponiveis,
+    getTurmasPorCurso,
+    temDadosPlanilha
   }
 }
