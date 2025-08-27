@@ -39,21 +39,48 @@
 
         <!-- Status dos dados existentes -->
         <ClientOnly>
-          <v-alert
+          <v-card
             v-if="temDadosExistentes"
-            type="success"
-            variant="tonal"
+            variant="outlined"
+            color="success"
             class="mb-6"
           >
-            <template v-slot:prepend>
-              <v-icon>mdi-check-circle</v-icon>
-            </template>
-            <div>
-              <strong>Planilha já configurada!</strong><br>
-              {{ resumoDados.totalAlunos }} alunos em {{ resumoDados.totalCursos }} cursos.<br>
-              Última atualização: {{ formatarData(resumoDados.ultimaAtualizacao) }}
-            </div>
-          </v-alert>
+            <v-card-title class="bg-success text-white pa-4">
+              <v-icon class="mr-2">mdi-check-circle</v-icon>
+              Planilha Configurada
+            </v-card-title>
+            <v-card-text class="pa-4">
+              <div class="d-flex align-center justify-space-between">
+                <div>
+                  <p class="text-body-1 font-weight-medium mb-1">
+                    <strong>{{ resumoDados.totalAlunos }}</strong> alunos em <strong>{{ resumoDados.totalCursos }}</strong> cursos
+                  </p>
+                  <p class="text-body-2 text-medium-emphasis mb-0">
+                    <v-icon size="small" class="mr-1">mdi-clock</v-icon>
+                    Última atualização: {{ formatarData(resumoDados.ultimaAtualizacao) }}
+                  </p>
+                </div>
+                <div class="d-flex gap-2">
+                  <v-btn
+                    color="warning"
+                    variant="outlined"
+                    prepend-icon="mdi-swap-horizontal"
+                    @click="mostrarTrocaArquivo"
+                  >
+                    Trocar Planilha
+                  </v-btn>
+                  <v-btn
+                    color="error"
+                    variant="outlined"
+                    prepend-icon="mdi-delete"
+                    @click="confirmarRemocao"
+                  >
+                    Remover
+                  </v-btn>
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
         </ClientOnly>
 
         <!-- Área de drop/seleção de arquivo -->
