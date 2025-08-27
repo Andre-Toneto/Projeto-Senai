@@ -126,20 +126,26 @@
                   :class="{ 'bg-success': turmaSelecionada?.id === turma.id }"
                   :variant="turmaSelecionada?.id === turma.id ? 'flat' : 'text'"
                   rounded="lg"
-                  class="mb-2"
+                  class="mb-2 turma-item"
                   @click="selecionarTurma(turma)"
                 >
                   <template v-slot:prepend>
-                    <v-avatar :color="cursoSelecionado.cor" size="40" variant="outlined">
-                      <strong class="text-h6">{{ turma.nome }}</strong>
+                    <v-avatar
+                      :color="cursoSelecionado.cor"
+                      :size="$vuetify.display.smAndDown ? 36 : 40"
+                      variant="outlined"
+                    >
+                      <strong :class="$vuetify.display.smAndDown ? 'text-body-1' : 'text-h6'">
+                        {{ turma.nome.length > 4 && $vuetify.display.smAndDown ? turma.nome.substring(0, 3) : turma.nome }}
+                      </strong>
                     </v-avatar>
                   </template>
 
-                  <v-list-item-title class="font-weight-bold">
+                  <v-list-item-title class="font-weight-bold" :class="$vuetify.display.smAndDown ? 'text-body-1' : 'text-h6'">
                     Turma {{ turma.nome }}
                   </v-list-item-title>
 
-                  <v-list-item-subtitle>
+                  <v-list-item-subtitle :class="$vuetify.display.smAndDown ? 'text-caption' : 'text-body-2'">
                     {{ turma.totalAlunos }} alunos
                   </v-list-item-subtitle>
 
@@ -147,12 +153,22 @@
                     <v-chip
                       v-if="turmaSelecionada?.id === turma.id"
                       color="success"
-                      size="small"
+                      :size="$vuetify.display.smAndDown ? 'x-small' : 'small'"
                       variant="flat"
+                      class="hidden-xs"
                     >
-                      <v-icon start size="small">mdi-check</v-icon>
-                      Selecionada
+                      <v-icon start :size="$vuetify.display.smAndDown ? 'x-small' : 'small'">mdi-check</v-icon>
+                      <span class="hidden-sm-and-down">Selecionada</span>
                     </v-chip>
+                    <!-- Ícone para dispositivos móveis -->
+                    <v-icon
+                      v-if="turmaSelecionada?.id === turma.id"
+                      color="success"
+                      size="small"
+                      class="d-sm-none"
+                    >
+                      mdi-check-circle
+                    </v-icon>
                   </template>
                 </v-list-item>
               </v-list>
