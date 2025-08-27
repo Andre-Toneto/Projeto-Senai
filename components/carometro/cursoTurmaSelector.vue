@@ -10,63 +10,66 @@
           </v-card-title>
           <v-card-text class="pa-4">
             <ClientOnly>
-              <v-alert
-                v-if="!temDadosExcel"
-                type="warning"
-                variant="tonal"
-                class="mb-4"
-              >
-              <template v-slot:prepend>
-                <v-icon>mdi-alert</v-icon>
+              <template v-if="!temDadosExcel">
+                <v-alert
+                  type="warning"
+                  variant="tonal"
+                  class="mb-4"
+                >
+                  <template v-slot:prepend>
+                    <v-icon>mdi-alert</v-icon>
+                  </template>
+                  Nenhuma planilha configurada. Configure primeiro sua planilha Excel.
+                </v-alert>
               </template>
-                Nenhuma planilha configurada. Configure primeiro sua planilha Excel.
-              </v-alert>
-            </ClientOnly>
 
-            <ClientOnly>
-              <div v-if="cursosDisponiveis.length === 0 && temDadosExcel" class="text-center py-4">
-              <v-icon size="48" color="grey-lighten-2" class="mb-2">mdi-folder-open</v-icon>
-                <p class="text-body-2 text-medium-emphasis">Nenhum curso encontrado na planilha</p>
-              </div>
-            </ClientOnly>
+              <template v-else-if="cursosDisponiveis.length === 0">
+                <div class="text-center py-4">
+                  <v-icon size="48" color="grey-lighten-2" class="mb-2">mdi-folder-open</v-icon>
+                  <p class="text-body-2 text-medium-emphasis">Nenhum curso encontrado na planilha</p>
+                </div>
+              </template>
 
-            <v-list v-else class="pa-0">
-              <v-list-item
-                v-for="curso in cursosDisponiveis"
-                :key="curso.id"
-                :class="{ 'bg-primary': cursoSelecionado?.id === curso.id }"
-                :variant="cursoSelecionado?.id === curso.id ? 'flat' : 'text'"
-                rounded="lg"
-                class="mb-2"
-                @click="selecionarCurso(curso)"
-              >
-                <template v-slot:prepend>
-                  <v-avatar :color="curso.cor" size="40">
-                    <v-icon color="white">mdi-book-open-variant</v-icon>
-                  </v-avatar>
-                </template>
-
-                <v-list-item-title class="font-weight-bold">
-                  {{ curso.nome }}
-                </v-list-item-title>
-
-                <v-list-item-subtitle>
-                  {{ curso.totalAlunos }} alunos • {{ curso.totalTurmas }} turmas
-                </v-list-item-subtitle>
-
-                <template v-slot:append>
-                  <v-chip
-                    v-if="cursoSelecionado?.id === curso.id"
-                    color="success"
-                    size="small"
-                    variant="flat"
+              <template v-else>
+                <v-list class="pa-0">
+                  <v-list-item
+                    v-for="curso in cursosDisponiveis"
+                    :key="curso.id"
+                    :class="{ 'bg-primary': cursoSelecionado?.id === curso.id }"
+                    :variant="cursoSelecionado?.id === curso.id ? 'flat' : 'text'"
+                    rounded="lg"
+                    class="mb-2"
+                    @click="selecionarCurso(curso)"
                   >
-                    <v-icon start size="small">mdi-check</v-icon>
-                    Selecionado
-                  </v-chip>
-                </template>
-              </v-list-item>
-            </v-list>
+                    <template v-slot:prepend>
+                      <v-avatar :color="curso.cor" size="40">
+                        <v-icon color="white">mdi-book-open-variant</v-icon>
+                      </v-avatar>
+                    </template>
+
+                    <v-list-item-title class="font-weight-bold">
+                      {{ curso.nome }}
+                    </v-list-item-title>
+
+                    <v-list-item-subtitle>
+                      {{ curso.totalAlunos }} alunos • {{ curso.totalTurmas }} turmas
+                    </v-list-item-subtitle>
+
+                    <template v-slot:append>
+                      <v-chip
+                        v-if="cursoSelecionado?.id === curso.id"
+                        color="success"
+                        size="small"
+                        variant="flat"
+                      >
+                        <v-icon start size="small">mdi-check</v-icon>
+                        Selecionado
+                      </v-chip>
+                    </template>
+                  </v-list-item>
+                </v-list>
+              </template>
+            </ClientOnly>
           </v-card-text>
         </v-card>
       </v-col>
@@ -79,62 +82,67 @@
             Selecionar Turma
           </v-card-title>
           <v-card-text class="pa-4">
-            <v-alert
-              v-if="!cursoSelecionado"
-              type="info"
-              variant="tonal"
-              class="mb-4"
-            >
-              <template v-slot:prepend>
-                <v-icon>mdi-information</v-icon>
-              </template>
-              Selecione um curso primeiro para ver as turmas disponíveis.
-            </v-alert>
-
-            <div v-else-if="turmasDisponiveis.length === 0" class="text-center py-4">
-              <v-icon size="48" color="grey-lighten-2" class="mb-2">mdi-account-group-outline</v-icon>
-              <p class="text-body-2 text-medium-emphasis">
-                Nenhuma turma encontrada para o curso "{{ cursoSelecionado.nome }}"
-              </p>
-            </div>
-
-            <v-list v-else class="pa-0">
-              <v-list-item
-                v-for="turma in turmasDisponiveis"
-                :key="turma.id"
-                :class="{ 'bg-success': turmaSelecionada?.id === turma.id }"
-                :variant="turmaSelecionada?.id === turma.id ? 'flat' : 'text'"
-                rounded="lg"
-                class="mb-2"
-                @click="selecionarTurma(turma)"
+            <template v-if="!cursoSelecionado">
+              <v-alert
+                type="info"
+                variant="tonal"
+                class="mb-4"
               >
                 <template v-slot:prepend>
-                  <v-avatar :color="cursoSelecionado.cor" size="40" variant="outlined">
-                    <strong class="text-h6">{{ turma.nome }}</strong>
-                  </v-avatar>
+                  <v-icon>mdi-information</v-icon>
                 </template>
+                Selecione um curso primeiro para ver as turmas disponíveis.
+              </v-alert>
+            </template>
 
-                <v-list-item-title class="font-weight-bold">
-                  Turma {{ turma.nome }}
-                </v-list-item-title>
+            <template v-else-if="turmasDisponiveis.length === 0">
+              <div class="text-center py-4">
+                <v-icon size="48" color="grey-lighten-2" class="mb-2">mdi-account-group-outline</v-icon>
+                <p class="text-body-2 text-medium-emphasis">
+                  Nenhuma turma encontrada para o curso "{{ cursoSelecionado.nome }}"
+                </p>
+              </div>
+            </template>
 
-                <v-list-item-subtitle>
-                  {{ turma.totalAlunos }} alunos
-                </v-list-item-subtitle>
+            <template v-else>
+              <v-list class="pa-0">
+                <v-list-item
+                  v-for="turma in turmasDisponiveis"
+                  :key="turma.id"
+                  :class="{ 'bg-success': turmaSelecionada?.id === turma.id }"
+                  :variant="turmaSelecionada?.id === turma.id ? 'flat' : 'text'"
+                  rounded="lg"
+                  class="mb-2"
+                  @click="selecionarTurma(turma)"
+                >
+                  <template v-slot:prepend>
+                    <v-avatar :color="cursoSelecionado.cor" size="40" variant="outlined">
+                      <strong class="text-h6">{{ turma.nome }}</strong>
+                    </v-avatar>
+                  </template>
 
-                <template v-slot:append>
-                  <v-chip
-                    v-if="turmaSelecionada?.id === turma.id"
-                    color="success"
-                    size="small"
-                    variant="flat"
-                  >
-                    <v-icon start size="small">mdi-check</v-icon>
-                    Selecionada
-                  </v-chip>
-                </template>
-              </v-list-item>
-            </v-list>
+                  <v-list-item-title class="font-weight-bold">
+                    Turma {{ turma.nome }}
+                  </v-list-item-title>
+
+                  <v-list-item-subtitle>
+                    {{ turma.totalAlunos }} alunos
+                  </v-list-item-subtitle>
+
+                  <template v-slot:append>
+                    <v-chip
+                      v-if="turmaSelecionada?.id === turma.id"
+                      color="success"
+                      size="small"
+                      variant="flat"
+                    >
+                      <v-icon start size="small">mdi-check</v-icon>
+                      Selecionada
+                    </v-chip>
+                  </template>
+                </v-list-item>
+              </v-list>
+            </template>
           </v-card-text>
         </v-card>
       </v-col>
@@ -182,14 +190,14 @@
     <ClientOnly>
       <v-row v-if="!temDadosExcel">
         <v-col cols="12" class="text-center">
-        <v-btn
-          color="senai-red"
-          size="large"
-          prepend-icon="mdi-file-excel"
-          rounded="xl"
-          @click="abrirConfigExcel"
-        >
-          Configurar Planilha Excel
+          <v-btn
+            color="senai-red"
+            size="large"
+            prepend-icon="mdi-file-excel"
+            rounded="xl"
+            @click="abrirConfigExcel"
+          >
+            Configurar Planilha Excel
           </v-btn>
         </v-col>
       </v-row>
