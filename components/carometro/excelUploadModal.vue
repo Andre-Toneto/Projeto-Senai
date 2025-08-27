@@ -329,16 +329,28 @@ const processarArquivo = async () => {
   }
 }
 
-const removerDados = () => {
-  if (confirm('Tem certeza que deseja remover todos os dados da planilha?')) {
-    if (process.client) {
-      localStorage.removeItem('carometro_dados_excel')
-      localStorage.removeItem('carometro_excel_timestamp')
-    }
-    temDadosExistentes.value = false
-    resumoDados.value = {}
-    emit('dados-configurados')
+const mostrarTrocaArquivo = () => {
+  mostrandoTrocaArquivo.value = true
+  arquivoSelecionado.value = null
+  dadosPreview.value = null
+  erro.value = ''
+}
+
+const confirmarRemocao = () => {
+  if (confirm('⚠️ ATENÇÃO!\n\nTem certeza que deseja remover TODOS os dados da planilha?\n\nEsta ação não pode ser desfeita e você precisará fazer upload da planilha novamente.')) {
+    removerDados()
   }
+}
+
+const removerDados = () => {
+  if (process.client) {
+    localStorage.removeItem('carometro_dados_excel')
+    localStorage.removeItem('carometro_excel_timestamp')
+  }
+  temDadosExistentes.value = false
+  resumoDados.value = {}
+  mostrandoTrocaArquivo.value = false
+  emit('dados-configurados')
 }
 
 const fechar = () => {
