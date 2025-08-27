@@ -164,10 +164,37 @@
       </div>
     </div>
 
+    <!-- Mensagem quando nenhum resultado for encontrado -->
+    <div v-else-if="pessoas.length > 0 && pessoasFiltradas.length === 0" class="text-center py-12">
+      <v-icon
+        size="80"
+        color="grey-lighten-2"
+        class="mb-4"
+      >
+        mdi-account-search
+      </v-icon>
+
+      <h3 class="text-h6 text-medium-emphasis mb-2">Nenhum aluno encontrado</h3>
+
+      <p class="text-body-2 text-medium-emphasis mb-6">
+        Não foi possível encontrar alunos com o termo "<strong>{{ termoBusca }}</strong>"<br>
+        Verifique se digitou corretamente o nome ou matrícula.
+      </p>
+
+      <v-btn
+        color="primary"
+        variant="outlined"
+        prepend-icon="mdi-filter-remove"
+        @click="limparFiltros"
+      >
+        Limpar Busca
+      </v-btn>
+    </div>
+
     <!-- Grid Responsivo Moderno -->
-    <v-row v-else class="d-flex">
+    <v-row v-else-if="pessoasFiltradas.length > 0" class="d-flex">
       <v-col
-        v-for="pessoa in pessoas"
+        v-for="pessoa in pessoasFiltradas"
         :key="pessoa.matricula"
         cols="12"
         sm="6"
