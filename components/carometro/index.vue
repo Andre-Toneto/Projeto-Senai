@@ -294,6 +294,23 @@ const cacheInfo = ref(null)
 const loadingRefresh = ref(false)
 const configModalAberto = ref(false)
 
+// Computed para filtros
+const pessoasFiltradas = computed(() => {
+  if (!termoBusca.value) return pessoas.value
+
+  const termo = termoBusca.value.toLowerCase().trim()
+  return pessoas.value.filter(pessoa => {
+    const nome = pessoa.nome?.toLowerCase() || ''
+    const matricula = pessoa.matricula?.toString().toLowerCase() || ''
+
+    return nome.includes(termo) || matricula.includes(termo)
+  })
+})
+
+const filtroAtivo = computed(() => {
+  return !!termoBusca.value
+})
+
 const atualizarCacheInfo = () => {
   if (process.client) {
     try {
