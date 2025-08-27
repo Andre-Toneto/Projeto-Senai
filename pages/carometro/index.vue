@@ -23,7 +23,8 @@
                 />
 
                 <!-- Botão para configurar Excel se não tiver dados -->
-                <div v-if="!temDadosExcel" class="text-center mt-6">
+                <ClientOnly>
+                  <div v-if="!temDadosExcel" class="text-center mt-6">
                   <v-divider class="mb-4" />
                   <p class="text-body-2 text-medium-emphasis mb-4">
                     Para começar, você precisa configurar sua planilha Excel com os dados dos alunos
@@ -37,10 +38,12 @@
                   >
                     Configurar Planilha Excel
                   </v-btn>
-                </div>
+                  </div>
+                </ClientOnly>
 
                 <!-- Entrada manual de turma (fallback) -->
-                <div v-if="temDadosExcel" class="mt-6">
+                <ClientOnly>
+                  <div v-if="temDadosExcel" class="mt-6">
                   <v-divider class="mb-4" />
                   <h3 class="text-h6 text-senai-red font-weight-medium mb-4 text-center">
                     Ou digite o código da turma diretamente
@@ -71,7 +74,8 @@
                       Carregar Turma
                     </v-btn>
                   </v-form>
-                </div>
+                  </div>
+                </ClientOnly>
               </v-card-text>
             </v-card>
           </v-col>
@@ -180,6 +184,8 @@ const turmaRules = [
 const verificarDadosExcel = () => {
   if (process.client) {
     temDadosExcel.value = temDadosPlanilha()
+  } else {
+    temDadosExcel.value = false // Garantir valor padrão no servidor
   }
 }
 
