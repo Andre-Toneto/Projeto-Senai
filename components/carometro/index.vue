@@ -9,13 +9,18 @@
               {{ pessoas.length }} {{ pessoas.length === 1 ? 'pessoa cadastrada' : 'pessoas cadastradas' }}
             </h3>
             <p class="text-caption text-medium-emphasis mb-0">
-              <v-icon size="small" class="mr-1">mdi-google-spreadsheet</v-icon>
-              <span v-if="dadosExemplo">Dados de exemplo para teste</span>
-              <span v-else>Dados sincronizados da planilha</span>
+              <v-icon size="small" class="mr-1">
+                {{ temDadosPlanilha() && props.curso ? 'mdi-file-excel' : 'mdi-google-spreadsheet' }}
+              </v-icon>
+              <ClientOnly fallback="<span>Carregando...</span>">
+                <span v-if="dadosExemplo">Dados de exemplo para teste</span>
+                <span v-else-if="temDadosExcel && props.curso">Dados da planilha Excel</span>
+                <span v-else>Dados locais ou sincronizados</span>
+              </ClientOnly>
               <ClientOnly>
-                <span v-if="cacheInfo && !dadosExemplo">
-                  • Última atualização: {{ cacheInfo.minutesAgo }}min atrás
-                </span>
+                <span v-if="cacheInfo && !dadosExemplo && !temDadosExcel && props.curso">
+                • Última atualização: {{ cacheInfo.minutesAgo }}min atrás
+              </span>
               </ClientOnly>
             </p>
           </div>
@@ -126,18 +131,18 @@
           @click="abrirModal(pessoa)"
           style="cursor: pointer"
         >
-          <!-- Badge da planilha ou exemplo -->
+          <!-- Badge da fonte dos dados -->
           <v-chip
             size="x-small"
-            :color="dadosExemplo ? 'info' : 'success'"
+            :color="getCorBadge()"
             variant="flat"
             class="position-absolute"
             style="top: 8px; right: 8px; z-index: 1"
           >
             <v-icon start size="x-small">
-              {{ dadosExemplo ? 'mdi-file-document-outline' : 'mdi-google-spreadsheet' }}
+              {{ getIconeBadge() }}
             </v-icon>
-            {{ dadosExemplo ? 'Exemplo' : 'Planilha' }}
+            {{ getTextoBadge() }}
           </v-chip>
 
           <!-- Avatar/Foto -->
@@ -196,7 +201,8 @@
 
 <script setup>
 const props = defineProps({
-  turma: String
+  turma: String,
+  curso: String
 })
 
 const emit = defineEmits(['selectPessoa', 'updateTotal'])
@@ -204,8 +210,29 @@ const emit = defineEmits(['selectPessoa', 'updateTotal'])
 const pessoas = ref([])
 const loading = ref(false)
 const dadosExemplo = ref(false)
+const temDadosExcel = ref(false)
 
-const { getAlunosByTurma, getCacheInfo, fetchSheetData, isUsingExampleUrl } = useGoogleSheets()
+const { getAlunosTurma } = useCarometro()
+const { getAlunosPorCursoTurma, temDadosPlanilha } = useExcelData()
+
+// Google Sheets apenas quando necessário
+let googleSheetsComposable = null
+const getGoogleSheetsComposable = () => {
+  if (!googleSheetsComposable) {
+    try {
+      googleSheetsComposable = useGoogleSheets()
+    } catch (error) {
+      console.warn('Google Sheets não disponível:', error)
+      googleSheetsComposable = {
+        getAlunosByTurma: () => [],
+        getCacheInfo: () => null,
+        isUsingExampleUrl: () => false,
+        fetchSheetData: () => Promise.resolve()
+      }
+    }
+  }
+  return googleSheetsComposable
+}
 
 const cacheInfo = ref(null)
 const loadingRefresh = ref(false)
@@ -213,7 +240,12 @@ const configModalAberto = ref(false)
 
 const atualizarCacheInfo = () => {
   if (process.client) {
-    cacheInfo.value = getCacheInfo()
+    try {
+      const googleSheets = getGoogleSheetsComposable()
+      cacheInfo.value = googleSheets.getCacheInfo()
+    } catch (error) {
+      cacheInfo.value = null
+    }
   }
 }
 
@@ -222,11 +254,39 @@ const carregarAlunos = async () => {
 
   loading.value = true
   try {
-    // Verificar se está usando dados de exemplo
-    dadosExemplo.value = isUsingExampleUrl()
+    let alunosCarregados = []
 
-    // Buscar dados da planilha Google Sheets
-    pessoas.value = await getAlunosByTurma(props.turma)
+    // Atualizar estado do Excel
+    atualizarEstadoExcel()
+
+    // Primeiro tentar carregar da planilha Excel se curso for especificado
+    if (props.curso && temDadosExcel.value) {
+      alunosCarregados = getAlunosPorCursoTurma(props.curso, props.turma)
+      dadosExemplo.value = false
+
+      if (alunosCarregados.length > 0) {
+        pessoas.value = alunosCarregados
+        emit('updateTotal', pessoas.value)
+        atualizarCacheInfo()
+        return
+      }
+    }
+
+    // Fallback para dados locais (localStorage) ou Google Sheets
+    alunosCarregados = getAlunosTurma(props.turma, props.curso)
+
+    if (alunosCarregados.length === 0) {
+      // Tentar dados de exemplo se não encontrar nada
+      try {
+        const googleSheets = getGoogleSheetsComposable()
+        dadosExemplo.value = googleSheets.isUsingExampleUrl()
+        alunosCarregados = await googleSheets.getAlunosByTurma(props.turma)
+      } catch (error) {
+        console.warn('Erro ao carregar dados de exemplo:', error)
+      }
+    }
+
+    pessoas.value = alunosCarregados
     emit('updateTotal', pessoas.value)
     atualizarCacheInfo()
   } catch (error) {
@@ -251,8 +311,20 @@ const atualizarDados = async () => {
 
   loadingRefresh.value = true
   try {
-    await fetchSheetData(true) // Force refresh
-    await carregarAlunos()
+    // Se tiver dados Excel, apenas recarregar
+    if (props.curso && temDadosPlanilha()) {
+      await carregarAlunos()
+    } else {
+      // Tentar atualizar Google Sheets se disponível
+      try {
+        const googleSheets = getGoogleSheetsComposable()
+        await googleSheets.fetchSheetData(true) // Force refresh
+        await carregarAlunos()
+      } catch (error) {
+        console.warn('Erro ao atualizar Google Sheets:', error)
+        await carregarAlunos()
+      }
+    }
   } catch (error) {
     console.error('Erro ao atualizar dados:', error)
     if (process.client) {
@@ -269,17 +341,46 @@ const onDadosAtualizados = () => {
 
 // Carregar alunos apenas no cliente
 onMounted(() => {
-  if (process.client && props.turma) {
-    carregarAlunos()
+  if (process.client) {
+    atualizarEstadoExcel()
+    if (props.turma) {
+      carregarAlunos()
+    }
   }
 })
 
-// Watch para mudanças na turma, mas apenas no cliente
-watch(() => props.turma, (newTurma) => {
+// Watch para mudanças na turma ou curso, mas apenas no cliente
+watch(() => [props.turma, props.curso], ([newTurma, newCurso]) => {
   if (process.client && newTurma) {
     carregarAlunos()
   }
 })
+
+// Funções auxiliares para badge
+const getCorBadge = () => {
+  if (dadosExemplo.value) return 'info'
+  if (temDadosExcel.value && props.curso) return 'success'
+  return 'warning'
+}
+
+const getIconeBadge = () => {
+  if (dadosExemplo.value) return 'mdi-file-document-outline'
+  if (temDadosExcel.value && props.curso) return 'mdi-file-excel'
+  return 'mdi-database'
+}
+
+const getTextoBadge = () => {
+  if (dadosExemplo.value) return 'Exemplo'
+  if (temDadosExcel.value && props.curso) return 'Excel'
+  return 'Local'
+}
+
+// Atualizar estado do Excel apenas no cliente
+const atualizarEstadoExcel = () => {
+  if (process.client) {
+    temDadosExcel.value = temDadosPlanilha()
+  }
+}
 
 </script>
 

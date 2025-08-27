@@ -1,91 +1,81 @@
 <template>
   <div>
-    <!-- Seleção de Turma (se não selecionada) -->
-    <div v-if="!turmaSelecionada">
+    <!-- Seleção de Curso e Turma (se não selecionada) -->
+    <div v-if="!selecaoFeita">
       <v-container fluid>
         <v-row justify="center">
-          <v-col cols="12" md="8" lg="6">
-            <v-card elevation="8" rounded="lg" class="pa-6 mb-4">
+          <v-col cols="12">
+            <v-card elevation="8" rounded="xl" class="pa-6 mb-4">
               <v-card-title class="text-center pb-4">
                 <div class="text-center">
-                  <v-icon size="56" color="senai-red" class="mb-3">mdi-school</v-icon>
-                  <h2 class="text-h4 text-senai-red font-weight-medium mb-2">Selecionar Turma</h2>
-                  <p class="text-body-1 text-medium-emphasis">Digite o código da turma para visualizar os alunos</p>
+                  <v-icon size="56" color="senai-red" class="mb-3">mdi-account-school</v-icon>
+                  <h2 class="text-h4 text-senai-red font-weight-medium mb-2">Carômetro SENAI</h2>
+                  <p class="text-body-1 text-medium-emphasis">Selecione o curso e turma para visualizar os alunos</p>
                 </div>
               </v-card-title>
 
               <v-card-text>
-                <v-form ref="form" v-model="valid" @submit.prevent="loadTurma">
-                  <v-text-field
-                    v-model="turmaCode"
-                    label="Código da Turma"
-                    placeholder="Ex: T2025-001, ADM-2024, etc."
-                    variant="outlined"
-                    density="comfortable"
-                    prepend-inner-icon="mdi-identifier"
-                    :rules="turmaRules"
-                    class="mb-4"
-                    autofocus
-                  />
+                <!-- Seletor de Curso e Turma -->
+                <CarometroCursoTurmaSelector
+                  ref="selectorRef"
+                  @curso-turma-selecionados="onCursoTurmaSelecionados"
+                  @configurar-excel="abrirConfigExcel"
+                />
 
+                <!-- Botão para configurar Excel se não tiver dados -->
+                <ClientOnly>
+                  <div v-if="!temDadosExcel" class="text-center mt-6">
+                  <v-divider class="mb-4" />
+                  <p class="text-body-2 text-medium-emphasis mb-4">
+                    Para começar, você precisa configurar sua planilha Excel com os dados dos alunos
+                  </p>
                   <v-btn
-                    :disabled="!valid"
-                    :loading="loading"
                     color="senai-red"
                     size="large"
-                    block
-                    type="submit"
-                    elevation="2"
+                    prepend-icon="mdi-file-excel"
+                    rounded="xl"
+                    @click="abrirConfigExcel"
                   >
-                    Carregar Turma
+                    Configurar Planilha Excel
                   </v-btn>
-                </v-form>
+                  </div>
+                </ClientOnly>
 
-                <!-- Turmas Disponíveis -->
-                <div class="mt-6 text-center">
+                <!-- Entrada manual de turma (fallback) -->
+                <ClientOnly>
+                  <div v-if="temDadosExcel" class="mt-6">
                   <v-divider class="mb-4" />
-                  <div class="d-flex justify-space-between align-center mb-3">
-                    <h3 class="text-h6 text-senai-red font-weight-medium">Turmas da Planilha</h3>
-                    <v-btn
-                      variant="text"
-                      size="small"
-                      :loading="loadingTurmas"
-                      @click="carregarTurmas"
-                      prepend-icon="mdi-refresh"
-                    >
-                      Atualizar
-                    </v-btn>
-                  </div>
-
-                  <div v-if="loadingTurmas" class="text-center py-4">
-                    <v-progress-circular indeterminate color="senai-red" size="32" />
-                    <p class="text-body-2 text-medium-emphasis mt-2">Carregando turmas...</p>
-                  </div>
-
-                  <div v-else-if="turmasDisponiveis.length === 0" class="text-center py-4">
-                    <v-icon size="48" color="grey-lighten-2" class="mb-2">mdi-google-spreadsheet</v-icon>
-                    <p class="text-body-2 text-medium-emphasis mb-2">
-                      Nenhuma turma encontrada
-                    </p>
-                    <p class="text-caption text-medium-emphasis">
-                      Configure sua planilha do Google Sheets ou use dados de exemplo para teste
-                    </p>
-                  </div>
-
-                  <v-chip-group v-else>
-                    <v-chip
-                      v-for="turma in turmasDisponiveis"
-                      :key="turma"
-                      color="senai-red"
+                  <h3 class="text-h6 text-senai-red font-weight-medium mb-4 text-center">
+                    Ou digite o código da turma diretamente
+                  </h3>
+                  
+                  <v-form ref="form" v-model="valid" @submit.prevent="loadTurmaManual">
+                    <v-text-field
+                      v-model="turmaCode"
+                      label="Código da Turma"
+                      placeholder="Ex: T2025-001, ADM-2024, etc."
                       variant="outlined"
-                      @click="selectTurma(turma)"
-                      style="cursor: pointer"
+                      density="comfortable"
+                      prepend-inner-icon="mdi-identifier"
+                      :rules="turmaRules"
+                      class="mb-4"
+                    />
+
+                    <v-btn
+                      :disabled="!valid"
+                      :loading="loading"
+                      color="primary"
+                      size="large"
+                      block
+                      type="submit"
+                      elevation="2"
+                      variant="outlined"
                     >
-                      <v-icon start size="small">mdi-google-spreadsheet</v-icon>
-                      {{ turma }}
-                    </v-chip>
-                  </v-chip-group>
-                </div>
+                      Carregar Turma
+                    </v-btn>
+                  </v-form>
+                  </div>
+                </ClientOnly>
               </v-card-text>
             </v-card>
           </v-col>
@@ -93,33 +83,46 @@
       </v-container>
     </div>
 
-    <!-- Carômetro (se turma selecionada) -->
+    <!-- Carômetro (se curso/turma selecionada) -->
     <div v-else>
       <!-- Header da Turma -->
       <v-container fluid>
-        <v-card color="senai-red" dark elevation="4" rounded="lg" class="mb-4">
-          <v-card-text class="pa-4">
+        <v-card :color="cursoSelecionado.cor || 'senai-red'" dark elevation="4" rounded="xl" class="mb-4">
+          <v-card-text class="pa-6">
             <v-row align="center">
               <v-col>
                 <div class="d-flex align-center">
-                  <v-icon size="large" class="mr-3">mdi-school</v-icon>
+                  <v-avatar :color="lightenColor(cursoSelecionado.cor || '#D32F2F')" size="64" class="mr-4">
+                    <v-icon color="white" size="32">mdi-school</v-icon>
+                  </v-avatar>
                   <div>
-                    <h2 class="text-h5 font-weight-medium mb-1">Turma: {{ turmaSelecionada }}</h2>
+                    <h2 class="text-h4 font-weight-bold mb-1">{{ turmaSelecionada.nome }}</h2>
+                    <p class="text-h6 opacity-90 mb-1">{{ cursoSelecionado.nome }}</p>
                     <ClientOnly fallback-tag="p" fallback="Carregando dados...">
-                      <p class="text-body-2 opacity-80 mb-0">{{ totalAlunos }} pessoas cadastradas</p>
+                      <p class="text-body-2 opacity-80 mb-0">{{ totalAlunos }} alunos cadastrados</p>
                     </ClientOnly>
                   </div>
                 </div>
               </v-col>
               <v-col cols="auto">
-                <v-btn
-                  variant="outlined"
-                  color="white"
-                  @click="changeTurma"
-                  prepend-icon="mdi-swap-horizontal"
-                >
-                  Trocar Turma
-                </v-btn>
+                <div class="d-flex gap-2">
+                  <v-btn
+                    variant="outlined"
+                    color="white"
+                    @click="abrirConfigExcel"
+                    prepend-icon="mdi-cog"
+                  >
+                    Configurar
+                  </v-btn>
+                  <v-btn
+                    variant="outlined"
+                    color="white"
+                    @click="voltarSelecao"
+                    prepend-icon="mdi-arrow-left"
+                  >
+                    Voltar
+                  </v-btn>
+                </div>
               </v-col>
             </v-row>
           </v-card-text>
@@ -129,7 +132,8 @@
       <!-- Componente Carômetro -->
       <ClientOnly fallback-tag="div" fallback="<v-container class='text-center py-8'><v-progress-circular indeterminate color='senai-red' size='64' /><p class='text-body-1 text-medium-emphasis mt-4'>Carregando carômetro...</p></v-container>">
         <Carometro
-          :turma="turmaSelecionada"
+          :turma="turmaSelecionada.id"
+          :curso="cursoSelecionado.id"
           @selectPessoa="selecionarPessoa"
           @updateTotal="atualizarTotal"
         />
@@ -141,26 +145,49 @@
       v-model="modalAberto"
       :pessoa="pessoaSelecionada"
     />
+
+    <!-- Modal de Configuração Excel -->
+    <CarometroExcelUploadModal
+      v-model="configExcelAberto"
+      @dados-configurados="onDadosConfigurados"
+    />
   </div>
 </template>
 
 <script setup>
 const router = useRouter()
 const modalAberto = ref(false)
+const configExcelAberto = ref(false)
 const pessoaSelecionada = ref({})
-const { getTurmas, getCacheInfo } = useGoogleSheets()
 
-const turmaSelecionada = ref('')
+const { temDadosPlanilha } = useExcelData()
+
+// Estado da seleção
+const selecaoFeita = ref(false)
+const cursoSelecionado = ref({})
+const turmaSelecionada = ref({})
 const totalAlunos = ref(0)
+
+// Estado para entrada manual
 const valid = ref(false)
 const loading = ref(false)
 const turmaCode = ref('')
-const turmasDisponiveis = ref([])
-const loadingTurmas = ref(false)
+const temDadosExcel = ref(false)
+
+const selectorRef = ref(null)
 
 const turmaRules = [
   v => !!v || 'Código da turma é obrigatório'
 ]
+
+// Verificar se há dados Excel disponíveis
+const verificarDadosExcel = () => {
+  if (process.client) {
+    temDadosExcel.value = temDadosPlanilha()
+  } else {
+    temDadosExcel.value = false // Garantir valor padrão no servidor
+  }
+}
 
 onMounted(() => {
   if (process.client) {
@@ -170,55 +197,63 @@ onMounted(() => {
       return
     }
 
-    const turma = sessionStorage.getItem('turma_selecionada')
-    if (turma) {
-      turmaSelecionada.value = turma
-      totalAlunos.value = 0
-    }
+    verificarDadosExcel()
 
-    // Carregar turmas da planilha após um pequeno delay para evitar problemas de hidratação
-    nextTick(() => {
-      setTimeout(() => {
-        carregarTurmas()
-      }, 100)
-    })
+    // Verificar se há seleção salva
+    const selecaoSalva = sessionStorage.getItem('carometro_selecao')
+    if (selecaoSalva) {
+      try {
+        const selecao = JSON.parse(selecaoSalva)
+        cursoSelecionado.value = selecao.curso
+        turmaSelecionada.value = selecao.turma
+        selecaoFeita.value = true
+      } catch (error) {
+        console.error('Erro ao carregar seleção salva:', error)
+      }
+    }
   }
 })
 
-const carregarTurmas = async () => {
-  if (!process.client) return
-
-  loadingTurmas.value = true
-  try {
-    const turmas = await getTurmas(false) // Não forçar refresh por padrão
-    turmasDisponiveis.value = Array.isArray(turmas) ? turmas : []
-  } catch (error) {
-    console.warn('Erro ao carregar turmas:', error.message)
-    turmasDisponiveis.value = []
-  } finally {
-    loadingTurmas.value = false
+const onCursoTurmaSelecionados = (selecao) => {
+  cursoSelecionado.value = selecao.curso
+  turmaSelecionada.value = selecao.turma
+  selecaoFeita.value = true
+  
+  // Salvar seleção
+  if (process.client) {
+    sessionStorage.setItem('carometro_selecao', JSON.stringify(selecao))
   }
 }
 
-const loadTurma = () => {
-  if (!process.client) return
+const loadTurmaManual = () => {
+  if (!process.client || !turmaCode.value.trim()) return
 
   loading.value = true
 
   setTimeout(() => {
-    if (turmaCode.value.trim()) {
-      sessionStorage.setItem('turma_selecionada', turmaCode.value)
-      turmaSelecionada.value = turmaCode.value
-      totalAlunos.value = 0 // Será atualizado pelo componente carômetro
-    }
+    // Para entrada manual, vamos usar curso genérico
+    const cursoGenerico = { id: 'MANUAL', nome: 'Curso Manual', cor: '#607D8B' }
+    const turmaManual = { id: turmaCode.value, nome: turmaCode.value, totalAlunos: 0 }
+    
+    onCursoTurmaSelecionados({
+      curso: cursoGenerico,
+      turma: turmaManual
+    })
+    
     loading.value = false
   }, 800)
 }
 
-const selectTurma = (turma) => {
-  if (!process.client) return
-  turmaCode.value = turma
-  loadTurma()
+const voltarSelecao = () => {
+  selecaoFeita.value = false
+  cursoSelecionado.value = {}
+  turmaSelecionada.value = {}
+  totalAlunos.value = 0
+  turmaCode.value = ''
+  
+  if (process.client) {
+    sessionStorage.removeItem('carometro_selecao')
+  }
 }
 
 const selecionarPessoa = (pessoa) => {
@@ -226,17 +261,44 @@ const selecionarPessoa = (pessoa) => {
   modalAberto.value = true
 }
 
-const changeTurma = () => {
-  turmaSelecionada.value = ''
-  turmaCode.value = ''
-  totalAlunos.value = 0
-  if (process.client) {
-    sessionStorage.removeItem('turma_selecionada')
+const atualizarTotal = (alunos) => {
+  totalAlunos.value = Array.isArray(alunos) ? alunos.length : 0
+}
+
+const abrirConfigExcel = () => {
+  configExcelAberto.value = true
+}
+
+const onDadosConfigurados = () => {
+  verificarDadosExcel()
+  
+  // Recarregar cursos no seletor
+  if (selectorRef.value && selectorRef.value.recarregarCursos) {
+    selectorRef.value.recarregarCursos()
+  }
+  
+  // Se estiver em modo manual e agora tem dados Excel, voltar para seleção
+  if (selecaoFeita.value && cursoSelecionado.value.id === 'MANUAL') {
+    voltarSelecao()
   }
 }
 
-// Função para atualizar total de alunos
-const atualizarTotal = (alunos) => {
-  totalAlunos.value = Array.isArray(alunos) ? alunos.length : 0
+// Função auxiliar para clarear cor
+const lightenColor = (color) => {
+  // Remover # se presente
+  color = color.replace('#', '')
+  
+  // Converter para RGB
+  const r = parseInt(color.substr(0, 2), 16)
+  const g = parseInt(color.substr(2, 2), 16)
+  const b = parseInt(color.substr(4, 2), 16)
+  
+  // Clarear 20%
+  const factor = 1.2
+  const newR = Math.min(255, Math.floor(r * factor))
+  const newG = Math.min(255, Math.floor(g * factor))
+  const newB = Math.min(255, Math.floor(b * factor))
+  
+  return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`
 }
 </script>

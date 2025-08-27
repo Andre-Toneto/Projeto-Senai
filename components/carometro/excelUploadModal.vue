@@ -1,0 +1,361 @@
+<template>
+  <v-dialog
+    v-model="internalModelValue"
+    max-width="800"
+    persistent
+  >
+    <v-card rounded="xl">
+      <v-card-title class="bg-senai-red text-white pa-6">
+        <div class="d-flex align-center">
+          <v-icon size="32" class="mr-3">mdi-file-excel</v-icon>
+          <div>
+            <h3 class="text-h5 font-weight-bold">Configurar Planilha Excel</h3>
+            <p class="text-body-2 mb-0 text-grey-lighten-3">
+              Faça upload da planilha "Alunos Cursos Regulares ano 2025.xlsx"
+            </p>
+          </div>
+        </div>
+      </v-card-title>
+
+      <v-card-text class="pa-6">
+        <!-- Upload de arquivo -->
+        <v-alert
+          v-if="!arquivoSelecionado && !temDadosExistentes"
+          type="info"
+          variant="tonal"
+          class="mb-6"
+        >
+          <template v-slot:prepend>
+            <v-icon>mdi-information</v-icon>
+          </template>
+          <div>
+            <strong>Formato esperado:</strong> Planilha Excel (.xlsx) com os cursos:<br>
+            • CAI<br>
+            • SESI TÉC ADM<br>
+            • SEDUC TÉC ELETROMECÂNICA<br><br>
+            Cada planilha deve conter as turmas e alunos do respectivo curso.
+          </div>
+        </v-alert>
+
+        <!-- Status dos dados existentes -->
+        <ClientOnly>
+          <v-alert
+            v-if="temDadosExistentes"
+            type="success"
+            variant="tonal"
+            class="mb-6"
+          >
+            <template v-slot:prepend>
+              <v-icon>mdi-check-circle</v-icon>
+            </template>
+            <div>
+              <strong>Planilha já configurada!</strong><br>
+              {{ resumoDados.totalAlunos }} alunos em {{ resumoDados.totalCursos }} cursos.<br>
+              Última atualização: {{ formatarData(resumoDados.ultimaAtualizacao) }}
+            </div>
+          </v-alert>
+        </ClientOnly>
+
+        <!-- Área de drop/seleção de arquivo -->
+        <div
+          class="upload-area pa-8 text-center rounded-lg border-dashed"
+          :class="{
+            'border-success': arquivoSelecionado,
+            'border-primary': !arquivoSelecionado && !dragOver,
+            'border-info elevation-4': dragOver
+          }"
+          @dragover.prevent="dragOver = true"
+          @dragleave.prevent="dragOver = false"
+          @drop.prevent="handleDrop"
+          @click="selecionarArquivo"
+          style="cursor: pointer; border-width: 2px;"
+        >
+          <input
+            ref="fileInput"
+            type="file"
+            accept=".xlsx,.xls"
+            style="display: none"
+            @change="handleFileSelect"
+          >
+
+          <v-icon
+            :color="arquivoSelecionado ? 'success' : 'primary'"
+            size="64"
+            class="mb-4"
+          >
+            {{ arquivoSelecionado ? 'mdi-check-circle' : 'mdi-cloud-upload' }}
+          </v-icon>
+
+          <h4 class="text-h6 mb-2">
+            {{ arquivoSelecionado ? 'Arquivo Selecionado' : 'Clique ou arraste a planilha aqui' }}
+          </h4>
+
+          <p v-if="arquivoSelecionado" class="text-body-1 font-weight-medium text-success">
+            📁 {{ arquivoSelecionado.name }}
+            <br>
+            📊 {{ formatarTamanho(arquivoSelecionado.size) }}
+          </p>
+          <p v-else class="text-body-2 text-medium-emphasis">
+            Formatos aceitos: .xlsx, .xls
+          </p>
+        </div>
+
+        <!-- Preview dos dados -->
+        <div v-if="dadosPreview" class="mt-6">
+          <h4 class="text-h6 mb-4 d-flex align-center">
+            <v-icon class="mr-2">mdi-eye</v-icon>
+            Preview dos Dados
+          </h4>
+
+          <v-row>
+            <v-col
+              v-for="planilha in dadosPreview.nomesPlanilhas"
+              :key="planilha"
+              cols="12"
+              md="4"
+            >
+              <v-card variant="outlined" rounded="lg">
+                <v-card-title class="text-body-1 font-weight-bold bg-grey-lighten-4">
+                  📊 {{ planilha }}
+                </v-card-title>
+                <v-card-text>
+                  <p class="text-body-2 mb-1">
+                    <strong>Registros:</strong> {{ dadosPreview.planilhas[planilha].totalRegistros }}
+                  </p>
+                  <p class="text-body-2 mb-1">
+                    <strong>Colunas:</strong> {{ dadosPreview.planilhas[planilha].colunas.length }}
+                  </p>
+                  <v-chip-group class="mt-2">
+                    <v-chip
+                      v-for="coluna in dadosPreview.planilhas[planilha].colunas.slice(0, 3)"
+                      :key="coluna"
+                      size="x-small"
+                      variant="outlined"
+                    >
+                      {{ coluna }}
+                    </v-chip>
+                    <v-chip
+                      v-if="dadosPreview.planilhas[planilha].colunas.length > 3"
+                      size="x-small"
+                      variant="outlined"
+                    >
+                      +{{ dadosPreview.planilhas[planilha].colunas.length - 3 }} mais
+                    </v-chip>
+                  </v-chip-group>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </div>
+
+        <!-- Erro -->
+        <v-alert
+          v-if="erro"
+          type="error"
+          variant="tonal"
+          class="mt-4"
+          closable
+          @click:close="erro = ''"
+        >
+          {{ erro }}
+        </v-alert>
+      </v-card-text>
+
+      <v-card-actions class="pa-6 pt-0">
+        <v-spacer />
+        <v-btn
+          variant="outlined"
+          @click="fechar"
+          :disabled="processando"
+        >
+          <ClientOnly fallback="Cancelar">
+            {{ temDadosExistentes ? 'Fechar' : 'Cancelar' }}
+          </ClientOnly>
+        </v-btn>
+        
+        <ClientOnly>
+          <v-btn
+            v-if="temDadosExistentes"
+            color="warning"
+            variant="outlined"
+            @click="removerDados"
+            :disabled="processando"
+          >
+            Remover Dados
+          </v-btn>
+        </ClientOnly>
+
+        <v-btn
+          color="senai-red"
+          :disabled="!arquivoSelecionado || processando"
+          :loading="processando"
+          @click="processarArquivo"
+        >
+          {{ dadosPreview ? 'Salvar Dados' : 'Processar Planilha' }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+
+<script setup>
+const props = defineProps({
+  modelValue: Boolean
+})
+
+const emit = defineEmits(['update:modelValue', 'dados-configurados'])
+
+const { lerArquivoExcel, processarDadosPlanilha, salvarDadosProcessados, carregarDadosProcessados, temDadosPlanilha } = useExcelData()
+
+const internalModelValue = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+})
+
+const fileInput = ref(null)
+const arquivoSelecionado = ref(null)
+const dadosPreview = ref(null)
+const processando = ref(false)
+const erro = ref('')
+const dragOver = ref(false)
+
+// Dados existentes
+const temDadosExistentes = ref(false)
+const resumoDados = ref({})
+
+const verificarDadosExistentes = () => {
+  if (process.client) {
+    temDadosExistentes.value = temDadosPlanilha()
+    if (temDadosExistentes.value) {
+      const dados = carregarDadosProcessados()
+      if (dados) {
+        resumoDados.value = {
+          totalAlunos: dados.totalAlunos || 0,
+          totalCursos: Object.keys(dados.cursos || {}).length,
+          ultimaAtualizacao: dados.ultimaAtualizacao
+        }
+      }
+    }
+  } else {
+    temDadosExistentes.value = false
+    resumoDados.value = {}
+  }
+}
+
+const selecionarArquivo = () => {
+  if (fileInput.value) {
+    fileInput.value.click()
+  }
+}
+
+const handleFileSelect = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    arquivoSelecionado.value = file
+    dadosPreview.value = null
+    erro.value = ''
+  }
+}
+
+const handleDrop = (event) => {
+  dragOver.value = false
+  const files = event.dataTransfer.files
+  if (files.length > 0) {
+    arquivoSelecionado.value = files[0]
+    dadosPreview.value = null
+    erro.value = ''
+  }
+}
+
+const processarArquivo = async () => {
+  if (!arquivoSelecionado.value) return
+
+  processando.value = true
+  erro.value = ''
+
+  try {
+    // Se já temos preview, apenas salvar
+    if (dadosPreview.value) {
+      const dadosProcessados = processarDadosPlanilha(dadosPreview.value)
+      const sucesso = salvarDadosProcessados(dadosProcessados)
+      
+      if (sucesso) {
+        emit('dados-configurados')
+        fechar()
+      } else {
+        erro.value = 'Erro ao salvar dados processados'
+      }
+      return
+    }
+
+    // Processar arquivo Excel
+    const dadosExcel = await lerArquivoExcel(arquivoSelecionado.value)
+    dadosPreview.value = dadosExcel
+
+  } catch (error) {
+    console.error('Erro ao processar arquivo:', error)
+    erro.value = error.message || 'Erro ao processar arquivo'
+  } finally {
+    processando.value = false
+  }
+}
+
+const removerDados = () => {
+  if (confirm('Tem certeza que deseja remover todos os dados da planilha?')) {
+    if (process.client) {
+      localStorage.removeItem('carometro_dados_excel')
+      localStorage.removeItem('carometro_excel_timestamp')
+    }
+    temDadosExistentes.value = false
+    resumoDados.value = {}
+    emit('dados-configurados')
+  }
+}
+
+const fechar = () => {
+  internalModelValue.value = false
+  // Reset
+  arquivoSelecionado.value = null
+  dadosPreview.value = null
+  erro.value = ''
+  dragOver.value = false
+}
+
+const formatarTamanho = (bytes) => {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+const formatarData = (isoString) => {
+  if (!isoString) return 'N/A'
+  return new Date(isoString).toLocaleString('pt-BR')
+}
+
+// Verificar dados existentes quando o modal abrir
+watch(internalModelValue, (newValue) => {
+  if (newValue) {
+    verificarDadosExistentes()
+  }
+})
+
+onMounted(() => {
+  verificarDadosExistentes()
+})
+</script>
+
+<style scoped>
+.upload-area {
+  transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+  background-color: rgba(var(--v-theme-primary), 0.04);
+}
+
+.border-dashed {
+  border-style: dashed !important;
+}
+</style>
