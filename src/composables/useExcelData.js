@@ -269,9 +269,49 @@ export const useExcelData = () => {
     return carregarDadosProcessados() !== null
   }
 
+  // Função para ler arquivo Excel via URL
+  const lerArquivoExcelUrl = async (url) => {
+    if (!url || typeof url !== 'string') {
+      throw new Error('URL inválida')
+    }
+
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error('Falha ao baixar arquivo: ' + response.status)
+    }
+
+    const buffer = await response.arrayBuffer()
+    try {
+      const data = new Uint8Array(buffer)
+      const workbook = XLSX.read(data, { type: 'array' })
+
+      const planilhas = {}
+      workbook.SheetNames.forEach(sheetName => {
+        const worksheet = workbook.Sheets[sheetName]
+        const jsonData = XLSX.utils.sheet_to_json(worksheet)
+
+        planilhas[sheetName] = {
+          nome: sheetName,
+          dados: jsonData,
+          totalRegistros: jsonData.length,
+          colunas: jsonData.length > 0 ? Object.keys(jsonData[0]) : []
+        }
+      })
+
+      return {
+        planilhas,
+        totalPlanilhas: workbook.SheetNames.length,
+        nomesPlanilhas: workbook.SheetNames
+      }
+    } catch (error) {
+      throw new Error('Erro ao processar arquivo Excel: ' + error.message)
+    }
+  }
+
   return {
     cursosDisponiveis,
     lerArquivoExcel,
+    lerArquivoExcelUrl,
     processarDadosPlanilha,
     salvarDadosProcessados,
     carregarDadosProcessados,
