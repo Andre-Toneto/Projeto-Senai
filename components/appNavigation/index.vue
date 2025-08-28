@@ -59,15 +59,15 @@ const navigationWidth = ref(280)
 
 const navItems = [
   { text: 'Carômetro', route: 'carometro/login', icon: 'mdi-account-group', badge: 'Novo' },
-  { text: 'Planilha de Registros', route: 'registros', icon: 'mdi-table-large' },
+  { text: 'Planilha de Registros', route: '', icon: 'mdi-table-large' },
   { text: 'Formulários', route: 'formularios', icon: 'mdi-form-select' },
-  { text: 'Horário Escolar', route: 'horarios', icon: 'mdi-calendar-clock' },
-  { text: 'Calendário Escolar', route: 'calendario', icon: 'mdi-calendar' },
-  { text: 'Proposta Pedagógica', route: 'proposta', icon: 'mdi-book-open-variant' },
-  { text: 'Plano Escolar', route: 'plano', icon: 'mdi-file-document-outline' },
-  { text: 'Coordenação', route: 'coordenacao', icon: 'mdi-account-supervisor' },
-  { text: 'Regimento SENAI', route: 'regimento', icon: 'mdi-gavel' },
-  { text: 'Educacional Plano', route: 'educacional', icon: 'mdi-school' }
+  { text: 'Horário Escolar', route: '', icon: 'mdi-calendar-clock' },
+  { text: 'Calendário Escolar', route: '', icon: 'mdi-calendar' },
+  { text: 'Proposta Pedagógica', route: '', icon: 'mdi-book-open-variant' },
+  { text: 'Plano Escolar', route: '', icon: 'mdi-file-document-outline' },
+  { text: 'Coordenação', route: '', icon: 'mdi-account-supervisor' },
+  { text: 'Regimento SENAI', route: '', icon: 'mdi-gavel' },
+  { text: 'Educacional Plano', route: '', icon: 'mdi-school' }
 ]
 
 const getIconColor = (routeName) => {
