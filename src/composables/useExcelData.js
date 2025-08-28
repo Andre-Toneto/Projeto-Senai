@@ -208,8 +208,6 @@ export const useExcelData = () => {
 
   // Função para salvar dados processados no localStorage
   const salvarDadosProcessados = (dados) => {
-    if (!process.client) return false
-    
     try {
       localStorage.setItem('carometro_dados_excel', JSON.stringify(dados))
       localStorage.setItem('carometro_excel_timestamp', Date.now().toString())
@@ -222,8 +220,6 @@ export const useExcelData = () => {
 
   // Função para carregar dados processados do localStorage
   const carregarDadosProcessados = () => {
-    if (!process.client) return null
-    
     try {
       const dados = localStorage.getItem('carometro_dados_excel')
       return dados ? JSON.parse(dados) : null

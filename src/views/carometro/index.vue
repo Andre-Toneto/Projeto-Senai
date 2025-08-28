@@ -23,8 +23,7 @@
                 />
 
                 <!-- Botão para configurar Excel se não tiver dados -->
-                <ClientOnly>
-                  <div v-if="!temDadosExcel" class="text-center mt-6">
+                <div v-if="!temDadosExcel" class="text-center mt-6">
                   <v-divider class="mb-4" />
                   <p class="text-body-2 text-medium-emphasis mb-4">
                     Para começar, você precisa configurar sua planilha Excel com os dados dos alunos
@@ -38,12 +37,10 @@
                   >
                     Configurar Planilha Excel
                   </v-btn>
-                  </div>
-                </ClientOnly>
+                </div>
 
                 <!-- Entrada manual de turma (fallback) -->
-                <ClientOnly>
-                  <div v-if="temDadosExcel" class="mt-6">
+                <div v-if="temDadosExcel" class="mt-6">
                   <v-divider class="mb-4" />
                   <h3 class="text-h6 text-senai-red font-weight-medium mb-4 text-center">
                     Ou digite o código da turma diretamente
@@ -74,8 +71,7 @@
                       Carregar Turma
                     </v-btn>
                   </v-form>
-                  </div>
-                </ClientOnly>
+                </div>
               </v-card-text>
             </v-card>
           </v-col>
@@ -98,9 +94,7 @@
                   <div>
                     <h2 class="text-h4 font-weight-bold mb-1">{{ turmaSelecionada.nome }}</h2>
                     <p class="text-h6 opacity-90 mb-1">{{ cursoSelecionado.nome }}</p>
-                    <ClientOnly fallback-tag="p" fallback="Carregando dados...">
-                      <p class="text-body-2 opacity-80 mb-0">{{ totalAlunos }} alunos cadastrados</p>
-                    </ClientOnly>
+                    <p class="text-body-2 opacity-80 mb-0">{{ totalAlunos }} alunos cadastrados</p>
                   </div>
                 </div>
               </v-col>
@@ -130,14 +124,12 @@
       </v-container>
 
       <!-- Componente Carômetro -->
-      <ClientOnly fallback-tag="div" fallback="<v-container class='text-center py-8'><v-progress-circular indeterminate color='senai-red' size='64' /><p class='text-body-1 text-medium-emphasis mt-4'>Carregando carômetro...</p></v-container>">
-        <Carometro
-          :turma="turmaSelecionada.id"
-          :curso="cursoSelecionado.id"
-          @selectPessoa="selecionarPessoa"
-          @updateTotal="atualizarTotal"
-        />
-      </ClientOnly>
+      <Carometro
+        :turma="turmaSelecionada.id"
+        :curso="cursoSelecionado.id"
+        @selectPessoa="selecionarPessoa"
+        @updateTotal="atualizarTotal"
+      />
     </div>
 
     <!-- Modal de Pessoa -->
@@ -155,6 +147,14 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useExcelData } from '@/composables/useExcelData.js'
+import CarometroCursoTurmaSelector from '@/components/carometro/cursoTurmaSelector.vue'
+import Carometro from '@/components/carometro/index.vue'
+import CarometroPessoaModal from '@/components/carometro/pessoaModal.vue'
+import CarometroExcelUploadModal from '@/components/carometro/excelUploadModal.vue'
+
 const router = useRouter()
 const modalAberto = ref(false)
 const configExcelAberto = ref(false)
@@ -182,34 +182,28 @@ const turmaRules = [
 
 // Verificar se há dados Excel disponíveis
 const verificarDadosExcel = () => {
-  if (process.client) {
-    temDadosExcel.value = temDadosPlanilha()
-  } else {
-    temDadosExcel.value = false // Garantir valor padrão no servidor
-  }
+  temDadosExcel.value = temDadosPlanilha()
 }
 
 onMounted(() => {
-  if (process.client) {
-    const isAuthenticated = sessionStorage.getItem('carometro_authenticated')
-    if (!isAuthenticated) {
-      router.push('/carometro/login')
-      return
-    }
+  const isAuthenticated = sessionStorage.getItem('carometro_authenticated')
+  if (!isAuthenticated) {
+    router.push('/carometro/login')
+    return
+  }
 
-    verificarDadosExcel()
+  verificarDadosExcel()
 
-    // Verificar se há seleção salva
-    const selecaoSalva = sessionStorage.getItem('carometro_selecao')
-    if (selecaoSalva) {
-      try {
-        const selecao = JSON.parse(selecaoSalva)
-        cursoSelecionado.value = selecao.curso
-        turmaSelecionada.value = selecao.turma
-        selecaoFeita.value = true
-      } catch (error) {
-        console.error('Erro ao carregar seleção salva:', error)
-      }
+  // Verificar se há seleção salva
+  const selecaoSalva = sessionStorage.getItem('carometro_selecao')
+  if (selecaoSalva) {
+    try {
+      const selecao = JSON.parse(selecaoSalva)
+      cursoSelecionado.value = selecao.curso
+      turmaSelecionada.value = selecao.turma
+      selecaoFeita.value = true
+    } catch (error) {
+      console.error('Erro ao carregar seleção salva:', error)
     }
   }
 })
@@ -220,13 +214,11 @@ const onCursoTurmaSelecionados = (selecao) => {
   selecaoFeita.value = true
   
   // Salvar seleção
-  if (process.client) {
-    sessionStorage.setItem('carometro_selecao', JSON.stringify(selecao))
-  }
+  sessionStorage.setItem('carometro_selecao', JSON.stringify(selecao))
 }
 
 const loadTurmaManual = () => {
-  if (!process.client || !turmaCode.value.trim()) return
+  if (!turmaCode.value.trim()) return
 
   loading.value = true
 
@@ -251,9 +243,7 @@ const voltarSelecao = () => {
   totalAlunos.value = 0
   turmaCode.value = ''
   
-  if (process.client) {
-    sessionStorage.removeItem('carometro_selecao')
-  }
+  sessionStorage.removeItem('carometro_selecao')
 }
 
 const selecionarPessoa = (pessoa) => {

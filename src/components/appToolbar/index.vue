@@ -15,12 +15,7 @@
 
     <!-- Date Section -->
     <v-icon size="small" class="mr-2">mdi-calendar</v-icon>
-    <ClientOnly fallback-tag="span" class="text-body-2">
-      <span class="text-body-2 font-weight-medium text-capitalize">{{ formattedDate }}</span>
-      <template #fallback>
-        <span class="text-body-2">Portal SENAI</span>
-      </template>
-    </ClientOnly>
+    <span class="text-body-2 font-weight-medium text-capitalize">{{ formattedDate }}</span>
 
     <v-spacer />
 
@@ -69,17 +64,16 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+
 const formattedDate = computed(() => {
-  if (process.client) {
-    const date = new Date()
-    return date.toLocaleDateString('pt-BR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
-  return 'Portal SENAI'
+  const date = new Date()
+  return date.toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
 })
 
 const menuItems = [

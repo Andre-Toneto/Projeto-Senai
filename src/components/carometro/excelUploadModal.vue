@@ -38,50 +38,48 @@
         </v-alert>
 
         <!-- Status dos dados existentes -->
-        <ClientOnly>
-          <v-card
-            v-if="temDadosExistentes"
-            variant="outlined"
-            color="success"
-            class="mb-6"
-          >
-            <v-card-title class="bg-success text-white pa-4">
-              <v-icon class="mr-2">mdi-check-circle</v-icon>
-              Planilha Configurada
-            </v-card-title>
-            <v-card-text class="pa-4">
-              <div class="d-flex align-center justify-space-between">
-                <div>
-                  <p class="text-body-1 font-weight-medium mb-1">
-                    <strong>{{ resumoDados.totalAlunos }}</strong> alunos em <strong>{{ resumoDados.totalCursos }}</strong> cursos
-                  </p>
-                  <p class="text-body-2 text-medium-emphasis mb-0">
-                    <v-icon size="small" class="mr-1">mdi-clock</v-icon>
-                    Última atualização: {{ formatarData(resumoDados.ultimaAtualizacao) }}
-                  </p>
-                </div>
-                <div class="d-flex gap-2">
-                  <v-btn
-                    color="warning"
-                    variant="outlined"
-                    prepend-icon="mdi-swap-horizontal"
-                    @click="mostrarTrocaArquivo"
-                  >
-                    Trocar Planilha
-                  </v-btn>
-                  <v-btn
-                    color="error"
-                    variant="outlined"
-                    prepend-icon="mdi-delete"
-                    @click="confirmarRemocao"
-                  >
-                    Remover
-                  </v-btn>
-                </div>
+        <v-card
+          v-if="temDadosExistentes"
+          variant="outlined"
+          color="success"
+          class="mb-6"
+        >
+          <v-card-title class="bg-success text-white pa-4">
+            <v-icon class="mr-2">mdi-check-circle</v-icon>
+            Planilha Configurada
+          </v-card-title>
+          <v-card-text class="pa-4">
+            <div class="d-flex align-center justify-space-between">
+              <div>
+                <p class="text-body-1 font-weight-medium mb-1">
+                  <strong>{{ resumoDados.totalAlunos }}</strong> alunos em <strong>{{ resumoDados.totalCursos }}</strong> cursos
+                </p>
+                <p class="text-body-2 text-medium-emphasis mb-0">
+                  <v-icon size="small" class="mr-1">mdi-clock</v-icon>
+                  Última atualização: {{ formatarData(resumoDados.ultimaAtualizacao) }}
+                </p>
               </div>
-            </v-card-text>
-          </v-card>
-        </ClientOnly>
+              <div class="d-flex gap-2">
+                <v-btn
+                  color="warning"
+                  variant="outlined"
+                  prepend-icon="mdi-swap-horizontal"
+                  @click="mostrarTrocaArquivo"
+                >
+                  Trocar Planilha
+                </v-btn>
+                <v-btn
+                  color="error"
+                  variant="outlined"
+                  prepend-icon="mdi-delete"
+                  @click="confirmarRemocao"
+                >
+                  Remover
+                </v-btn>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
 
         <!-- Área de drop/seleção de arquivo -->
         <div
@@ -209,9 +207,7 @@
           @click="fechar"
           :disabled="processando"
         >
-          <ClientOnly fallback="Cancelar">
-            {{ temDadosExistentes && !mostrandoTrocaArquivo ? 'Fechar' : 'Cancelar' }}
-          </ClientOnly>
+          {{ temDadosExistentes && !mostrandoTrocaArquivo ? 'Fechar' : 'Cancelar' }}
         </v-btn>
 
         <!-- Botão Processar/Salvar -->
@@ -230,6 +226,9 @@
 </template>
 
 <script setup>
+import { ref, computed, watch, onMounted } from 'vue'
+import { useExcelData } from '@/composables/useExcelData.js'
+
 const props = defineProps({
   modelValue: Boolean
 })
@@ -256,21 +255,16 @@ const temDadosExistentes = ref(false)
 const resumoDados = ref({})
 
 const verificarDadosExistentes = () => {
-  if (process.client) {
-    temDadosExistentes.value = temDadosPlanilha()
-    if (temDadosExistentes.value) {
-      const dados = carregarDadosProcessados()
-      if (dados) {
-        resumoDados.value = {
-          totalAlunos: dados.totalAlunos || 0,
-          totalCursos: Object.keys(dados.cursos || {}).length,
-          ultimaAtualizacao: dados.ultimaAtualizacao
-        }
+  temDadosExistentes.value = temDadosPlanilha()
+  if (temDadosExistentes.value) {
+    const dados = carregarDadosProcessados()
+    if (dados) {
+      resumoDados.value = {
+        totalAlunos: dados.totalAlunos || 0,
+        totalCursos: Object.keys(dados.cursos || {}).length,
+        ultimaAtualizacao: dados.ultimaAtualizacao
       }
     }
-  } else {
-    temDadosExistentes.value = false
-    resumoDados.value = {}
   }
 }
 
@@ -346,10 +340,8 @@ const confirmarRemocao = () => {
 }
 
 const removerDados = () => {
-  if (process.client) {
-    localStorage.removeItem('carometro_dados_excel')
-    localStorage.removeItem('carometro_excel_timestamp')
-  }
+  localStorage.removeItem('carometro_dados_excel')
+  localStorage.removeItem('carometro_excel_timestamp')
   temDadosExistentes.value = false
   resumoDados.value = {}
   mostrandoTrocaArquivo.value = false

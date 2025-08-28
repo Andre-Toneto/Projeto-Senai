@@ -1,8 +1,11 @@
+import { useExcelData } from './useExcelData.js'
+
 export const useCarometro = () => {
   const { getAlunosPorCursoTurma, getCursosDisponiveis, getTurmasPorCurso, temDadosPlanilha } = useExcelData()
+  
   // Função para obter dados de uma turma (integrada com Excel)
   const getAlunosTurma = (turma, curso = null) => {
-    if (!process.client || !turma) return []
+    if (!turma) return []
 
     // Primeiro tentar buscar da planilha Excel se curso for especificado
     if (curso && temDadosPlanilha()) {
@@ -25,7 +28,7 @@ export const useCarometro = () => {
 
   // Função para salvar dados de uma turma
   const saveAlunosTurma = (turma, alunos) => {
-    if (!process.client || !turma) return false
+    if (!turma) return false
     
     try {
       const key = `carometro_turma_${turma}`
@@ -147,8 +150,6 @@ export const useCarometro = () => {
 
   // Função para listar todas as turmas existentes
   const getTurmasExistentes = () => {
-    if (!process.client) return []
-    
     try {
       const keys = Object.keys(localStorage)
       const turmas = keys
@@ -165,7 +166,7 @@ export const useCarometro = () => {
 
   // Função para exportar dados de uma turma
   const exportarTurma = (turma) => {
-    if (!process.client || !turma) return null
+    if (!turma) return null
     
     try {
       const alunos = getAlunosTurma(turma)

@@ -9,7 +9,8 @@
       >
         <div class="d-flex align-center">
           <v-avatar size="64" class="elevation-8" :style="{ border: '4px solid rgba(255,255,255,0.3)' }">
-            <v-img :src="pessoa.foto" />
+            <v-img v-if="pessoa.foto" :src="pessoa.foto" />
+            <v-icon v-else color="white" size="32">mdi-account</v-icon>
           </v-avatar>
           <div class="ml-4">
             <div class="d-flex align-center">
@@ -28,14 +29,17 @@
       <!-- Conteúdo -->
       <v-card-text class="pa-6">
         <v-row>
-
           <!-- Cards -->
           <v-col cols="12">
             <v-row dense>
               <!-- foto -->
               <v-col cols="12" md="3" class="d-flex justify-center">
-                <v-img :src="pessoa.foto" height="240" width="180" rounded="lg" cover class="elevation-6" />
+                <v-img v-if="pessoa.foto" :src="pessoa.foto" height="240" width="180" rounded="lg" cover class="elevation-6" />
+                <v-sheet v-else height="240" width="180" rounded="lg" class="elevation-6 d-flex align-center justify-center">
+                  <v-icon size="80" color="grey-lighten-2">mdi-account</v-icon>
+                </v-sheet>
               </v-col>
+              
               <!-- Acadêmico -->
               <v-col cols="12" sm="3">
                 <v-card elevation="4" rounded="xl" variant="tonal">
@@ -64,9 +68,9 @@
                     </div>
                     <v-divider class="mb-2" />
                     <v-list density="compact">
-                      <v-list-item title="RG" :subtitle="pessoa.rg" />
-                      <v-list-item title="CPF" :subtitle="pessoa.cpf" />
-                      <v-list-item title="Nascimento" subtitle="17/01/2007" />
+                      <v-list-item title="RG" :subtitle="pessoa.rg || 'Não informado'" />
+                      <v-list-item title="CPF" :subtitle="pessoa.cpf || 'Não informado'" />
+                      <v-list-item title="Email" :subtitle="pessoa.email || 'Não informado'" />
                     </v-list>
                   </v-card-text>
                 </v-card>
@@ -82,16 +86,16 @@
                     </div>
                     <v-divider class="mb-2" />
                     <v-list density="compact">
-                      <v-list-item title="Mãe" :subtitle="pessoa.mae" />
-                      <v-list-item title="Pai" :subtitle="pessoa.pai" />
-                      <v-list-item title="Empresa" :subtitle="pessoa.empresa" />
+                      <v-list-item title="Mãe" :subtitle="pessoa.mae || 'Não informado'" />
+                      <v-list-item title="Pai" :subtitle="pessoa.pai || 'Não informado'" />
+                      <v-list-item title="Empresa" :subtitle="pessoa.empresa || 'Não informado'" />
                     </v-list>
                   </v-card-text>
                 </v-card>
               </v-col>
 
               <!-- Contato -->
-              <v-col cols="12" sm="4">
+              <v-col cols="12" sm="6">
                 <v-card elevation="4" rounded="xl" variant="tonal">
                   <v-card-text>
                     <div class="d-flex align-center mb-2">
@@ -100,20 +104,19 @@
                     </div>
                     <v-divider class="mb-2" />
                     <v-list density="compact">
-                      <v-list-item title="Telefone" :subtitle="pessoa.telefone" />
-                      <v-list-item title="Celular" :subtitle="pessoa.celular" />
-                      <v-list-item title="Endereço" :subtitle="pessoa.endereco + ', ' + pessoa.bairro" />
-                      <v-list-item title="Cidade" :subtitle="pessoa.cidade + ' - ' + pessoa.estado" />
-                      <v-list-item title="CEP" :subtitle="pessoa.cep" />
+                      <v-list-item title="Telefone" :subtitle="pessoa.telefone || 'Não informado'" />
+                      <v-list-item title="Celular" :subtitle="pessoa.celular || 'Não informado'" />
+                      <v-list-item title="Endereço" :subtitle="getEndereco()" />
+                      <v-list-item title="Cidade" :subtitle="getCidade()" />
+                      <v-list-item title="CEP" :subtitle="pessoa.cep || 'Não informado'" />
                     </v-list>
                   </v-card-text>
                 </v-card>
               </v-col>
 
-              
-                <!-- Ocorrências -->
-              <v-col cols="12" sm="8">
-                <v-card  elevation="4" rounded="xl" variant="tonal">
+              <!-- Ocorrências -->
+              <v-col cols="12" sm="6">
+                <v-card elevation="4" rounded="xl" variant="tonal">
                   <v-card-text>
                     <div class="d-flex justify-space-between align-center mb-3">
                       <div class="d-flex align-center">
@@ -126,7 +129,7 @@
                     </div>
 
                     <!-- Lista com scroll fixo -->
-                    <v-sheet height="263" rounded="lg" border class="pa-2 overflow-y-auto">
+                    <v-sheet height="200" rounded="lg" border class="pa-2 overflow-y-auto">
                       <template v-if="pessoa.ocorrencias && pessoa.ocorrencias.length">
                         <v-card
                           v-for="(ocorrencia, index) in pessoa.ocorrencias"
@@ -157,88 +160,8 @@
                         </div>
                       </template>
                     </v-sheet>
-
-                    <!-- Formulário para Nova Ocorrência (re-adicionado) -->
-                    <!-- <v-expand-transition>
-                      <v-card v-if="showAddForm" class="mt-4" elevation="2" rounded="lg" variant="tonal">
-                        <v-card-text>
-                          <div class="d-flex align-center mb-3">
-                            <v-icon color="error" class="mr-2">mdi-plus-circle</v-icon>
-                            <h4 class="text-subtitle-1 font-weight-medium">Nova Ocorrência</h4>
-                          </div>
-
-                          <v-form ref="formRef" v-model="formValid" @submit.prevent="adicionarOcorrencia">
-                            <v-textarea
-                              v-model="novaOcorrencia"
-                              label="Descrição da Ocorrência"
-                              variant="outlined"
-                              rows="3"
-                              :rules="[required]"
-                              class="mb-4"
-                            />
-
-                            <div class="d-flex align-center">
-                              <v-btn
-                                color="error"
-                                :disabled="!formValid"
-                                type="submit"
-                                rounded="lg"
-                                elevation="2"
-                              >
-                                <v-icon start>mdi-content-save</v-icon>
-                                Registrar
-                              </v-btn>
-
-                              <v-btn class="ml-2" variant="outlined" rounded="lg" @click="cancelarRegistro">
-                                Cancelar
-                              </v-btn>
-                            </div>
-                          </v-form>
-                        </v-card-text>
-                      </v-card>
-                    </v-expand-transition> -->
                   </v-card-text>
                 </v-card>
-              </v-col>
-              <v-col cols="12" sm="12">
-                <v-expand-transition>
-                      <v-card v-if="showAddForm" class="mt-4" elevation="2" rounded="lg" variant="tonal">
-                        <v-card-text>
-                          <div class="d-flex align-center mb-3">
-                            <v-icon color="error" class="mr-2">mdi-plus-circle</v-icon>
-                            <h4 class="text-subtitle-1 font-weight-medium">Nova Ocorrência</h4>
-                          </div>
-
-                          <v-form ref="formRef" v-model="formValid" @submit.prevent="adicionarOcorrencia">
-                            <v-textarea
-                              v-model="novaOcorrencia"
-                              label="Descrição da Ocorrência"
-                              variant="outlined"
-                              rows="3"
-                              :rules="[required]"
-                              class="mb-4"
-                            />
-
-                            <div class="d-flex align-center">
-                              <v-btn
-                                color="error"
-                                :disabled="!formValid"
-                                type="submit"
-                                rounded="lg"
-                                elevation="2"
-                              >
-                                <v-icon start>mdi-content-save</v-icon>
-                                Registrar
-                              </v-btn>
-
-                              <v-btn class="ml-2" variant="outlined" rounded="lg" @click="cancelarRegistro">
-                                Cancelar
-                              </v-btn>
-                            </div>
-                          </v-form>
-                        </v-card-text>
-                      </v-card>
-                    </v-expand-transition>
               </v-col>
             </v-row>
           </v-col>
@@ -252,24 +175,13 @@
           Voltar
         </v-btn>
         <v-spacer />
-        <v-btn
-          :color="showAddForm ? 'grey' : 'error'"
-          @click="toggleAddForm"
-          :variant="showAddForm ? 'outlined' : 'elevated'"
-          rounded="lg"
-          size="large"
-          elevation="2"
-        >
-          <v-icon start>{{ showAddForm ? 'mdi-close' : 'mdi-plus' }}</v-icon>
-          {{ showAddForm ? 'Cancelar' : 'Registrar Ocorrência' }}
-        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
@@ -283,39 +195,33 @@ const isOpen = computed({
   set: (val) => emit('update:modelValue', val)
 })
 
-const showAddForm = ref(false)
-const formRef = ref()
-const formValid = ref(false)
-const novaOcorrencia = ref('')
-
-const required = (v) => !!(v && String(v).trim()) || 'Descrição é obrigatória'
-
-const toggleAddForm = () => {
-  showAddForm.value = !showAddForm.value
-  if (!showAddForm.value) {
-    novaOcorrencia.value = ''
-    formRef.value?.reset()
-    formRef.value?.resetValidation?.()
+const getEndereco = () => {
+  const endereco = props.pessoa.endereco || ''
+  const bairro = props.pessoa.bairro || ''
+  
+  if (endereco && bairro) {
+    return `${endereco}, ${bairro}`
+  } else if (endereco) {
+    return endereco
+  } else if (bairro) {
+    return bairro
   }
+  
+  return 'Não informado'
 }
 
-const cancelarRegistro = () => {
-  showAddForm.value = false
-  novaOcorrencia.value = ''
-  formRef.value?.reset()
-  formRef.value?.resetValidation?.()
-}
-
-const adicionarOcorrencia = async () => {
-  const { valid } = await formRef.value.validate()
-  if (!valid) return
-
-  if (!props.pessoa.ocorrencias) props.pessoa.ocorrencias = []
-  props.pessoa.ocorrencias.unshift(novaOcorrencia.value.trim())
-
-  // limpar e fechar form
-  novaOcorrencia.value = ''
-  formRef.value?.resetValidation?.()
-  showAddForm.value = false
+const getCidade = () => {
+  const cidade = props.pessoa.cidade || ''
+  const estado = props.pessoa.estado || ''
+  
+  if (cidade && estado) {
+    return `${cidade} - ${estado}`
+  } else if (cidade) {
+    return cidade
+  } else if (estado) {
+    return estado
+  }
+  
+  return 'Não informado'
 }
 </script>

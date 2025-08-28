@@ -54,6 +54,9 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
+
 const route = useRoute()
 const navigationWidth = ref(280)
 
@@ -80,17 +83,15 @@ const openHelp = () => {
 }
 
 onMounted(() => {
-  if (process.client) {
-    const updateWidth = () => {
-      navigationWidth.value = window.innerWidth < 960 ? 260 : 280
-    }
-
-    updateWidth()
-    window.addEventListener('resize', updateWidth)
-
-    onUnmounted(() => {
-      window.removeEventListener('resize', updateWidth)
-    })
+  const updateWidth = () => {
+    navigationWidth.value = window.innerWidth < 960 ? 260 : 280
   }
+
+  updateWidth()
+  window.addEventListener('resize', updateWidth)
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', updateWidth)
+  })
 })
 </script>

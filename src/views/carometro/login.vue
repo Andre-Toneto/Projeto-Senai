@@ -54,6 +54,9 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
 const router = useRouter()
 const valid = ref(false)
 const loading = ref(false)
@@ -76,9 +79,7 @@ const authenticate = () => {
 
   setTimeout(() => {
     if (credentials.value.usuario === 'professor' && credentials.value.senha === '123456') {
-      if (process.client) {
-        sessionStorage.setItem('carometro_authenticated', 'true')
-      }
+      sessionStorage.setItem('carometro_authenticated', 'true')
       router.push('/carometro')
     } else {
       alert('Credenciais inválidas. Use: professor/123456')
