@@ -160,7 +160,7 @@ const modalAberto = ref(false)
 const configExcelAberto = ref(false)
 const pessoaSelecionada = ref({})
 
-const { temDadosPlanilha } = useExcelData()
+const { temDadosPlanilha, sincronizarPlanilhaConfigurada } = useExcelData()
 
 // Estado da seleção
 const selecaoFeita = ref(false)
