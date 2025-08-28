@@ -185,11 +185,18 @@ const verificarDadosExcel = () => {
   temDadosExcel.value = temDadosPlanilha()
 }
 
-onMounted(() => {
+onMounted(async () => {
   const isAuthenticated = sessionStorage.getItem('carometro_authenticated')
   if (!isAuthenticated) {
     router.push('/carometro/login')
     return
+  }
+
+  // Sincroniza automaticamente se houver URL configurada (ENV/localStorage)
+  try {
+    await sincronizarPlanilhaConfigurada()
+  } catch (e) {
+    console.warn('Falha ao sincronizar planilha configurada automaticamente:', e?.message || e)
   }
 
   verificarDadosExcel()
