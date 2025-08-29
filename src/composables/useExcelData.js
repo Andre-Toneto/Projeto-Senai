@@ -98,7 +98,6 @@ export const useExcelData = () => {
 
           // Extrair informações do aluno
           const aluno = extrairDadosAluno(registro, cursoId)
-          console.log('o que vem no aluno agora', aluno)
           if (!aluno.turma) {
             console.warn('Turma não identificada para aluno:', aluno)
             return
@@ -232,7 +231,6 @@ export const useExcelData = () => {
   // Função para obter alunos por curso e turma
   const getAlunosPorCursoTurma = (cursoId, turmaId) => {
     const dados = carregarDadosProcessados()
-    console.log('o que vem no dados', dados)
     if (!dados || !dados.cursos[cursoId] || !dados.cursos[cursoId].turmas[turmaId]) {
       return []
     }
