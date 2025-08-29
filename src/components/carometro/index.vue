@@ -377,7 +377,7 @@ const nomeComSep = (nome, sep) => baseNome(nome).replace(/\s+/g, sep)
 // Candidatos de arquivo para tentar
 const buildCandidatos = (pessoa) => {
   const nome = pessoa?.nome || ''
-  const raw = String(nome).trim().replace(/\\s+/g, ' ')
+  const raw = String(nome).trim().replace(/\s+/g, ' ')
   const nomes = [
     // Normalizados
     nomeComSep(nome, '_'),
