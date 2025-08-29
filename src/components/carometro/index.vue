@@ -352,6 +352,25 @@ const getTextoBadge = () => {
 const atualizarEstadoExcel = () => {
   temDadosExcel.value = temDadosPlanilha()
 }
+
+// Normaliza o nome do aluno para coincidir com o nome do arquivo
+const normalizarNomeArquivo = (nome) => {
+  if (!nome) return ''
+  return String(nome)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '_')
+}
+
+// Retorna a URL da foto do aluno no padrão /fotos/{curso}/{turma}/{nome}.jpg
+const getFoto = (pessoa) => {
+  if (pessoa?.foto) return pessoa.foto
+  const nomeNormalizado = normalizarNomeArquivo(pessoa?.nome || '')
+  if (!nomeNormalizado || !props.curso || !props.turma) return ''
+  return `/fotos/${props.curso}/${props.turma}/${nomeNormalizado}.jpg`
+}
 </script>
 
 <style scoped>
