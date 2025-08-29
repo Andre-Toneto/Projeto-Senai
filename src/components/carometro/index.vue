@@ -183,18 +183,11 @@
           <!-- Avatar/Foto -->
           <div class="text-center pt-6 pb-2">
             <v-avatar size="80" class="elevation-4">
-              <v-img
-                v-if="pessoa.foto"
-                :src="pessoa.foto"
-                cover
-              />
-              <v-icon
-                v-else
-                size="40"
-                color="grey-lighten-1"
-              >
-                mdi-account
-              </v-icon>
+              <v-img :src="fotoSrcs[getPessoaKey(pessoa)] || getFoto(pessoa)" cover>
+                <template #error>
+                  <v-icon size="40" color="grey-lighten-1">mdi-account</v-icon>
+                </template>
+              </v-img>
             </v-avatar>
           </div>
 
@@ -286,6 +279,7 @@ const carregarAlunos = async () => {
       if (alunosCarregados.length > 0) {
         pessoas.value = alunosCarregados
         emit('updateTotal', pessoas.value)
+        pessoas.value.forEach(resolverFoto)
         return
       }
     }
@@ -295,6 +289,8 @@ const carregarAlunos = async () => {
 
     pessoas.value = alunosCarregados
     emit('updateTotal', pessoas.value)
+    // Resolver fotos para lista
+    pessoas.value.forEach(resolverFoto)
   } catch (error) {
     console.error('Erro ao carregar alunos:', error)
     pessoas.value = []
@@ -305,7 +301,8 @@ const carregarAlunos = async () => {
 }
 
 const abrirModal = (pessoa) => {
-  emit('selectPessoa', pessoa)
+  const foto = fotoSrcs.value[getPessoaKey(pessoa)] || getFoto(pessoa)
+  emit('selectPessoa', { ...pessoa, foto })
 }
 
 const atualizarDados = async () => {
@@ -335,6 +332,7 @@ onMounted(() => {
 // Watch para mudanças na turma ou curso
 watch(() => [props.turma, props.curso], ([newTurma, newCurso]) => {
   if (newTurma) {
+    fotoSrcs.value = {}
     carregarAlunos()
   }
 })
@@ -358,6 +356,73 @@ const getTextoBadge = () => {
 // Atualizar estado do Excel
 const atualizarEstadoExcel = () => {
   temDadosExcel.value = temDadosPlanilha()
+}
+
+// Cache de URLs resolvidas por pessoa.id
+const fotoSrcs = ref({})
+
+// Normalização base (minúsculas, sem acentos, espaços únicos)
+const baseNome = (nome) => {
+  return String(nome || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s_-]/g, '')
+    .replace(/\s+/g, ' ')
+}
+
+const nomeComSep = (nome, sep) => baseNome(nome).replace(/\s+/g, sep)
+
+// Candidatos de arquivo para tentar
+const buildCandidatos = (pessoa) => {
+  const nome = pessoa?.nome || ''
+  const raw = String(nome).trim().replace(/\s+/g, ' ')
+  const nomes = [
+    // Normalizados
+    nomeComSep(nome, '_'),
+    nomeComSep(nome, '-'),
+    baseNome(nome),
+    // Originais (com acentos/caixa)
+    raw.replace(/\s+/g, '_'),
+    raw.replace(/\s+/g, '-'),
+    raw
+  ]
+  const exts = ['.jpg', '.jpeg', '.png', '.webp']
+  const candidatos = []
+  for (const n of nomes) {
+    for (const ext of exts) {
+      candidatos.push(`/fotos/${props.curso}/${props.turma}/${n}${ext}`)
+    }
+  }
+  return candidatos
+}
+
+// Tenta resolver a primeira URL existente
+const getPessoaKey = (pessoa) => pessoa?.id || pessoa?.matricula || baseNome(pessoa?.nome || '')
+
+const resolverFoto = (pessoa) => {
+  if (!pessoa || !props.curso || !props.turma) return
+  const key = getPessoaKey(pessoa)
+  if (!key || fotoSrcs.value[key]) return
+  const candidatos = buildCandidatos(pessoa)
+  const tryNext = (i) => {
+    if (i >= candidatos.length) { fotoSrcs.value[key] = ''; return }
+    const url = candidatos[i]
+    const img = new Image()
+    img.onload = () => { fotoSrcs.value[key] = url }
+    img.onerror = () => tryNext(i + 1)
+    img.src = url
+  }
+  tryNext(0)
+}
+
+// Retorna uma URL padrão (primeira convenção) caso ainda não resolvido
+const getFoto = (pessoa) => {
+  if (pessoa?.foto) return pessoa.foto
+  const nome = nomeComSep(pessoa?.nome || '', '_')
+  if (!nome || !props.curso || !props.turma) return ''
+  return `/fotos/${props.curso}/${props.turma}/${nome}.jpg`
 }
 </script>
 

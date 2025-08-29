@@ -271,17 +271,18 @@ export const useExcelData = () => {
 
   // Função para ler arquivo Excel via URL
   const lerArquivoExcelUrl = async (url) => {
-    if (!url || typeof url !== 'string') {
-      throw new Error('URL inválida')
+    if (!url || typeof url !== 'string' || !url.trim()) {
+      return null
     }
 
-    const response = await fetch(url)
-    if (!response.ok) {
-      throw new Error('Falha ao baixar arquivo: ' + response.status)
-    }
-
-    const buffer = await response.arrayBuffer()
     try {
+      const response = await fetch(url, { mode: 'cors' })
+      if (!response || !response.ok) {
+        console.warn('Falha ao baixar arquivo Excel:', response ? response.status : 'sem resposta')
+        return null
+      }
+
+      const buffer = await response.arrayBuffer()
       const data = new Uint8Array(buffer)
       const workbook = XLSX.read(data, { type: 'array' })
 
@@ -304,7 +305,8 @@ export const useExcelData = () => {
         nomesPlanilhas: workbook.SheetNames
       }
     } catch (error) {
-      throw new Error('Erro ao processar arquivo Excel: ' + error.message)
+      console.warn('Erro ao obter/processar planilha por URL:', error?.message || error)
+      return null
     }
   }
 
@@ -338,21 +340,33 @@ export const useExcelData = () => {
 
   // Obtém URL configurada via ENV ou localStorage
   const getUrlConfigurada = () => {
-    const envUrl = (import.meta?.env && import.meta.env.VITE_CAROMETRO_EXCEL_URL) ? String(import.meta.env.VITE_CAROMETRO_EXCEL_URL) : ''
-    const storedUrl = localStorage.getItem('carometro_excel_url') || ''
+    const sanitize = (u) => {
+      const s = (u ?? '').toString().trim()
+      if (!s || s.toLowerCase() === 'undefined' || s.toLowerCase() === 'null' || s === '#') return ''
+      return s
+    }
+    const envUrl = sanitize(import.meta?.env?.VITE_CAROMETRO_EXCEL_URL)
+    const storedUrl = sanitize(localStorage.getItem('carometro_excel_url'))
     const url = envUrl || storedUrl
     return normalizarUrlPlanilha(url)
   }
 
   // Sincroniza automaticamente a planilha configurada
   const sincronizarPlanilhaConfigurada = async (force = false) => {
-    const url = getUrlConfigurada()
-    if (!url) return false
-    if (!force && temDadosPlanilha()) return true
+    try {
+      const url = getUrlConfigurada()
+      if (!url) return false
+      if (!force && temDadosPlanilha()) return true
 
-    const dadosExcel = await lerArquivoExcelUrl(url)
-    const dadosProcessados = processarDadosPlanilha(dadosExcel)
-    return salvarDadosProcessados(dadosProcessados)
+      const dadosExcel = await lerArquivoExcelUrl(url)
+      if (!dadosExcel) return false
+
+      const dadosProcessados = processarDadosPlanilha(dadosExcel)
+      return salvarDadosProcessados(dadosProcessados)
+    } catch (e) {
+      console.warn('Sincronização da planilha falhou:', e?.message || e)
+      return false
+    }
   }
 
   return {
