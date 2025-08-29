@@ -377,10 +377,16 @@ const nomeComSep = (nome, sep) => baseNome(nome).replace(/\s+/g, sep)
 // Candidatos de arquivo para tentar
 const buildCandidatos = (pessoa) => {
   const nome = pessoa?.nome || ''
+  const raw = String(nome).trim().replace(/\\s+/g, ' ')
   const nomes = [
-    nomeComSep(nome, '_'), // underscores
-    nomeComSep(nome, '-'), // hyphens
-    baseNome(nome) // com espaço
+    // Normalizados
+    nomeComSep(nome, '_'),
+    nomeComSep(nome, '-'),
+    baseNome(nome),
+    // Originais (com acentos/caixa)
+    raw.replace(/\s+/g, '_'),
+    raw.replace(/\s+/g, '-'),
+    raw
   ]
   const exts = ['.jpg', '.jpeg', '.png']
   const candidatos = []
