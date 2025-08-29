@@ -9,7 +9,11 @@
       >
         <div class="d-flex align-center">
           <v-avatar size="64" class="elevation-8" :style="{ border: '4px solid rgba(255,255,255,0.3)' }">
-            <v-img v-if="pessoa.foto" :src="pessoa.foto" />
+            <v-img v-if="pessoa.foto" :src="pessoa.foto">
+              <template #error>
+                <v-icon color="white" size="32">mdi-account</v-icon>
+              </template>
+            </v-img>
             <v-icon v-else color="white" size="32">mdi-account</v-icon>
           </v-avatar>
           <div class="ml-4">
@@ -34,7 +38,13 @@
             <v-row dense>
               <!-- foto -->
               <v-col cols="12" md="3" class="d-flex justify-center">
-                <v-img v-if="pessoa.foto" :src="pessoa.foto" height="240" width="180" rounded="lg" cover class="elevation-6" />
+                <v-img v-if="pessoa.foto" :src="pessoa.foto" height="240" width="180" rounded="lg" cover class="elevation-6">
+                  <template #error>
+                    <v-sheet height="240" width="180" rounded="lg" class="elevation-6 d-flex align-center justify-center">
+                      <v-icon size="80" color="grey-lighten-2">mdi-account</v-icon>
+                    </v-sheet>
+                  </template>
+                </v-img>
                 <v-sheet v-else height="240" width="180" rounded="lg" class="elevation-6 d-flex align-center justify-center">
                   <v-icon size="80" color="grey-lighten-2">mdi-account</v-icon>
                 </v-sheet>
