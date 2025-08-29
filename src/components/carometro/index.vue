@@ -298,7 +298,8 @@ const carregarAlunos = async () => {
 }
 
 const abrirModal = (pessoa) => {
-  emit('selectPessoa', pessoa)
+  const foto = getFoto(pessoa)
+  emit('selectPessoa', { ...pessoa, foto })
 }
 
 const atualizarDados = async () => {
