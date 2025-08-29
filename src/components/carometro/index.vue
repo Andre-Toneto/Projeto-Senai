@@ -183,7 +183,7 @@
           <!-- Avatar/Foto -->
           <div class="text-center pt-6 pb-2">
             <v-avatar size="80" class="elevation-4">
-              <v-img :src="getFoto(pessoa)" cover>
+              <v-img :src="fotoSrcs[pessoa.id] || getFoto(pessoa)" cover>
                 <template #error>
                   <v-icon size="40" color="grey-lighten-1">mdi-account</v-icon>
                 </template>
@@ -288,6 +288,8 @@ const carregarAlunos = async () => {
 
     pessoas.value = alunosCarregados
     emit('updateTotal', pessoas.value)
+    // Resolver fotos para lista
+    pessoas.value.forEach(resolverFoto)
   } catch (error) {
     console.error('Erro ao carregar alunos:', error)
     pessoas.value = []
@@ -298,7 +300,7 @@ const carregarAlunos = async () => {
 }
 
 const abrirModal = (pessoa) => {
-  const foto = getFoto(pessoa)
+  const foto = fotoSrcs.value[pessoa.id] || getFoto(pessoa)
   emit('selectPessoa', { ...pessoa, foto })
 }
 
@@ -329,6 +331,7 @@ onMounted(() => {
 // Watch para mudanças na turma ou curso
 watch(() => [props.turma, props.curso], ([newTurma, newCurso]) => {
   if (newTurma) {
+    fotoSrcs.value = {}
     carregarAlunos()
   }
 })
@@ -354,23 +357,63 @@ const atualizarEstadoExcel = () => {
   temDadosExcel.value = temDadosPlanilha()
 }
 
-// Normaliza o nome do aluno para coincidir com o nome do arquivo
-const normalizarNomeArquivo = (nome) => {
-  if (!nome) return ''
-  return String(nome)
+// Cache de URLs resolvidas por pessoa.id
+const fotoSrcs = ref({})
+
+// Normalização base (minúsculas, sem acentos, espaços únicos)
+const baseNome = (nome) => {
+  return String(nome || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, '_')
+    .replace(/[^a-z0-9\s_-]/g, '')
+    .replace(/\s+/g, ' ')
 }
 
-// Retorna a URL da foto do aluno no padrão /fotos/{curso}/{turma}/{nome}.jpg
+const nomeComSep = (nome, sep) => baseNome(nome).replace(/\s+/g, sep)
+
+// Candidatos de arquivo para tentar
+const buildCandidatos = (pessoa) => {
+  const nome = pessoa?.nome || ''
+  const nomes = [
+    nomeComSep(nome, '_'), // underscores
+    nomeComSep(nome, '-'), // hyphens
+    baseNome(nome) // com espaço
+  ]
+  const exts = ['.jpg', '.jpeg', '.png']
+  const candidatos = []
+  for (const n of nomes) {
+    for (const ext of exts) {
+      candidatos.push(`/fotos/${props.curso}/${props.turma}/${n}${ext}`)
+    }
+  }
+  return candidatos
+}
+
+// Tenta resolver a primeira URL existente
+const resolverFoto = (pessoa) => {
+  if (!pessoa || !props.curso || !props.turma) return
+  const id = pessoa.id
+  if (!id || fotoSrcs.value[id]) return
+  const candidatos = buildCandidatos(pessoa)
+  const tryNext = (i) => {
+    if (i >= candidatos.length) { fotoSrcs.value[id] = ''; return }
+    const url = candidatos[i]
+    const img = new Image()
+    img.onload = () => { fotoSrcs.value[id] = url }
+    img.onerror = () => tryNext(i + 1)
+    img.src = url
+  }
+  tryNext(0)
+}
+
+// Retorna uma URL padrão (primeira convenção) caso ainda não resolvido
 const getFoto = (pessoa) => {
   if (pessoa?.foto) return pessoa.foto
-  const nomeNormalizado = normalizarNomeArquivo(pessoa?.nome || '')
-  if (!nomeNormalizado || !props.curso || !props.turma) return ''
-  return `/fotos/${props.curso}/${props.turma}/${nomeNormalizado}.jpg`
+  const nome = nomeComSep(pessoa?.nome || '', '_')
+  if (!nome || !props.curso || !props.turma) return ''
+  return `/fotos/${props.curso}/${props.turma}/${nome}.jpg`
 }
 </script>
 
