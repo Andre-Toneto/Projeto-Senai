@@ -374,25 +374,66 @@ const baseNome = (nome) => {
 
 const nomeComSep = (nome, sep) => baseNome(nome).replace(/\s+/g, sep)
 
-// Candidatos de arquivo para tentar
+// Converte para Title Case preservando apenas letras/números dos nomes normalizados
+const toTitleCase = (str) => {
+  const b = baseNome(str)
+  return b
+    .split(' ')
+    .map(p => (p ? p.charAt(0).toUpperCase() + p.slice(1) : ''))
+    .join(' ')
+}
+
+// Gera variações possíveis para pastas de curso/turma
+const folderVariants = (str) => {
+  const raw = String(str || '').trim().replace(/\s+/g, ' ')
+  return [
+    raw,
+    raw.toUpperCase(),
+    raw.toLowerCase(),
+    nomeComSep(str, '_'),
+    nomeComSep(str, '-'),
+    baseNome(str)
+  ]
+}
+
+// Candidatos de arquivo para tentar (inclui variações de nome e pastas)
 const buildCandidatos = (pessoa) => {
   const nome = pessoa?.nome || ''
   const raw = String(nome).trim().replace(/\s+/g, ' ')
-  const nomes = [
-    // Normalizados
+
+  const nomes = Array.from(new Set([
+    // Normalizados (lower)
     nomeComSep(nome, '_'),
     nomeComSep(nome, '-'),
     baseNome(nome),
-    // Originais (com acentos/caixa)
+    baseNome(nome).replace(/\s+/g, ''),
+
+    // Title Case
+    toTitleCase(nome),
+    toTitleCase(nome).replace(/\s+/g, '_'),
+    toTitleCase(nome).replace(/\s+/g, '-'),
+    toTitleCase(nome).replace(/\s+/g, ''),
+
+    // Originais (como vieram)
+    raw,
     raw.replace(/\s+/g, '_'),
     raw.replace(/\s+/g, '-'),
-    raw
-  ]
-  const exts = ['.jpg', '.jpeg', '.png', '.webp']
+    raw.replace(/\s+/g, ''),
+  ]))
+
+  const exts = ['.jpg', '.jpeg', '.png', '.webp', '.JPG', '.JPEG', '.PNG', '.WEBP']
+
+  const cursoDirs = folderVariants(props.curso)
+  const turmaDirs = folderVariants(props.turma)
+
   const candidatos = []
-  for (const n of nomes) {
-    for (const ext of exts) {
-      candidatos.push(`/fotos/${props.curso}/${props.turma}/${n}${ext}`)
+  for (const c of cursoDirs) {
+    for (const t of turmaDirs) {
+      for (const n of nomes) {
+        for (const ext of exts) {
+          candidatos.push(`/fotos/${c}/${t}/${n}${ext}`)
+        }
+      }
     }
   }
   return candidatos
