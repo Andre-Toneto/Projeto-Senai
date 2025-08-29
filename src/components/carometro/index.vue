@@ -279,6 +279,7 @@ const carregarAlunos = async () => {
       if (alunosCarregados.length > 0) {
         pessoas.value = alunosCarregados
         emit('updateTotal', pessoas.value)
+        pessoas.value.forEach(resolverFoto)
         return
       }
     }
