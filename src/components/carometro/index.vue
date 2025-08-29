@@ -192,7 +192,7 @@
           </div>
 
           <!-- Informações -->
-          <v-card-title class="text-center text-h6 font-weight-bold text-senai-red px-4 pb-1">
+          <v-card-title class="text-center text-h6 font-weight-bold text-senai-red px-4 pb-1 student-name">
             {{ pessoa.nome }}
           </v-card-title>
 
@@ -550,5 +550,10 @@ const getFoto = (pessoa) => {
 .v-chip:hover {
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.student-name {
+  white-space: normal;
+  word-break: break-word;
 }
 </style>
