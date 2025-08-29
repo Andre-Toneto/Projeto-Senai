@@ -61,7 +61,7 @@ const route = useRoute()
 const navigationWidth = ref(280)
 
 const navItems = [
-  { text: 'Carômetro', route: 'carometro/login', icon: 'mdi-account-group', badge: 'Novo' },
+  { text: 'Carômetro', route: 'carometro', icon: 'mdi-account-group', badge: 'Novo' },
   { text: 'Planilha de Registros', route: '', icon: 'mdi-table-large' },
   { text: 'Formulários', route: 'formularios', icon: 'mdi-form-select' },
   { text: 'Horário Escolar', route: '', icon: 'mdi-calendar-clock' },

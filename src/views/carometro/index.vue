@@ -39,39 +39,6 @@
                   </v-btn>
                 </div>
 
-                <!-- Entrada manual de turma (fallback) -->
-                <div v-if="temDadosExcel" class="mt-6">
-                  <v-divider class="mb-4" />
-                  <h3 class="text-h6 text-senai-red font-weight-medium mb-4 text-center">
-                    Ou digite o código da turma diretamente
-                  </h3>
-                  
-                  <v-form ref="form" v-model="valid" @submit.prevent="loadTurmaManual">
-                    <v-text-field
-                      v-model="turmaCode"
-                      label="Código da Turma"
-                      placeholder="Ex: T2025-001, ADM-2024, etc."
-                      variant="outlined"
-                      density="comfortable"
-                      prepend-inner-icon="mdi-identifier"
-                      :rules="turmaRules"
-                      class="mb-4"
-                    />
-
-                    <v-btn
-                      :disabled="!valid"
-                      :loading="loading"
-                      color="primary"
-                      size="large"
-                      block
-                      type="submit"
-                      elevation="2"
-                      variant="outlined"
-                    >
-                      Carregar Turma
-                    </v-btn>
-                  </v-form>
-                </div>
               </v-card-text>
             </v-card>
           </v-col>
@@ -169,16 +136,9 @@ const turmaSelecionada = ref({})
 const totalAlunos = ref(0)
 
 // Estado para entrada manual
-const valid = ref(false)
-const loading = ref(false)
-const turmaCode = ref('')
 const temDadosExcel = ref(false)
 
 const selectorRef = ref(null)
-
-const turmaRules = [
-  v => !!v || 'Código da turma é obrigatório'
-]
 
 // Verificar se há dados Excel disponíveis
 const verificarDadosExcel = () => {
@@ -186,11 +146,7 @@ const verificarDadosExcel = () => {
 }
 
 onMounted(async () => {
-  const isAuthenticated = sessionStorage.getItem('carometro_authenticated')
-  if (!isAuthenticated) {
-    router.push('/carometro/login')
-    return
-  }
+  // Sem autenticação: acesso direto ao carômetro
 
   // Sincroniza automaticamente se houver URL configurada (ENV/localStorage)
   try {
@@ -224,24 +180,6 @@ const onCursoTurmaSelecionados = (selecao) => {
   sessionStorage.setItem('carometro_selecao', JSON.stringify(selecao))
 }
 
-const loadTurmaManual = () => {
-  if (!turmaCode.value.trim()) return
-
-  loading.value = true
-
-  setTimeout(() => {
-    // Para entrada manual, vamos usar curso genérico
-    const cursoGenerico = { id: 'MANUAL', nome: 'Curso Manual', cor: '#607D8B' }
-    const turmaManual = { id: turmaCode.value, nome: turmaCode.value, totalAlunos: 0 }
-    
-    onCursoTurmaSelecionados({
-      curso: cursoGenerico,
-      turma: turmaManual
-    })
-    
-    loading.value = false
-  }, 800)
-}
 
 const voltarSelecao = () => {
   selecaoFeita.value = false

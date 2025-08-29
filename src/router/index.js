@@ -17,11 +17,6 @@ const routes = [
     component: () => import('@/views/carometro/index.vue')
   },
   {
-    path: '/carometro/login',
-    name: 'CarometroLogin',
-    component: () => import('@/views/carometro/login.vue')
-  },
-  {
     path: '/formularios',
     name: 'Formularios',
     component: () => import('@/views/formularios/index.vue')

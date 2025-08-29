@@ -192,7 +192,7 @@
           </div>
 
           <!-- Informações -->
-          <v-card-title class="text-center text-h6 font-weight-bold text-senai-red px-4 pb-1">
+          <v-card-title class="text-center text-h6 font-weight-bold text-senai-red px-4 pb-1 student-name">
             {{ pessoa.nome }}
           </v-card-title>
 
@@ -383,42 +383,74 @@ const toTitleCase = (str) => {
     .join(' ')
 }
 
+// Title Case preservando acentos do texto original
+const toTitleCaseRaw = (str) => {
+  const r = String(str || '').trim().replace(/\s+/g, ' ')
+  return r
+    .split(' ')
+    .map(p => (p ? p.charAt(0).toUpperCase() + p.slice(1).toLowerCase() : ''))
+    .join(' ')
+}
+
+// Normalização NFC para evitar problemas de composição Unicode
+const toNFC = (s) => {
+  try { return String(s || '').normalize('NFC') } catch { return String(s || '') }
+}
+
 // Gera variações possíveis para pastas de curso/turma
 const folderVariants = (str) => {
   const raw = String(str || '').trim().replace(/\s+/g, ' ')
+  const rawNFC = toNFC(raw)
   return [
     raw,
+    rawNFC,
     raw.toUpperCase(),
     raw.toLowerCase(),
+    rawNFC.toUpperCase(),
+    rawNFC.toLowerCase(),
     nomeComSep(str, '_'),
     nomeComSep(str, '-'),
     baseNome(str)
   ]
 }
 
-// Candidatos de arquivo para tentar (inclui variações de nome e pastas)
+// Encoda segmento de URL com segurança
+const enc = (s) => encodeURIComponent(String(s || ''))
+
+// Candidatos de arquivo para tentar (inclui variações de nome e pastas) e encoding de URL
 const buildCandidatos = (pessoa) => {
   const nome = pessoa?.nome || ''
   const raw = String(nome).trim().replace(/\s+/g, ' ')
+  const rawNFC = toNFC(raw)
 
   const nomes = Array.from(new Set([
-    // Normalizados (lower)
+    // Normalizados (lower, sem acento)
     nomeComSep(nome, '_'),
     nomeComSep(nome, '-'),
     baseNome(nome),
     baseNome(nome).replace(/\s+/g, ''),
 
-    // Title Case
+    // Title Case a partir do normalizado (sem acento)
     toTitleCase(nome),
     toTitleCase(nome).replace(/\s+/g, '_'),
     toTitleCase(nome).replace(/\s+/g, '-'),
     toTitleCase(nome).replace(/\s+/g, ''),
 
-    // Originais (como vieram)
+    // Title Case preservando acentos do original
+    toTitleCaseRaw(rawNFC),
+    toTitleCaseRaw(rawNFC).replace(/\s+/g, '_'),
+    toTitleCaseRaw(rawNFC).replace(/\s+/g, '-'),
+    toTitleCaseRaw(rawNFC).replace(/\s+/g, ''),
+
+    // Originais (como vieram, preservando acentos)
     raw,
+    rawNFC,
     raw.replace(/\s+/g, '_'),
     raw.replace(/\s+/g, '-'),
     raw.replace(/\s+/g, ''),
+    rawNFC.replace(/\s+/g, '_'),
+    rawNFC.replace(/\s+/g, '-'),
+    rawNFC.replace(/\s+/g, ''),
   ]))
 
   const exts = ['.jpg', '.jpeg', '.png', '.webp', '.JPG', '.JPEG', '.PNG', '.WEBP']
@@ -431,7 +463,7 @@ const buildCandidatos = (pessoa) => {
     for (const t of turmaDirs) {
       for (const n of nomes) {
         for (const ext of exts) {
-          candidatos.push(`/fotos/${c}/${t}/${n}${ext}`)
+          candidatos.push(`/fotos/${enc(c)}/${enc(t)}/${enc(n)}${ext}`)
         }
       }
     }
@@ -463,7 +495,7 @@ const getFoto = (pessoa) => {
   if (pessoa?.foto) return pessoa.foto
   const nome = nomeComSep(pessoa?.nome || '', '_')
   if (!nome || !props.curso || !props.turma) return ''
-  return `/fotos/${props.curso}/${props.turma}/${nome}.jpg`
+  return `/fotos/${enc(props.curso)}/${enc(props.turma)}/${enc(nome)}.jpg`
 }
 </script>
 
@@ -518,5 +550,10 @@ const getFoto = (pessoa) => {
 .v-chip:hover {
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.student-name {
+  white-space: normal;
+  word-break: break-word;
 }
 </style>

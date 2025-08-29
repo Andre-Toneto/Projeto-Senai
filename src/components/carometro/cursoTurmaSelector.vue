@@ -118,15 +118,15 @@
                   @click="selecionarTurma(turma)"
                 >
                   <template v-slot:prepend>
-                    <v-avatar
+                    <v-chip
                       :color="cursoSelecionado.cor"
-                      size="40"
-                      variant="outlined"
+                      text-color="white"
+                      size="small"
+                      class="turma-badge"
+                      variant="flat"
                     >
-                      <strong class="text-h6">
-                        {{ turma.nome }}
-                      </strong>
-                    </v-avatar>
+                      Turma {{ turma.nome }}
+                    </v-chip>
                   </template>
 
                   <v-list-item-title class="font-weight-bold text-h6">
@@ -290,4 +290,8 @@ defineExpose({
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+.turma-badge {
+  font-weight: 700;
+}
+
 </style>
