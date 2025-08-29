@@ -126,6 +126,38 @@
           </p>
         </div>
 
+        <v-divider class="my-6" />
+
+        <h4 class="text-h6 mb-3 d-flex align-center">
+          <v-icon class="mr-2">mdi-link-variant</v-icon>
+          Importar por link
+        </h4>
+        <v-row class="align-center">
+          <v-col cols="12" md="9">
+            <v-text-field
+              v-model="linkPlanilha"
+              label="Link direto da planilha (.xlsx ou .xls)"
+              placeholder="https://.../arquivo.xlsx"
+              variant="outlined"
+              density="comfortable"
+              prepend-inner-icon="mdi-link"
+              clearable
+            />
+          </v-col>
+          <v-col cols="12" md="3">
+            <v-btn
+              block
+              color="senai-red"
+              :disabled="!linkPlanilha || processando"
+              :loading="loadingLink"
+              @click="processarLink"
+              prepend-icon="mdi-download"
+            >
+              Processar Link
+            </v-btn>
+          </v-col>
+        </v-row>
+
         <!-- Preview dos dados -->
         <div v-if="dadosPreview" class="mt-6">
           <h4 class="text-h6 mb-4 d-flex align-center">
@@ -235,7 +267,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'dados-configurados'])
 
-const { lerArquivoExcel, processarDadosPlanilha, salvarDadosProcessados, carregarDadosProcessados, temDadosPlanilha } = useExcelData()
+const { lerArquivoExcel, lerArquivoExcelUrl, processarDadosPlanilha, salvarDadosProcessados, carregarDadosProcessados, temDadosPlanilha } = useExcelData()
 
 const internalModelValue = computed({
   get: () => props.modelValue,
@@ -249,6 +281,8 @@ const processando = ref(false)
 const erro = ref('')
 const dragOver = ref(false)
 const mostrandoTrocaArquivo = ref(false)
+const linkPlanilha = ref('')
+const loadingLink = ref(false)
 
 // Dados existentes
 const temDadosExistentes = ref(false)
@@ -290,6 +324,25 @@ const handleDrop = (event) => {
     arquivoSelecionado.value = files[0]
     dadosPreview.value = null
     erro.value = ''
+  }
+}
+
+const processarLink = async () => {
+  if (!linkPlanilha.value) return
+
+  processando.value = true
+  loadingLink.value = true
+  erro.value = ''
+
+  try {
+    const dadosExcel = await lerArquivoExcelUrl(linkPlanilha.value)
+    dadosPreview.value = dadosExcel
+  } catch (error) {
+    console.error('Erro ao processar link:', error)
+    erro.value = error.message || 'Erro ao processar link'
+  } finally {
+    processando.value = false
+    loadingLink.value = false
   }
 }
 

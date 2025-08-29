@@ -269,15 +269,105 @@ export const useExcelData = () => {
     return carregarDadosProcessados() !== null
   }
 
+  // Função para ler arquivo Excel via URL
+  const lerArquivoExcelUrl = async (url) => {
+    if (!url || typeof url !== 'string') {
+      throw new Error('URL inválida')
+    }
+
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error('Falha ao baixar arquivo: ' + response.status)
+    }
+
+    const buffer = await response.arrayBuffer()
+    try {
+      const data = new Uint8Array(buffer)
+      const workbook = XLSX.read(data, { type: 'array' })
+
+      const planilhas = {}
+      workbook.SheetNames.forEach(sheetName => {
+        const worksheet = workbook.Sheets[sheetName]
+        const jsonData = XLSX.utils.sheet_to_json(worksheet)
+
+        planilhas[sheetName] = {
+          nome: sheetName,
+          dados: jsonData,
+          totalRegistros: jsonData.length,
+          colunas: jsonData.length > 0 ? Object.keys(jsonData[0]) : []
+        }
+      })
+
+      return {
+        planilhas,
+        totalPlanilhas: workbook.SheetNames.length,
+        nomesPlanilhas: workbook.SheetNames
+      }
+    } catch (error) {
+      throw new Error('Erro ao processar arquivo Excel: ' + error.message)
+    }
+  }
+
+  // Normaliza links (Google Sheets/SharePoint) para download direto
+  const normalizarUrlPlanilha = (url) => {
+    if (!url) return ''
+    try {
+      const u = new URL(url)
+      // Google Sheets -> export xlsx
+      if (u.hostname.includes('docs.google.com') && /\/spreadsheets\/d\//.test(u.pathname)) {
+        const match = u.pathname.match(/\/spreadsheets\/d\/([^/]+)/)
+        if (match && match[1]) {
+          return `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=xlsx`
+        }
+      }
+      // SharePoint: garantir download=1
+      if (u.hostname.includes('sharepoint.com')) {
+        if (u.searchParams.has('web')) {
+          u.searchParams.delete('web')
+        }
+        if (!u.searchParams.has('download')) {
+          u.searchParams.set('download', '1')
+        }
+        return u.toString()
+      }
+      return url
+    } catch (e) {
+      return url
+    }
+  }
+
+  // Obtém URL configurada via ENV ou localStorage
+  const getUrlConfigurada = () => {
+    const envUrl = (import.meta?.env && import.meta.env.VITE_CAROMETRO_EXCEL_URL) ? String(import.meta.env.VITE_CAROMETRO_EXCEL_URL) : ''
+    const storedUrl = localStorage.getItem('carometro_excel_url') || ''
+    const url = envUrl || storedUrl
+    return normalizarUrlPlanilha(url)
+  }
+
+  // Sincroniza automaticamente a planilha configurada
+  const sincronizarPlanilhaConfigurada = async (force = false) => {
+    const url = getUrlConfigurada()
+    if (!url) return false
+    if (!force && temDadosPlanilha()) return true
+
+    const dadosExcel = await lerArquivoExcelUrl(url)
+    const dadosProcessados = processarDadosPlanilha(dadosExcel)
+    return salvarDadosProcessados(dadosProcessados)
+  }
+
   return {
     cursosDisponiveis,
     lerArquivoExcel,
+    lerArquivoExcelUrl,
     processarDadosPlanilha,
     salvarDadosProcessados,
     carregarDadosProcessados,
     getAlunosPorCursoTurma,
     getCursosDisponiveis,
     getTurmasPorCurso,
-    temDadosPlanilha
+    temDadosPlanilha,
+    normalizarUrlPlanilha,
+    getUrlConfigurada,
+    sincronizarPlanilhaConfigurada
   }
 }
