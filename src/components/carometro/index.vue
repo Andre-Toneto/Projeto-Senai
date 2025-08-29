@@ -183,7 +183,7 @@
           <!-- Avatar/Foto -->
           <div class="text-center pt-6 pb-2">
             <v-avatar size="80" class="elevation-4">
-              <v-img :src="fotoSrcs[pessoa.id] || getFoto(pessoa)" cover>
+              <v-img :src="fotoSrcs[getPessoaKey(pessoa)] || getFoto(pessoa)" cover>
                 <template #error>
                   <v-icon size="40" color="grey-lighten-1">mdi-account</v-icon>
                 </template>
@@ -300,7 +300,7 @@ const carregarAlunos = async () => {
 }
 
 const abrirModal = (pessoa) => {
-  const foto = fotoSrcs.value[pessoa.id] || getFoto(pessoa)
+  const foto = fotoSrcs.value[getPessoaKey(pessoa)] || getFoto(pessoa)
   emit('selectPessoa', { ...pessoa, foto })
 }
 
@@ -392,16 +392,18 @@ const buildCandidatos = (pessoa) => {
 }
 
 // Tenta resolver a primeira URL existente
+const getPessoaKey = (pessoa) => pessoa?.id || pessoa?.matricula || baseNome(pessoa?.nome || '')
+
 const resolverFoto = (pessoa) => {
   if (!pessoa || !props.curso || !props.turma) return
-  const id = pessoa.id
-  if (!id || fotoSrcs.value[id]) return
+  const key = getPessoaKey(pessoa)
+  if (!key || fotoSrcs.value[key]) return
   const candidatos = buildCandidatos(pessoa)
   const tryNext = (i) => {
-    if (i >= candidatos.length) { fotoSrcs.value[id] = ''; return }
+    if (i >= candidatos.length) { fotoSrcs.value[key] = ''; return }
     const url = candidatos[i]
     const img = new Image()
-    img.onload = () => { fotoSrcs.value[id] = url }
+    img.onload = () => { fotoSrcs.value[key] = url }
     img.onerror = () => tryNext(i + 1)
     img.src = url
   }
