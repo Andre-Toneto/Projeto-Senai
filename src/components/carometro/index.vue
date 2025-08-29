@@ -388,7 +388,7 @@ const buildCandidatos = (pessoa) => {
     raw.replace(/\s+/g, '-'),
     raw
   ]
-  const exts = ['.jpg', '.jpeg', '.png']
+  const exts = ['.jpg', '.jpeg', '.png', '.webp']
   const candidatos = []
   for (const n of nomes) {
     for (const ext of exts) {
