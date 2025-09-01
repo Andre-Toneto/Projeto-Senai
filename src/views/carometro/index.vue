@@ -16,14 +16,25 @@
 
               <v-card-text>
                 <!-- Seletor de Curso e Turma -->
+                <div v-if="!temDadosExcel" class="text-center py-12">
+                  <v-progress-circular
+                    indeterminate
+                    color="senai-red"
+                    size="64"
+                  />
+                  <p class="text-body-1 text-medium-emphasis mt-4">
+                    Carregando cursos e turmas...
+                  </p>
+                </div>
                 <CarometroCursoTurmaSelector
+                  v-else
                   ref="selectorRef"
                   @curso-turma-selecionados="onCursoTurmaSelecionados"
                   @configurar-excel="abrirConfigExcel"
                 />
 
                 <!-- Botão para configurar Excel se não tiver dados -->
-                <div v-if="!temDadosExcel" class="text-center mt-6">
+                <!-- <div v-if="!temDadosExcel" class="text-center mt-6">
                   <v-divider class="mb-4" />
                   <p class="text-body-2 text-medium-emphasis mb-4">
                     Para começar, você precisa configurar sua planilha Excel com os dados dos alunos
@@ -37,7 +48,7 @@
                   >
                     Configurar Planilha Excel
                   </v-btn>
-                </div>
+                </div> -->
 
               </v-card-text>
             </v-card>
@@ -106,10 +117,10 @@
     />
 
     <!-- Modal de Configuração Excel -->
-    <CarometroExcelUploadModal
+    <!-- <CarometroExcelUploadModal
       v-model="configExcelAberto"
       @dados-configurados="onDadosConfigurados"
-    />
+    /> -->
   </div>
 </template>
 

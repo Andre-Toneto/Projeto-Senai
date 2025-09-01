@@ -337,16 +337,19 @@ export const useExcelData = () => {
   }
 
   // Obtém URL configurada via ENV ou localStorage
+  // const getUrlConfigurada = () => {
+  //   const sanitize = (u) => {
+  //     const s = (u ?? '').toString().trim()
+  //     if (!s || s.toLowerCase() === 'undefined' || s.toLowerCase() === 'null' || s === '#') return ''
+  //     return s
+  //   }
+  //   const envUrl = sanitize(import.meta?.env?.VITE_CAROMETRO_EXCEL_URL)
+  //   const storedUrl = sanitize(localStorage.getItem('carometro_excel_url'))
+  //   const url = envUrl || storedUrl
+  //   return normalizarUrlPlanilha(url)
+  // }
   const getUrlConfigurada = () => {
-    const sanitize = (u) => {
-      const s = (u ?? '').toString().trim()
-      if (!s || s.toLowerCase() === 'undefined' || s.toLowerCase() === 'null' || s === '#') return ''
-      return s
-    }
-    const envUrl = sanitize(import.meta?.env?.VITE_CAROMETRO_EXCEL_URL)
-    const storedUrl = sanitize(localStorage.getItem('carometro_excel_url'))
-    const url = envUrl || storedUrl
-    return normalizarUrlPlanilha(url)
+    return "https://docs.google.com/spreadsheets/d/1brCSzg2UepSJO-DoFH4xdpHlpz2SeaNm/export?format=xlsx"
   }
 
   // Sincroniza automaticamente a planilha configurada
